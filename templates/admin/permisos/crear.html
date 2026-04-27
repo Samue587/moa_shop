@@ -1,0 +1,71 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Crear Permiso — TiendaMoa07{% endblock %}
+{% block menu_permisos %}active{% endblock %}
+{% block navbar_title %}Crear Permiso{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">➕ Crear Nuevo Permiso</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_permisos' %}">Permisos</a> ›
+            Crear
+        </div>
+    </div>
+</div>
+
+<div class="card" style="max-width:600px;">
+    <div class="card-header">
+        <h3>🔑 Datos del Permiso</h3>
+    </div>
+    <div class="card-body">
+
+        <form action="{% url 'crear_permiso' %}" method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label">Descripción <span class="required">*</span></label>
+                <input type="text" name="descripcion" class="form-control"
+                       placeholder="Ej: Permite ver el listado de ventas"
+                       value="{{ form.descripcion|default:'' }}" required>
+                <span class="form-help">Describe para qué sirve este permiso.</span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Slug <span class="required">*</span></label>
+                <input type="text" name="slug" id="slug" class="form-control"
+                       placeholder="Ej: ver_ventas"
+                       value="{{ form.slug|default:'' }}" required>
+                <span class="form-help">Solo letras minúsculas, números y guiones bajos. Debe ser único.</span>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success">✅ Crear Permiso</button>
+                <a href="{% url 'admin_permisos' %}" class="btn btn-secondary">❌ Cancelar</a>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<script>
+// Auto-generar slug desde descripción
+const desc = document.querySelector('[name="descripcion"]');
+const slug = document.querySelector('[name="slug"]');
+let slugEditado = false;
+
+slug.addEventListener('input', () => slugEditado = true);
+
+desc.addEventListener('input', () => {
+    if (slugEditado) return;
+    slug.value = desc.value
+        .toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s_]/g, '')
+        .trim()
+        .replace(/\s+/g, '_');
+});
+</script>
+
+{% endblock %}

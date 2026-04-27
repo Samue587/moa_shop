@@ -1,0 +1,159 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Nuevo Usuario - MOA{% endblock %}
+{% block menu_usuarios %}active{% endblock %}
+{% block navbar_title %}Nuevo Usuario{% endblock %}
+ 
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">➕ Nuevo Usuario</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_usuarios' %}">Usuarios</a> ›
+            Nuevo
+        </div>
+    </div>
+</div>
+ 
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+ 
+<div class="card" style="max-width:720px;">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+ 
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+ 
+                <div class="form-group">
+                    <label class="form-label">👤 Nombres *</label>
+                    <input
+                        type="text"
+                        name="nombres_usuario"
+                        class="form-control"
+                        placeholder="Ej: Juan Carlos"
+                        value="{{ form_data.nombres_usuario|default:'' }}"
+                        required
+                        maxlength="100"
+                    >
+                </div>
+ 
+                <div class="form-group">
+                    <label class="form-label">👤 Apellidos *</label>
+                    <input
+                        type="text"
+                        name="apellidos_usuario"
+                        class="form-control"
+                        placeholder="Ej: Pérez García"
+                        value="{{ form_data.apellidos_usuario|default:'' }}"
+                        required
+                        maxlength="100"
+                    >
+                </div>
+ 
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label class="form-label">📧 Correo Electrónico *</label>
+                    <input
+                        type="email"
+                        name="correo_usuario"
+                        class="form-control"
+                        placeholder="Ej: juan@correo.com"
+                        value="{{ form_data.correo_usuario|default:'' }}"
+                        required
+                        maxlength="150"
+                    >
+                </div>
+ 
+                <div class="form-group">
+                    <label class="form-label">🔒 Contraseña *</label>
+                    <input
+                        type="password"
+                        name="password_usuario"
+                        class="form-control"
+                        placeholder="Mínimo 6 caracteres"
+                        required
+                    >
+                </div>
+ 
+                <div class="form-group">
+                    <label class="form-label">🔒 Confirmar Contraseña *</label>
+                    <input
+                        type="password"
+                        name="confirmar_password"
+                        class="form-control"
+                        placeholder="Repite la contraseña"
+                        required
+                    >
+                </div>
+ 
+                <div class="form-group">
+                    <label class="form-label">🪪 Tipo de Documento</label>
+                    <select name="tipo_documento" class="form-control">
+                        <option value="">-- Seleccionar --</option>
+                        <option value="CC"  {% if form_data.tipo_documento == 'CC' %}selected{% endif %}>Cédula de Ciudadanía</option>
+                        <option value="TI"  {% if form_data.tipo_documento == 'TI' %}selected{% endif %}>Tarjeta de Identidad</option>
+                        <option value="CE"  {% if form_data.tipo_documento == 'CE' %}selected{% endif %}>Cédula Extranjería</option>
+                        <option value="NIT" {% if form_data.tipo_documento == 'NIT' %}selected{% endif %}>NIT</option>
+                        <option value="PP"  {% if form_data.tipo_documento == 'PP' %}selected{% endif %}>Pasaporte</option>
+                    </select>
+                </div>
+ 
+                <div class="form-group">
+                    <label class="form-label">🔢 Número de Documento</label>
+                    <input
+                        type="text"
+                        name="numero_documento"
+                        class="form-control"
+                        placeholder="Ej: 1234567890"
+                        value="{{ form_data.numero_documento|default:'' }}"
+                        maxlength="20"
+                    >
+                </div>
+ 
+                <div class="form-group">
+                    <label class="form-label">📞 Teléfono</label>
+                    <input
+                        type="text"
+                        name="telefono_usuario"
+                        class="form-control"
+                        placeholder="Ej: 3001234567"
+                        value="{{ form_data.telefono_usuario|default:'' }}"
+                        maxlength="20"
+                    >
+                </div>
+ 
+                <div class="form-group">
+                    <label class="form-label">🛡️ Rol *</label>
+                    <select name="rol_id" class="form-control" required>
+                        <option value="">-- Seleccionar rol --</option>
+                        {% for rol in roles %}
+                            <option value="{{ rol.id }}" {% if form_data.rol_id == rol.id|stringformat:"s" %}selected{% endif %}>
+                                {{ rol.nombre_rol }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+ 
+                <div class="form-group">
+                    <label class="form-label">🔘 Estado</label>
+                    <select name="estado_usuario" class="form-control">
+                        <option value="ACTIVO" {% if form_data.estado_usuario == 'ACTIVO' or not form_data %}selected{% endif %}>✅ Activo</option>
+                        <option value="INACTIVO" {% if form_data.estado_usuario == 'INACTIVO' %}selected{% endif %}>❌ Inactivo</option>
+                    </select>
+                </div>
+ 
+            </div>
+ 
+            <div style="display:flex; gap:12px; margin-top:24px;">
+                <button type="submit" class="btn btn-primary">💾 Guardar Usuario</button>
+                <a href="{% url 'admin_usuarios' %}" class="btn btn-secondary">❌ Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

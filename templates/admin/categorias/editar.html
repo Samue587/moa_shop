@@ -1,0 +1,57 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Editar Categoría — TiendaMoa07{% endblock %}
+{% block menu_categorias %}active{% endblock %}
+{% block navbar_title %}Editar Categoría{% endblock %}
+ 
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">✏️ Editar Categoría</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_categorias' %}">Categorías</a> ›
+            Editar
+        </div>
+    </div>
+</div>
+ 
+<div class="card" style="max-width:650px;">
+    <div class="card-header">
+        <h3>📚 {{ categoria.nombre }}</h3>
+    </div>
+    <div class="card-body">
+ 
+        <div class="alert alert-warning">
+            ⚡ Si desactivas esta categoría, todos sus productos quedarán como <strong>No Disponible</strong>.
+        </div>
+ 
+        <form action="{% url 'editar_categoria' categoria.id %}" method="post">
+            {% csrf_token %}
+ 
+            <div class="form-group">
+                <label class="form-label">Nombre <span class="required">*</span></label>
+                <input type="text" name="nombre" class="form-control"
+                       value="{{ form.nombre|default:categoria.nombre }}" required>
+            </div>
+ 
+            <div class="form-group">
+                <label class="form-label">Descripción</label>
+                <textarea name="descripcion" class="form-control">{{ form.descripcion|default:categoria.descripcion }}</textarea>
+            </div>
+ 
+            <div class="form-group">
+                <label class="form-label">Estado</label>
+                <select name="estado" class="form-control">
+                    <option value="ACTIVO"   {% if categoria.estado == 'ACTIVO' %}selected{% endif %}>✅ Activo</option>
+                    <option value="INACTIVO" {% if categoria.estado == 'INACTIVO' %}selected{% endif %}>❌ Inactivo</option>
+                </select>
+            </div>
+ 
+            <div class="form-actions">
+                <button type="submit" class="btn btn-warning">💾 Guardar Cambios</button>
+                <a href="{% url 'admin_categorias' %}" class="btn btn-secondary">❌ Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

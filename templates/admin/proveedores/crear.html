@@ -1,0 +1,148 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Nuevo Proveedor - MOA{% endblock %}
+{% block menu_proveedores %}active{% endblock %}
+{% block navbar_title %}Nuevo Proveedor{% endblock %}
+ 
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">➕ Nuevo Proveedor</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_proveedores' %}">Proveedores</a> ›
+            Nuevo
+        </div>
+    </div>
+</div>
+ 
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+ 
+<div class="card" style="max-width:680px;">
+    <div class="card-body">
+ 
+        <form method="post">
+            {% csrf_token %}
+ 
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+ 
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label class="form-label">🏭 Nombre del Proveedor *</label>
+                    <input
+                        type="text"
+                        name="nombre_proveedor"
+                        class="form-control"
+                        placeholder="Ej: Distribuidora Textil S.A.S"
+                        value="{{ form_data.nombre_proveedor|default:'' }}"
+                        required
+                        maxlength="150"
+                    >
+                </div>
+ 
+                <div class="form-group">
+                    <label class="form-label">🪪 NIT / Documento</label>
+                    <input
+                        type="text"
+                        name="nit_proveedor"
+                        class="form-control"
+                        placeholder="Ej: 900123456-1"
+                        value="{{ form_data.nit_proveedor|default:'' }}"
+                        maxlength="20"
+                    >
+                </div>
+ 
+                <div class="form-group">
+                    <label class="form-label">👤 Persona de Contacto</label>
+                    <input
+                        type="text"
+                        name="contacto_proveedor"
+                        class="form-control"
+                        placeholder="Ej: Juan Pérez"
+                        value="{{ form_data.contacto_proveedor|default:'' }}"
+                        maxlength="100"
+                    >
+                </div>
+ 
+                <div class="form-group">
+                    <label class="form-label">📞 Teléfono</label>
+                    <input
+                        type="text"
+                        name="telefono_proveedor"
+                        class="form-control"
+                        placeholder="Ej: 3001234567"
+                        value="{{ form_data.telefono_proveedor|default:'' }}"
+                        maxlength="20"
+                    >
+                </div>
+ 
+                <div class="form-group">
+                    <label class="form-label">📧 Correo Electrónico</label>
+                    <input
+                        type="email"
+                        name="correo_proveedor"
+                        class="form-control"
+                        placeholder="Ej: contacto@proveedor.com"
+                        value="{{ form_data.correo_proveedor|default:'' }}"
+                        maxlength="120"
+                    >
+                </div>
+ 
+                <div class="form-group">
+                    <label class="form-label">🏙️ Ciudad</label>
+                    <input
+                        type="text"
+                        name="ciudad_proveedor"
+                        class="form-control"
+                        placeholder="Ej: Bogotá"
+                        value="{{ form_data.ciudad_proveedor|default:'' }}"
+                        maxlength="80"
+                    >
+                </div>
+ 
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label class="form-label">📍 Dirección</label>
+                    <input
+                        type="text"
+                        name="direccion_proveedor"
+                        class="form-control"
+                        placeholder="Ej: Calle 123 #45-67"
+                        value="{{ form_data.direccion_proveedor|default:'' }}"
+                        maxlength="200"
+                    >
+                </div>
+ 
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label class="form-label">📝 Observaciones</label>
+                    <textarea
+                        name="observaciones_proveedor"
+                        class="form-control"
+                        placeholder="Notas adicionales sobre el proveedor..."
+                        rows="3"
+                        style="resize:vertical;"
+                    >{{ form_data.observaciones_proveedor|default:'' }}</textarea>
+                </div>
+ 
+                <div class="form-group">
+                    <label class="form-label">🔘 Estado</label>
+                    <select name="estado_proveedor" class="form-control">
+                        <option value="ACTIVO" {% if form_data.estado_proveedor == 'ACTIVO' or not form_data %}selected{% endif %}>✅ Activo</option>
+                        <option value="INACTIVO" {% if form_data.estado_proveedor == 'INACTIVO' %}selected{% endif %}>❌ Inactivo</option>
+                    </select>
+                </div>
+ 
+            </div>
+ 
+            <div style="display:flex; gap:12px; margin-top:24px;">
+                <button type="submit" class="btn btn-primary">💾 Guardar Proveedor</button>
+                <a href="{% url 'admin_proveedores' %}" class="btn btn-secondary">❌ Cancelar</a>
+            </div>
+        </form>
+ 
+    </div>
+</div>
+{% endblock %}

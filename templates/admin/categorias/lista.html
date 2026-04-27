@@ -1,0 +1,74 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Categorías — TiendaMoa07{% endblock %}
+{% block menu_categorias %}active{% endblock %}
+{% block navbar_title %}Gestión de Categorías{% endblock %}
+ 
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">📚 Categorías de Productos</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> › Categorías
+        </div>
+    </div>
+    <a href="{% url 'crear_categoria' %}" class="btn btn-success">➕ Nueva Categoría</a>
+</div>
+ 
+<div class="card">
+    <div class="card-header">
+        <h3>📚 Categorías registradas</h3>
+        <span style="color:#7f8c8d;font-size:13px;">{{ categorias|length }} categoría(s) en total</span>
+    </div>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Productos</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for categoria in categorias %}
+                <tr>
+                    <td style="color:#7f8c8d;">{{ categoria.id }}</td>
+                    <td><strong>{{ categoria.nombre }}</strong></td>
+                    <td style="color:#7f8c8d;max-width:250px;">
+                        {{ categoria.descripcion|default:"—"|truncatechars:60 }}
+                    </td>
+                    <td>
+                        <span style="font-weight:600;color:#2c3e50;">{{ categoria.productos.count }}</span>
+                        <span style="color:#7f8c8d;font-size:12px;"> producto(s)</span>
+                    </td>
+                    <td>
+                        {% if categoria.estado == 'ACTIVO' %}
+                            <span class="badge badge-activo">✅ Activo</span>
+                        {% else %}
+                            <span class="badge badge-inactivo">❌ Inactivo</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="display:flex;gap:8px;">
+                            <a href="{% url 'editar_categoria' categoria.id %}" class="btn btn-warning btn-sm">✏️ Editar</a>
+                            <a href="{% url 'eliminar_categoria' categoria.id %}" class="btn btn-danger btn-sm">🗑️ Eliminar</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <div class="empty-icon">📚</div>
+                            <p>No hay categorías registradas. <a href="{% url 'crear_categoria' %}">Crear la primera</a></p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

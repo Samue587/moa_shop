@@ -1,0 +1,149 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Editar Proveedor - MOA{% endblock %}
+{% block menu_proveedores %}active{% endblock %}
+{% block navbar_title %}Editar Proveedor{% endblock %}
+ 
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">✏️ Editar Proveedor</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_proveedores' %}">Proveedores</a> ›
+            Editar
+        </div>
+    </div>
+</div>
+ 
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+ 
+<div class="card" style="max-width:680px;">
+    <div class="card-body">
+ 
+        <form method="post">
+            {% csrf_token %}
+ 
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+ 
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label class="form-label">🏭 Nombre del Proveedor *</label>
+                    <input
+                        type="text"
+                        name="nombre_proveedor"
+                        class="form-control"
+                        value="{{ proveedor.nombre_proveedor }}"
+                        required
+                        maxlength="150"
+                    >
+                </div>
+ 
+                <div class="form-group">
+                    <label class="form-label">🪪 NIT / Documento</label>
+                    <input
+                        type="text"
+                        name="nit_proveedor"
+                        class="form-control"
+                        value="{{ proveedor.nit_proveedor|default:'' }}"
+                        maxlength="20"
+                    >
+                </div>
+ 
+                <div class="form-group">
+                    <label class="form-label">👤 Persona de Contacto</label>
+                    <input
+                        type="text"
+                        name="contacto_proveedor"
+                        class="form-control"
+                        value="{{ proveedor.contacto_proveedor|default:'' }}"
+                        maxlength="100"
+                    >
+                </div>
+ 
+                <div class="form-group">
+                    <label class="form-label">📞 Teléfono</label>
+                    <input
+                        type="text"
+                        name="telefono_proveedor"
+                        class="form-control"
+                        value="{{ proveedor.telefono_proveedor|default:'' }}"
+                        maxlength="20"
+                    >
+                </div>
+ 
+                <div class="form-group">
+                    <label class="form-label">📧 Correo Electrónico</label>
+                    <input
+                        type="email"
+                        name="correo_proveedor"
+                        class="form-control"
+                        value="{{ proveedor.correo_proveedor|default:'' }}"
+                        maxlength="120"
+                    >
+                </div>
+ 
+                <div class="form-group">
+                    <label class="form-label">🏙️ Ciudad</label>
+                    <input
+                        type="text"
+                        name="ciudad_proveedor"
+                        class="form-control"
+                        value="{{ proveedor.ciudad_proveedor|default:'' }}"
+                        maxlength="80"
+                    >
+                </div>
+ 
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label class="form-label">📍 Dirección</label>
+                    <input
+                        type="text"
+                        name="direccion_proveedor"
+                        class="form-control"
+                        value="{{ proveedor.direccion_proveedor|default:'' }}"
+                        maxlength="200"
+                    >
+                </div>
+ 
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label class="form-label">📝 Observaciones</label>
+                    <textarea
+                        name="observaciones_proveedor"
+                        class="form-control"
+                        rows="3"
+                        style="resize:vertical;"
+                    >{{ proveedor.observaciones_proveedor|default:'' }}</textarea>
+                </div>
+ 
+                <div class="form-group">
+                    <label class="form-label">🔘 Estado</label>
+                    <select name="estado_proveedor" class="form-control">
+                        <option value="ACTIVO" {% if proveedor.estado_proveedor == 'ACTIVO' %}selected{% endif %}>✅ Activo</option>
+                        <option value="INACTIVO" {% if proveedor.estado_proveedor == 'INACTIVO' %}selected{% endif %}>❌ Inactivo</option>
+                    </select>
+                </div>
+ 
+            </div>
+ 
+            {% if proveedor.created_at %}
+            <div style="background:#f8f9fa; border-radius:8px; padding:12px 16px; margin-top:8px; font-size:13px; color:#7f8c8d;">
+                📅 Registrado el {{ proveedor.created_at|date:"d/m/Y H:i" }}
+                {% if proveedor.updated_at %}
+                 &nbsp;·&nbsp; 🕐 Última edición: {{ proveedor.updated_at|date:"d/m/Y H:i" }}
+                {% endif %}
+            </div>
+            {% endif %}
+ 
+            <div style="display:flex; gap:12px; margin-top:24px;">
+                <button type="submit" class="btn btn-primary">💾 Guardar Cambios</button>
+                <a href="{% url 'admin_proveedores' %}" class="btn btn-secondary">❌ Cancelar</a>
+            </div>
+        </form>
+ 
+    </div>
+</div>
+{% endblock %}

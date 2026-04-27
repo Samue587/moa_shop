@@ -1,0 +1,49 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Eliminar Producto — TiendaMoa07{% endblock %}
+{% block menu_productos %}active{% endblock %}
+{% block navbar_title %}Eliminar Producto{% endblock %}
+ 
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">🗑️ Eliminar Producto</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_productos' %}">Productos</a> ›
+            Eliminar
+        </div>
+    </div>
+</div>
+ 
+<div class="card" style="max-width:520px;">
+    <div class="card-body" style="text-align:center;padding:40px;">
+        <div style="font-size:60px;margin-bottom:20px;">⚠️</div>
+        <h3 style="color:#2c3e50;font-size:22px;margin-bottom:12px;">¿Eliminar este producto?</h3>
+ 
+        <div style="background:#f8f9fa;border:2px solid #e0e6ed;border-radius:10px;padding:16px;margin-bottom:20px;">
+            {% if producto.foto %}
+                <img src="{{ producto.foto_url }}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;margin-bottom:10px;">
+                <br>
+            {% endif %}
+            <span style="font-size:16px;font-weight:700;color:#144272;">📦 {{ producto.nombre_producto }}</span><br>
+            <span style="font-size:13px;color:#7f8c8d;">{{ producto.categoria.nombre }} · {{ producto.proveedor.nombre_proveedor }}</span>
+        </div>
+ 
+        <div class="alert alert-danger" style="text-align:left;">
+            ⚠️ Se eliminarán también todas sus <strong>variaciones</strong> (tallas, colores, stock).
+        </div>
+ 
+        <p style="color:#e74c3c;font-size:13px;margin-bottom:28px;">
+            Esta acción <strong>no se puede deshacer</strong>.
+        </p>
+ 
+        <div style="display:flex;gap:12px;justify-content:center;">
+            <form action="{% url 'eliminar_producto' producto.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">🗑️ Sí, eliminar</button>
+            </form>
+            <a href="{% url 'admin_productos' %}" class="btn btn-secondary">❌ Cancelar</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
