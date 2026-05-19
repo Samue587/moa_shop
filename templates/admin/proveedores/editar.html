@@ -1,8 +1,8 @@
 {% extends "admin/base_admin.html" %}
-{% block title %}Editar Proveedor - MOA{% endblock %}
+{% block title %}Editar Proveedor — TiendaMoa07{% endblock %}
 {% block menu_proveedores %}active{% endblock %}
 {% block navbar_title %}Editar Proveedor{% endblock %}
- 
+
 {% block content %}
 <div class="page-header">
     <div>
@@ -14,136 +14,119 @@
         </div>
     </div>
 </div>
- 
+
 {% if messages %}
     {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">
-            {{ message }}
-        </div>
+        <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">{{ message }}</div>
     {% endfor %}
 {% endif %}
- 
-<div class="card" style="max-width:680px;">
+
+<div class="card" style="max-width:720px;">
+    <div class="card-header"><h3>🏭 {{ proveedor.nombre_proveedor }}</h3></div>
     <div class="card-body">
- 
-        <form method="post">
+        <form method="post" id="formProveedor" novalidate>
             {% csrf_token %}
- 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
- 
-                <div class="form-group" style="grid-column:1/-1;">
-                    <label class="form-label">🏭 Nombre del Proveedor *</label>
-                    <input
-                        type="text"
-                        name="nombre_proveedor"
-                        class="form-control"
-                        value="{{ proveedor.nombre_proveedor }}"
-                        required
-                        maxlength="150"
-                    >
-                </div>
- 
+
+            <div class="form-group">
+                <label class="form-label">🏭 Nombre del Proveedor <span class="required">*</span></label>
+                <input type="text" name="nombre_proveedor" id="nombre_proveedor" class="form-control"
+                       value="{{ proveedor.nombre_proveedor }}" maxlength="150" required>
+                <span class="form-help error-msg" id="err_nombre" style="color:#e74c3c;display:none;">⚠️ Solo se permiten letras y espacios.</span>
+            </div>
+
+            <div class="form-row">
                 <div class="form-group">
-                    <label class="form-label">🪪 NIT / Documento</label>
-                    <input
-                        type="text"
-                        name="nit_proveedor"
-                        class="form-control"
-                        value="{{ proveedor.nit_proveedor|default:'' }}"
-                        maxlength="20"
-                    >
+                    <label class="form-label">🪪 NIT / Documento <span class="required">*</span></label>
+                    <input type="text" name="nit_proveedor" id="nit_proveedor" class="form-control"
+                           value="{{ proveedor.nit_proveedor|default:'' }}" minlength="5" maxlength="20" required>
+                    <span class="form-help error-msg" id="err_nit" style="color:#e74c3c;display:none;">⚠️ Mínimo 5 dígitos, solo números.</span>
                 </div>
- 
                 <div class="form-group">
                     <label class="form-label">👤 Persona de Contacto</label>
-                    <input
-                        type="text"
-                        name="contacto_proveedor"
-                        class="form-control"
-                        value="{{ proveedor.contacto_proveedor|default:'' }}"
-                        maxlength="100"
-                    >
+                    <input type="text" name="contacto_proveedor" id="contacto_proveedor" class="form-control"
+                           value="{{ proveedor.contacto_proveedor|default:'' }}" maxlength="100">
+                    <span class="form-help error-msg" id="err_contacto" style="color:#e74c3c;display:none;">⚠️ Solo se permiten letras y espacios.</span>
                 </div>
- 
-                <div class="form-group">
-                    <label class="form-label">📞 Teléfono</label>
-                    <input
-                        type="text"
-                        name="telefono_proveedor"
-                        class="form-control"
-                        value="{{ proveedor.telefono_proveedor|default:'' }}"
-                        maxlength="20"
-                    >
-                </div>
- 
-                <div class="form-group">
-                    <label class="form-label">📧 Correo Electrónico</label>
-                    <input
-                        type="email"
-                        name="correo_proveedor"
-                        class="form-control"
-                        value="{{ proveedor.correo_proveedor|default:'' }}"
-                        maxlength="120"
-                    >
-                </div>
- 
-                <div class="form-group">
-                    <label class="form-label">🏙️ Ciudad</label>
-                    <input
-                        type="text"
-                        name="ciudad_proveedor"
-                        class="form-control"
-                        value="{{ proveedor.ciudad_proveedor|default:'' }}"
-                        maxlength="80"
-                    >
-                </div>
- 
-                <div class="form-group" style="grid-column:1/-1;">
-                    <label class="form-label">📍 Dirección</label>
-                    <input
-                        type="text"
-                        name="direccion_proveedor"
-                        class="form-control"
-                        value="{{ proveedor.direccion_proveedor|default:'' }}"
-                        maxlength="200"
-                    >
-                </div>
- 
-                <div class="form-group" style="grid-column:1/-1;">
-                    <label class="form-label">📝 Observaciones</label>
-                    <textarea
-                        name="observaciones_proveedor"
-                        class="form-control"
-                        rows="3"
-                        style="resize:vertical;"
-                    >{{ proveedor.observaciones_proveedor|default:'' }}</textarea>
-                </div>
- 
-                <div class="form-group">
-                    <label class="form-label">🔘 Estado</label>
-                    <select name="estado_proveedor" class="form-control">
-                        <option value="ACTIVO" {% if proveedor.estado_proveedor == 'ACTIVO' %}selected{% endif %}>✅ Activo</option>
-                        <option value="INACTIVO" {% if proveedor.estado_proveedor == 'INACTIVO' %}selected{% endif %}>❌ Inactivo</option>
-                    </select>
-                </div>
- 
             </div>
- 
-            {% if proveedor.created_at %}
-            <div style="background:#f8f9fa; border-radius:8px; padding:12px 16px; margin-top:8px; font-size:13px; color:#7f8c8d;">
-                📅 Registrado el {{ proveedor.created_at|date:"d/m/Y H:i" }}
-                {% if proveedor.updated_at %}
-                 &nbsp;·&nbsp; 🕐 Última edición: {{ proveedor.updated_at|date:"d/m/Y H:i" }}
-                {% endif %}
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">📞 Teléfono <span class="required">*</span></label>
+                    <input type="text" name="telefono_proveedor" id="telefono_proveedor" class="form-control"
+                           value="{{ proveedor.telefono_proveedor|default:'' }}" minlength="7" maxlength="15" required>
+                    <span class="form-help error-msg" id="err_telefono" style="color:#e74c3c;display:none;">⚠️ Solo números, mínimo 7 dígitos.</span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">📧 Correo Electrónico <span class="required">*</span></label>
+                    <input type="email" name="correo_proveedor" id="correo_proveedor" class="form-control"
+                           value="{{ proveedor.correo_proveedor|default:'' }}" maxlength="150" required>
+                    <span class="form-help error-msg" id="err_correo" style="color:#e74c3c;display:none;">⚠️ Ingresa un correo válido (ej: nombre@dominio.com).</span>
+                </div>
             </div>
-            {% endif %}
- 
-            <div style="display:flex; gap:12px; margin-top:24px;">
-                <button type="submit" class="btn btn-primary">💾 Guardar Cambios</button>
+
+            <div class="form-group">
+                <label class="form-label">📍 Dirección</label>
+                <input type="text" name="direccion_proveedor" id="direccion_proveedor" class="form-control"
+                       value="{{ proveedor.direccion_proveedor|default:'' }}" maxlength="200">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">📝 Observaciones</label>
+                <textarea name="observaciones_proveedor" id="observaciones_proveedor" class="form-control"
+                          rows="3" maxlength="500">{{ proveedor.observaciones_proveedor|default:'' }}</textarea>
+                <span class="form-help"><span id="obs_count">0</span>/500 caracteres</span>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-warning">💾 Guardar Cambios</button>
                 <a href="{% url 'admin_proveedores' %}" class="btn btn-secondary">❌ Cancelar</a>
             </div>
         </form>
- 
     </div>
 </div>
+
+<script>
+const soloTexto   = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s.'-]+$/;
+const soloNumeros = /^\d+$/;
+const regexEmail  = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+function validar(id, condicion, errId) {
+    const campo = document.getElementById(id);
+    const err   = errId ? document.getElementById(errId) : null;
+    if (!campo) return;
+    campo.addEventListener('input', () => {
+        if (!condicion(campo.value)) {
+            campo.style.borderColor = '#e74c3c';
+            if (err) err.style.display = 'block';
+        } else {
+            campo.style.borderColor = '#27ae60';
+            if (err) err.style.display = 'none';
+        }
+    });
+}
+
+validar('nombre_proveedor',   v => soloTexto.test(v) && v.trim().length >= 3,  'err_nombre');
+validar('nit_proveedor',      v => soloNumeros.test(v) && v.length >= 5,        'err_nit');
+validar('contacto_proveedor', v => !v || (soloTexto.test(v) && v.trim().length >= 3), 'err_contacto');
+validar('telefono_proveedor', v => soloNumeros.test(v) && v.length >= 7,        'err_telefono');
+validar('correo_proveedor',   v => regexEmail.test(v),                          'err_correo');
+
+['nit_proveedor','telefono_proveedor'].forEach(id => {
+    document.getElementById(id).addEventListener('keypress', e => {
+        if (!/[0-9]/.test(e.key)) e.preventDefault();
+    });
+});
+
+['nombre_proveedor','contacto_proveedor'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('keypress', e => {
+        if (/[0-9]/.test(e.key)) e.preventDefault();
+    });
+});
+
+const obs = document.getElementById('observaciones_proveedor');
+const cnt = document.getElementById('obs_count');
+cnt.textContent = obs.value.length;
+obs.addEventListener('input', () => cnt.textContent = obs.value.length);
+</script>
 {% endblock %}

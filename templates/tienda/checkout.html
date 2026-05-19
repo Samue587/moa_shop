@@ -1,0 +1,390 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout — MOA Moda</title>
+    <link href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@700;800;900&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary:      #FF6B35;
+            --primary-dark: #E85A2B;
+            --navy:         #1e2d4a;
+            --dark:         #1A1A2E;
+            --light:        #F5F4F0;
+            --white:        #FFFFFF;
+            --border:       #e8e4de;
+            --muted:        #888;
+            --success:      #28A745;
+        }
+        body {
+            font-family: 'Instrument Sans', sans-serif;
+            background: var(--light);
+            color: var(--dark);
+            min-height: 100vh;
+        }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            background: var(--white);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .navbar-inner {
+            max-width: 1100px; margin: 0 auto;
+            padding: 0 30px; height: 72px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .logo { text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .logo-sq {
+            width: 44px; height: 38px;
+            background: var(--primary); border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .logo-sq span {
+            font-family: 'Darker Grotesque', sans-serif;
+            font-size: 32px; font-weight: 900; color: white; line-height: 1;
+        }
+        .logo-text { display: flex; flex-direction: column; line-height: 1; }
+        .logo-oa   { font-family: 'Darker Grotesque', sans-serif; font-size: 20px; font-weight: 900; color: var(--dark); }
+        .logo-shop { font-size: 11px; font-weight: 600; color: var(--primary); letter-spacing: 4px; text-transform: uppercase; }
+        .nav-back {
+            display: flex; align-items: center; gap: 6px;
+            color: var(--muted); text-decoration: none;
+            font-size: 14px; font-weight: 600; transition: color 0.2s;
+        }
+        .nav-back:hover { color: var(--dark); }
+
+        /* ── LAYOUT ── */
+        .page {
+            max-width: 1050px; margin: 40px auto;
+            padding: 0 24px 60px;
+            display: grid; grid-template-columns: 1fr 360px; gap: 28px;
+        }
+        @media (max-width: 800px) {
+            .page { grid-template-columns: 1fr; }
+            .resumen-sticky { position: static !important; }
+        }
+
+        /* ── CARDS ── */
+        .card {
+            background: var(--white); border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.07);
+            margin-bottom: 20px; overflow: hidden;
+        }
+        .card:last-child { margin-bottom: 0; }
+        .card-title {
+            padding: 20px 26px 16px;
+            border-bottom: 1px solid var(--border);
+            font-family: 'Darker Grotesque', sans-serif;
+            font-size: 19px; font-weight: 800; color: var(--dark);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .card-body { padding: 22px 26px; }
+
+        /* ── FORMULARIO ── */
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+        .form-group { margin-bottom: 16px; }
+        .form-group:last-child { margin-bottom: 0; }
+        label {
+            display: block; font-size: 13px; font-weight: 600;
+            color: var(--dark); margin-bottom: 6px;
+        }
+        label .req { color: var(--primary); margin-left: 2px; }
+        label .opc { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 4px; }
+        input[type="text"],
+        input[type="number"],
+        input[type="tel"],
+        select {
+            width: 100%; padding: 11px 14px;
+            border: 1.5px solid var(--border); border-radius: 10px;
+            font-family: inherit; font-size: 14px; color: var(--dark);
+            background: #fafafa;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            appearance: auto;
+        }
+        input:focus, select:focus {
+            outline: none; border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
+            background: var(--white);
+        }
+        select:disabled {
+            background: #f0f0f0; color: var(--muted);
+            cursor: not-allowed; border-color: #e0e0e0;
+            opacity: 1;
+        }
+        input[readonly] {
+            background: #f0f0f0; color: var(--muted);
+            cursor: not-allowed; border-color: #e0e0e0;
+        }
+
+        /* ── ALERTAS ── */
+        .alert {
+            padding: 13px 16px; border-radius: 10px; margin-bottom: 18px;
+            font-size: 13px; font-weight: 500;
+            display: flex; align-items: flex-start; gap: 8px;
+        }
+        .alert-error { background: #fdecea; color: #b91c1c; border-left: 4px solid #ef4444; }
+
+        /* ── RESUMEN ── */
+        .resumen-sticky { position: sticky; top: 90px; }
+        .resumen-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 13px 0; border-bottom: 1px solid var(--border);
+        }
+        .resumen-item:last-of-type { border-bottom: none; }
+        .item-foto {
+            width: 52px; height: 52px; border-radius: 10px;
+            background: var(--light); flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; overflow: hidden;
+        }
+        .item-foto img { width: 100%; height: 100%; object-fit: cover; }
+        .item-info { flex: 1; min-width: 0; }
+        .item-nombre {
+            font-size: 14px; font-weight: 600; color: var(--dark);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .item-qty { font-size: 12px; color: var(--muted); margin-top: 3px; }
+        .item-precio {
+            font-family: 'Darker Grotesque', sans-serif;
+            font-size: 17px; font-weight: 800; color: var(--navy); flex-shrink: 0;
+        }
+        .total-blk {
+            background: var(--navy); border-radius: 12px;
+            padding: 18px 22px; margin-top: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .total-label {
+            font-size: 11px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.55); margin-bottom: 4px;
+        }
+        .total-refs { font-size: 12px; color: rgba(255,255,255,0.35); }
+        .total-monto {
+            font-family: 'Darker Grotesque', sans-serif;
+            font-size: 36px; font-weight: 900; color: var(--primary); line-height: 1;
+        }
+        .total-cop { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 2px; text-align: right; }
+
+        /* ── BOTÓN COMPRAR ── */
+        .btn-comprar {
+            width: 100%; padding: 15px;
+            background: var(--primary); color: white;
+            border: none; border-radius: 12px;
+            font-family: inherit; font-size: 16px; font-weight: 700;
+            cursor: pointer; margin-top: 22px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: background 0.2s, transform 0.15s;
+        }
+        .btn-comprar:hover  { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-comprar:active { transform: translateY(0); }
+        .seguridad {
+            display: flex; align-items: center; justify-content: center;
+            gap: 6px; margin-top: 10px;
+            font-size: 12px; color: var(--muted);
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="navbar-inner">
+        <a href="{% url 'tienda' %}" class="logo">
+            <div class="logo-sq"><span>M</span></div>
+            <div class="logo-text">
+                <span class="logo-oa">OA</span>
+                <span class="logo-shop">Shop</span>
+            </div>
+        </a>
+        <a href="{% url 'carrito_ver' %}" class="nav-back">← Volver al carrito</a>
+    </div>
+</nav>
+
+<!-- CONTENIDO -->
+<div class="page">
+
+    <!-- COLUMNA IZQUIERDA: FORMULARIO -->
+    <div>
+
+        <form method="POST" action="{% url 'checkout_procesar' %}">
+            {% csrf_token %}
+
+            <!-- DATOS DE ENVÍO -->
+            <div class="card">
+                <div class="card-title">📦 Datos de envío</div>
+                <div class="card-body">
+
+                    <div class="form-group">
+                        <label>Dirección <span class="req">*</span></label>
+                        <input type="text" name="direccion"
+                               placeholder="Ej: Calle 123 # 45-67"
+                               value="{{ form.direccion|default:'' }}"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Barrio <span class="opc">(opcional)</span></label>
+                        <input type="text" name="barrio"
+                               placeholder="Ej: Chapinero"
+                               value="{{ form.barrio|default:'' }}">
+                    </div>
+
+                    <!-- DEPARTAMENTO → CIUDAD ENCADENADOS -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Departamento <span class="req">*</span></label>
+                            <select name="departamento" id="sel-departamento" required>
+                                <option value="">Selecciona departamento</option>
+                                {% for depto in departamentos %}
+                                    <option value="{{ depto }}"
+                                        {% if form.departamento == depto %}selected{% endif %}>
+                                        {{ depto }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Ciudad <span class="req">*</span></label>
+                            <select name="ciudad" id="sel-ciudad" required disabled>
+                                <option value="">Primero elige departamento</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Teléfono de contacto <span class="req">*</span></label>
+                        <input type="tel" name="telefono"
+                               placeholder="Ej: 3001234567"
+                               value="{{ form.telefono|default:'' }}"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Empresa de envío</label>
+                        <input type="text" name="empresa" value="Interrapidísimo" readonly>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- DATOS DEL RECEPTOR -->
+            <div class="card">
+                <div class="card-title">🪪 Datos del receptor</div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Número de documento <span class="req">*</span></label>
+                        <input type="number" name="num_documento"
+                               placeholder="Ej: 1023456789"
+                               value="{{ form.num_documento|default:'' }}"
+                               min="1000000" max="9999999999"
+                               required>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-comprar">💳 Confirmar compra</button>
+            <div class="seguridad">🔒 Compra segura — tus datos están protegidos</div>
+
+        </form>
+    </div>
+
+    <!-- COLUMNA DERECHA: RESUMEN DEL PEDIDO -->
+    <div>
+        <div class="card resumen-sticky">
+            <div class="card-title">🛒 Resumen del pedido</div>
+            <div class="card-body">
+
+                {% for item in items %}
+                <div class="resumen-item">
+                    <div class="item-foto">
+                        {% if item.foto %}
+                            <img src="/imagenes/{{ item.foto }}" alt="{{ item.nombre }}">
+                        {% else %}
+                            📦
+                        {% endif %}
+                    </div>
+                    <div class="item-info">
+                        <div class="item-nombre">{{ item.nombre }}</div>
+                        <div class="item-qty">Cantidad: {{ item.cantidad }}</div>
+                    </div>
+                    <div class="item-precio">${{ item.subtotal|floatformat:0|intcomma }}</div>
+                </div>
+                {% endfor %}
+
+                <div class="total-blk">
+                    <div>
+                        <div class="total-label">Total</div>
+                        <div class="total-refs">
+                            {{ items|length }} producto{% if items|length != 1 %}s{% endif %}
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="total-monto">${{ total|floatformat:0|intcomma }}</div>
+                        <div class="total-cop">Pesos colombianos</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ── ENCADENAMIENTO DEPARTAMENTO → CIUDAD ── -->
+<script>
+(function () {
+    // Datos inyectados desde Django
+    const ciudadesPorDepto = {{ ciudades_por_departamento|safe }};
+
+    const selDepto  = document.getElementById('sel-departamento');
+    const selCiudad = document.getElementById('sel-ciudad');
+
+    // Valor previo (en caso de error de validación y se repinta el form)
+    const ciudadPrevia = "{{ form.ciudad|default:'' }}";
+
+    function cargarCiudades(depto) {
+        // Limpiar y deshabilitar mientras no hay depto
+        selCiudad.innerHTML = '';
+
+        if (!depto) {
+            selCiudad.disabled = true;
+            selCiudad.innerHTML = '<option value="">Primero elige departamento</option>';
+            return;
+        }
+
+        const ciudades = ciudadesPorDepto[depto] || [];
+        selCiudad.disabled = false;
+
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = 'Selecciona ciudad';
+        selCiudad.appendChild(placeholder);
+
+        ciudades.forEach(function (c) {
+            const opt = document.createElement('option');
+            opt.value = c;
+            opt.textContent = c;
+            if (c === ciudadPrevia) opt.selected = true;
+            selCiudad.appendChild(opt);
+        });
+    }
+
+    // Al cambiar departamento
+    selDepto.addEventListener('change', function () {
+        cargarCiudades(this.value);
+    });
+
+    // Al cargar la página, si ya hay un departamento seleccionado (re-render por error)
+    if (selDepto.value) {
+        cargarCiudades(selDepto.value);
+    }
+})();
+</script>
+
+</body>
+</html>

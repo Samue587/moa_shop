@@ -12,6 +12,8 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.conf import settings
+from django.db.models import Sum, Count, F, ExpressionWrapper, FloatField
+from django.db.models.functions import TruncDay
 
 from .models import (
     Rol, Permiso, RolPermiso, Usuario,
@@ -152,8 +154,8 @@ def logout_view(request):
 
 def registro_view(request):
     if request.method == 'POST':
-        nombres   = request.POST.get('nombres', '').strip()
-        apellidos = request.POST.get('apellidos', '').strip()
+        nombres   = request.POST.get('nombre', '').strip()
+        apellidos = request.POST.get('apellido', '').strip()
         email     = request.POST.get('email', '').strip()
         password  = request.POST.get('password', '')
 
@@ -192,7 +194,7 @@ def tienda(request):
     catalogo_id  = request.GET.get('catalogo')
     busqueda     = request.GET.get('q', '').strip()
 
-    productos  = Producto.objects.select_related('categoria', 'catalogo', 'proveedor').filter(estado='DISPONIBLE')
+    productos = Producto.objects.select_related('categoria', 'catalogo', 'proveedor').filter(estado='DISPONIBLE')
     categorias = Categoria.objects.filter(estado='ACTIVO')
     catalogos  = Catalogo.objects.all()
 
@@ -210,6 +212,7 @@ def tienda(request):
         'busqueda':    busqueda,
         'usuario':     get_usuario_sesion(request),
         'cantidad_carrito': _cantidad_carrito(request),
+        'MEDIA_URL':        settings.MEDIA_URL,
     })
 
 
@@ -709,7 +712,7 @@ def editar_rol(request, id):
                     pass
 
         messages.success(request, f'Rol "{nombre_rol}" actualizado.')
-        return redirect('admin_roles')
+        return redirect('admin_roles')  
 
     return render(request, 'admin/roles/editar.html', {
         'rol': rol, 'permisos': permisos,
@@ -988,15 +991,15 @@ def crear_proveedor(request):
 
     return render(request, 'admin/proveedores/crear.html', {'form': {}, 'usuario': request.usuario})
 
-
 @admin_required
 def editar_proveedor(request, id):
     proveedor = get_object_or_404(Proveedor, pk=id)
 
     if request.method == 'POST':
-        nit      = request.POST.get('nit_proveedor', '').strip()
+        # ── Limpiar AQUÍ, antes de todo ──
+        nit      = request.POST.get('nit_proveedor', '').strip().replace('.', '').replace(',', '').replace(' ', '')
         nombre   = request.POST.get('nombre_proveedor', '').strip()
-        telefono = request.POST.get('telefono_proveedor', '').strip()
+        telefono = request.POST.get('telefono_proveedor', '').strip().replace('.', '').replace(',', '').replace(' ', '')
         correo   = request.POST.get('correo_proveedor', '').strip()
 
         if not nit or not nombre or not telefono or not correo:
@@ -1005,17 +1008,21 @@ def editar_proveedor(request, id):
                 'proveedor': proveedor, 'form': request.POST, 'usuario': request.usuario
             })
 
-        if Proveedor.objects.filter(nit_proveedor=nit).exclude(pk=id).exists():
+        # Ahora nit ya es limpio, int() no falla
+        if Proveedor.objects.filter(nit_proveedor=int(nit)).exclude(pk=id).exists():
             messages.error(request, f'Ya existe otro proveedor con NIT {nit}.')
             return render(request, 'admin/proveedores/editar.html', {
                 'proveedor': proveedor, 'form': request.POST, 'usuario': request.usuario
             })
 
         try:
-            proveedor.nit_proveedor      = int(nit)
-            proveedor.nombre_proveedor   = nombre
-            proveedor.telefono_proveedor = int(telefono)
-            proveedor.correo_proveedor   = correo
+            proveedor.nit_proveedor           = int(nit)
+            proveedor.nombre_proveedor        = nombre
+            proveedor.telefono_proveedor      = int(telefono)
+            proveedor.correo_proveedor        = correo
+            proveedor.contacto_proveedor      = request.POST.get('contacto_proveedor', '').strip() or None
+            proveedor.direccion_proveedor     = request.POST.get('direccion_proveedor', '').strip() or None
+            proveedor.observaciones_proveedor = request.POST.get('observaciones_proveedor', '').strip() or None
             proveedor.save()
             messages.success(request, f'Proveedor "{nombre}" actualizado.')
             return redirect('admin_proveedores')
@@ -1055,34 +1062,52 @@ def listar_catalogos(request):
 @admin_required
 def crear_catalogo(request):
     if request.method == 'POST':
-        nombre = request.POST.get('nombre_catalogo', '').strip()
+        nombre      = request.POST.get('nombre_catalogo', '').strip()
+        descripcion = request.POST.get('descripcion_catalogo', '').strip()
+        estado      = request.POST.get('estado_catalogo', 'ACTIVO')
+
         if not nombre:
             messages.error(request, 'El nombre es obligatorio.')
-            return render(request, 'admin/catalogos/crear.html', {'form': request.POST, 'usuario': request.usuario})
-        Catalogo.objects.create(nombre_catalogo=nombre)
+            return render(request, 'admin/catalogos/crear.html', {
+                'form': request.POST, 'usuario': request.usuario
+            })
+
+        Catalogo.objects.create(
+            nombre_catalogo      = nombre,
+            descripcion_catalogo = descripcion or None,
+            estado_catalogo      = estado,
+        )
         messages.success(request, f'Catálogo "{nombre}" creado.')
         return redirect('admin_catalogos')
-    return render(request, 'admin/catalogos/crear.html', {'form': {}, 'usuario': request.usuario})
 
+    return render(request, 'admin/catalogos/crear.html', {
+        'form': {}, 'usuario': request.usuario
+    })
 
 @admin_required
 def editar_catalogo(request, id):
     catalogo = get_object_or_404(Catalogo, pk=id)
     if request.method == 'POST':
-        nombre = request.POST.get('nombre_catalogo', '').strip()
+        nombre      = request.POST.get('nombre_catalogo', '').strip()
+        descripcion = request.POST.get('descripcion_catalogo', '').strip()
+        estado      = request.POST.get('estado_catalogo', 'ACTIVO')
+
         if not nombre:
             messages.error(request, 'El nombre es obligatorio.')
             return render(request, 'admin/catalogos/editar.html', {
                 'catalogo': catalogo, 'form': request.POST, 'usuario': request.usuario
             })
-        catalogo.nombre_catalogo = nombre
+
+        catalogo.nombre_catalogo       = nombre
+        catalogo.descripcion_catalogo  = descripcion or None
+        catalogo.estado_catalogo       = estado
         catalogo.save()
         messages.success(request, f'Catálogo "{nombre}" actualizado.')
         return redirect('admin_catalogos')
+
     return render(request, 'admin/catalogos/editar.html', {
         'catalogo': catalogo, 'form': {}, 'usuario': request.usuario
     })
-
 
 @admin_required
 def eliminar_catalogo(request, id):
@@ -1487,16 +1512,29 @@ def listar_entradas(request):
 
 
 @admin_required
+@admin_required
 def crear_entrada(request):
-    proveedores  = Proveedor.objects.all()
-    variaciones  = VariacionProducto.objects.select_related('producto').order_by('producto__nombre_producto', 'talla')
+    proveedores = Proveedor.objects.all()
+    variaciones = VariacionProducto.objects.select_related('producto').order_by('producto__nombre_producto', 'talla')
 
     if request.method == 'POST':
         proveedor_id  = request.POST.get('proveedor')
         fecha_entrada = request.POST.get('fecha_entrada')
-        variacion_ids = request.POST.getlist('variacion_id')
-        cantidades    = request.POST.getlist('cantidades')
-        precios       = request.POST.getlist('precio_comprado')
+        total_filas   = int(request.POST.get('totalFilas', 0))
+
+        # Recolecta filas dinámicas
+        variacion_ids = []
+        cantidades    = []
+        precios       = []
+
+        for i in range(total_filas):
+            vid    = request.POST.get(f'variacion_{i}')
+            cant   = request.POST.get(f'cantidad_{i}')
+            precio = request.POST.get(f'precio_{i}')
+            if vid and cant and precio:
+                variacion_ids.append(vid)
+                cantidades.append(cant)
+                precios.append(precio)
 
         if not proveedor_id or not fecha_entrada or not variacion_ids:
             messages.error(request, 'Proveedor, fecha y al menos una variación son obligatorios.')
@@ -1537,7 +1575,6 @@ def crear_entrada(request):
         'proveedores': proveedores, 'variaciones': variaciones,
         'form': {}, 'usuario': request.usuario
     })
-
 
 @admin_required
 def detalle_entrada(request, id):
@@ -1900,7 +1937,362 @@ def eliminar_envio(request, id):
 def envio_cambiar_estado(request, id):
     if request.method == 'POST':
         envio = get_object_or_404(Envio, pk=id)
-        envio.estado_envio = request.POST.get('estado_envio', envio.estado_envio)
+        envio.estado_envio = request.POST.get('estado') or request.POST.get('estado_envio') or envio.estado_envio
         envio.save()
         messages.success(request, f'Estado del envío #{id} actualizado a "{envio.get_estado_envio_display()}".')
     return redirect('admin_envios')
+
+@admin_required
+def reporte_inventario(request):
+    """Reporte 1 — Inventario por Producto"""
+    busqueda     = request.GET.get('q', '').strip()
+    categoria_id = request.GET.get('categoria', '')
+    filtro_stock = request.GET.get('stock', '')  # 'bajo', 'agotado', ''
+ 
+    variaciones = VariacionProducto.objects.select_related(
+        'producto__categoria', 'producto__proveedor'
+    ).order_by('producto__nombre_producto', 'talla', 'color')
+ 
+    if busqueda:
+        variaciones = variaciones.filter(
+            Q(producto__nombre_producto__icontains=busqueda) |
+            Q(talla__icontains=busqueda) |
+            Q(color__icontains=busqueda) |
+            Q(sku_unico__icontains=busqueda)
+        )
+    if categoria_id:
+        variaciones = variaciones.filter(producto__categoria_id=categoria_id)
+    if filtro_stock == 'bajo':
+        # bajo stock = stock_actual <= stock_minimo pero > 0
+        variaciones = [v for v in variaciones if v.bajo_stock and not v.sin_stock]
+    elif filtro_stock == 'agotado':
+        variaciones = [v for v in variaciones if v.sin_stock]
+    else:
+        variaciones = list(variaciones)
+ 
+    # Estadísticas
+    todas = VariacionProducto.objects.select_related('producto__categoria')
+    total_variaciones  = todas.count()
+    total_agotados     = sum(1 for v in todas if v.sin_stock)
+    total_bajo_stock   = sum(1 for v in todas if v.bajo_stock and not v.sin_stock)
+    stock_total_global = todas.aggregate(t=Sum('stock_actual'))['t'] or 0
+ 
+    # Más vendidos por producto
+    top_productos = (
+        DetalleVenta.objects
+        .values('variacion__producto__nombre_producto', 'variacion__producto__categoria__nombre')
+        .annotate(total_vendido=Sum('cantidad'))
+        .order_by('-total_vendido')[:10]
+    )
+ 
+    categorias = Categoria.objects.filter(estado='ACTIVO')
+ 
+    return render(request, 'admin/reportes/inventario.html', {
+        'variaciones':       variaciones,
+        'categorias':        categorias,
+        'busqueda':          busqueda,
+        'categoria_id':      categoria_id,
+        'filtro_stock':      filtro_stock,
+        'total_variaciones': total_variaciones,
+        'total_agotados':    total_agotados,
+        'total_bajo_stock':  total_bajo_stock,
+        'stock_total':       stock_total_global,
+        'top_productos':     top_productos,
+        'usuario':           request.usuario,
+    })
+ 
+ 
+@admin_required
+def reporte_ventas(request):
+    """Reporte 2 — Ventas por Fecha y Usuario"""
+    busqueda_usuario  = request.GET.get('busqueda_usuario', '').strip()
+    busqueda_producto = request.GET.get('busqueda_producto', '').strip()
+    filtro_fecha      = request.GET.get('filtro', '')
+    fecha_inicio      = request.GET.get('fecha_inicio', '')
+    fecha_fin         = request.GET.get('fecha_fin', '')
+ 
+    ventas = Venta.objects.select_related('usuario').prefetch_related(
+        'detalles__variacion__producto'
+    ).order_by('-fecha')
+ 
+    filtro_label = 'Todas las ventas'
+ 
+    if filtro_fecha == 'hoy':
+        ventas = ventas.filter(fecha__date=timezone.now().date())
+        filtro_label = 'Ventas del día'
+    elif filtro_fecha == 'mes':
+        hoy    = timezone.now()
+        ventas = ventas.filter(fecha__year=hoy.year, fecha__month=hoy.month)
+        filtro_label = 'Ventas del mes'
+    elif filtro_fecha == 'semana':
+        desde = timezone.now().date() - timedelta(days=7)
+        ventas = ventas.filter(fecha__date__gte=desde)
+        filtro_label = 'Últimos 7 días'
+    elif fecha_inicio and fecha_fin:
+        ventas = ventas.filter(fecha__date__gte=fecha_inicio, fecha__date__lte=fecha_fin)
+        filtro_label = f'Del {fecha_inicio} al {fecha_fin}'
+    elif busqueda_usuario:
+        ventas = ventas.filter(
+            Q(usuario__nombres_usuario__icontains=busqueda_usuario) |
+            Q(usuario__apellidos_usuario__icontains=busqueda_usuario) |
+            Q(usuario__correo_usuario__icontains=busqueda_usuario)
+        )
+        filtro_label = f'Cliente: {busqueda_usuario}'
+    elif busqueda_producto:
+        ventas = ventas.filter(
+            detalles__variacion__producto__nombre_producto__icontains=busqueda_producto
+        ).distinct()
+        filtro_label = f'Producto: {busqueda_producto}'
+ 
+    ventas_list = list(ventas)
+ 
+    # Estadísticas del filtro actual
+    total_ingresos  = sum(v.monto_final for v in ventas_list)
+    total_productos = sum(v.cantidad_productos for v in ventas_list)
+ 
+    # Top vendedores
+    top_usuarios = (
+        Venta.objects.values(
+            'usuario__nombres_usuario', 'usuario__apellidos_usuario', 'usuario__correo_usuario'
+        )
+        .annotate(num_ventas=Count('id'), total_gastado=Sum('monto_final'))
+        .order_by('-num_ventas')[:5]
+    )
+ 
+    # Ventas por día (últimos 30 días)
+    desde_30 = timezone.now().date() - timedelta(days=30)
+    ventas_por_dia = (
+        Venta.objects
+        .filter(fecha__date__gte=desde_30)
+        .annotate(dia=TruncDay('fecha'))
+        .values('dia')
+        .annotate(total=Sum('monto_final'), cantidad=Count('id'))
+        .order_by('dia')
+    )
+ 
+    return render(request, 'admin/reportes/ventas.html', {
+        'ventas':             ventas_list,
+        'filtro_label':       filtro_label,
+        'busqueda_usuario':   busqueda_usuario,
+        'busqueda_producto':  busqueda_producto,
+        'fecha_inicio':       fecha_inicio,
+        'fecha_fin':          fecha_fin,
+        'total_ingresos':     total_ingresos,
+        'total_productos':    total_productos,
+        'top_usuarios':       top_usuarios,
+        'ventas_por_dia':     list(ventas_por_dia),
+        'usuario':            request.usuario,
+    })
+ 
+ 
+@admin_required
+def reporte_categorias(request):
+    """Reporte 3 — Ventas por Categoría"""
+    fecha_inicio = request.GET.get('fecha_inicio', '')
+    fecha_fin    = request.GET.get('fecha_fin', '')
+ 
+    detalles_qs = DetalleVenta.objects.select_related(
+        'variacion__producto__categoria', 'venta'
+    )
+    if fecha_inicio and fecha_fin:
+        detalles_qs = detalles_qs.filter(
+            venta__fecha__date__gte=fecha_inicio,
+            venta__fecha__date__lte=fecha_fin
+        )
+ 
+    # Ventas agrupadas por categoría
+    por_categoria = (
+        detalles_qs
+        .values('variacion__producto__categoria__nombre')
+        .annotate(
+            total_unidades=Sum('cantidad'),
+            total_ingresos=Sum('subtotal'),   # subtotal es property, usamos precio*cant
+            num_ventas=Count('venta', distinct=True),
+        )
+        .order_by('-total_ingresos')
+    )
+    # subtotal es @property, no un campo DB → calculamos con precio_unitario*cantidad
+    por_categoria = (
+        detalles_qs
+        .values('variacion__producto__categoria__nombre')
+        .annotate(
+            total_unidades=Sum('cantidad'),
+            total_ingresos=Sum(
+                models_producto_ingreso()
+            ),
+            num_ventas=Count('venta', distinct=True),
+        )
+        .order_by('-total_ingresos')
+    )
+ 
+    # Usamos annotate con expresión directa
+    from django.db.models import F, ExpressionWrapper, FloatField
+    por_categoria = (
+        detalles_qs
+        .annotate(ingreso_item=ExpressionWrapper(
+            F('cantidad') * F('precio_unitario'), output_field=FloatField()
+        ))
+        .values('variacion__producto__categoria__nombre')
+        .annotate(
+            total_unidades=Sum('cantidad'),
+            total_ingresos=Sum('ingreso_item'),
+            num_ventas=Count('venta', distinct=True),
+        )
+        .order_by('-total_ingresos')
+    )
+ 
+    total_global = sum(c['total_ingresos'] or 0 for c in por_categoria)
+ 
+    # Producto más vendido por categoría
+    top_por_cat = (
+        DetalleVenta.objects
+        .annotate(ingreso_item=ExpressionWrapper(
+            F('cantidad') * F('precio_unitario'), output_field=FloatField()
+        ))
+        .values(
+            'variacion__producto__categoria__nombre',
+            'variacion__producto__nombre_producto'
+        )
+        .annotate(total_und=Sum('cantidad'), total_ing=Sum('ingreso_item'))
+        .order_by('variacion__producto__categoria__nombre', '-total_und')
+    )
+ 
+    return render(request, 'admin/reportes/categorias.html', {
+        'por_categoria': list(por_categoria),
+        'total_global':  total_global,
+        'top_por_cat':   list(top_por_cat),
+        'fecha_inicio':  fecha_inicio,
+        'fecha_fin':     fecha_fin,
+        'usuario':       request.usuario,
+    })
+ 
+ 
+def models_producto_ingreso():
+    """Placeholder — no se usa, la expresión se construye inline."""
+    return None
+ 
+ 
+@admin_required
+def reporte_envios(request):
+    """Reporte 4 — Estado de Envíos"""
+    filtro_estado  = request.GET.get('estado', '')
+    filtro_empresa = request.GET.get('empresa', '')
+    busqueda       = request.GET.get('q', '').strip()
+    fecha_inicio   = request.GET.get('fecha_inicio', '')
+    fecha_fin      = request.GET.get('fecha_fin', '')
+ 
+    envios = Envio.objects.select_related('venta__usuario', 'usuario').order_by('-id')
+ 
+    if filtro_estado:
+        envios = envios.filter(estado_envio=filtro_estado)
+    if filtro_empresa:
+        envios = envios.filter(empresa_transportadora__icontains=filtro_empresa)
+    if busqueda:
+        envios = envios.filter(
+            Q(ciudad_envio__icontains=busqueda) |
+            Q(departamento_envio__icontains=busqueda) |
+            Q(venta__usuario__nombres_usuario__icontains=busqueda) |
+            Q(numero_guia__icontains=busqueda)
+        )
+    if fecha_inicio and fecha_fin:
+        envios = envios.filter(fecha_envio__date__gte=fecha_inicio, fecha_envio__date__lte=fecha_fin)
+ 
+    # Estadísticas globales (siempre sobre todos)
+    todos = Envio.objects.all()
+    stats = {e[0]: 0 for e in Envio.ESTADO_CHOICES}
+    for e in todos:
+        stats[e.estado_envio] = stats.get(e.estado_envio, 0) + 1
+ 
+    # Top empresas transportadoras
+    top_empresas = (
+        Envio.objects
+        .values('empresa_transportadora')
+        .annotate(total=Count('id'))
+        .order_by('-total')[:6]
+    )
+ 
+    # Top destinos
+    top_destinos = (
+        Envio.objects
+        .values('ciudad_envio', 'departamento_envio')
+        .annotate(total=Count('id'))
+        .order_by('-total')[:8]
+    )
+ 
+    empresas_disponibles = (
+        Envio.objects
+        .values_list('empresa_transportadora', flat=True)
+        .distinct()
+        .order_by('empresa_transportadora')
+    )
+ 
+    return render(request, 'admin/reportes/envios.html', {
+        'envios':               envios,
+        'stats':                stats,
+        'top_empresas':         top_empresas,
+        'top_destinos':         top_destinos,
+        'filtro_estado':        filtro_estado,
+        'filtro_empresa':       filtro_empresa,
+        'busqueda':             busqueda,
+        'fecha_inicio':         fecha_inicio,
+        'fecha_fin':            fecha_fin,
+        'estados':              Envio.ESTADO_CHOICES,
+        'empresas_disponibles': empresas_disponibles,
+        'usuario':              request.usuario,
+    })
+ 
+ 
+@admin_required
+def reporte_clientes(request):
+    """Reporte 5 — Comportamiento de Clientes"""
+    busqueda     = request.GET.get('q', '').strip()
+    filtro_orden = request.GET.get('orden', 'ventas')
+
+    clientes_qs = Usuario.objects.filter(
+        rol__nombre_rol__iexact='CLIENTE'
+    ).prefetch_related('ventas__detalles')
+
+    if busqueda:
+        clientes_qs = clientes_qs.filter(
+            Q(nombres_usuario__icontains=busqueda) |
+            Q(apellidos_usuario__icontains=busqueda) |
+            Q(correo_usuario__icontains=busqueda)
+        )
+
+    clientes_qs = clientes_qs.annotate(
+        num_ventas=Count('ventas'),
+        total_gastado=Sum('ventas__monto_final'),
+    )
+
+    if filtro_orden == 'gastado':
+        clientes_qs = clientes_qs.order_by('-total_gastado')
+    else:
+        clientes_qs = clientes_qs.order_by('-num_ventas')
+
+    clientes_list = list(clientes_qs)
+
+    total_clientes = Usuario.objects.filter(rol__nombre_rol__iexact='CLIENTE').count()
+    clientes_activos = Venta.objects.values('usuario_id').distinct().count()
+
+    top_clientes = sorted(
+        [c for c in clientes_list if c.total_gastado],
+        key=lambda c: c.total_gastado or 0,
+        reverse=True
+    )[:5]
+
+    return render(request, 'admin/reportes/clientes.html', {
+        'clientes':           clientes_list,
+        'busqueda':           busqueda,
+        'filtro_orden':       filtro_orden,
+        'total_clientes':     total_clientes,
+        'clientes_activos':   clientes_activos,
+        'clientes_inactivos': total_clientes - clientes_activos,
+        'top_clientes':       top_clientes,
+        'usuario':            request.usuario,
+    })
+
+
+@admin_required
+def reportes_hub(request):
+    return render(request, 'admin/reportes/reportes_hub.html')
+    

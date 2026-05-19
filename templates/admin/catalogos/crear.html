@@ -53,13 +53,6 @@
                 >{{ form_data.descripcion_catalogo|default:'' }}</textarea>
             </div>
  
-            <div class="form-group">
-                <label class="form-label">🔘 Estado</label>
-                <select name="estado_catalogo" class="form-control">
-                    <option value="ACTIVO" {% if form_data.estado_catalogo == 'ACTIVO' or not form_data %}selected{% endif %}>✅ Activo</option>
-                    <option value="INACTIVO" {% if form_data.estado_catalogo == 'INACTIVO' %}selected{% endif %}>❌ Inactivo</option>
-                </select>
-            </div>
  
             <div style="display:flex; gap:12px; margin-top:24px;">
                 <button type="submit" class="btn btn-primary">💾 Guardar Catálogo</button>

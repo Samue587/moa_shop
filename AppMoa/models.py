@@ -151,7 +151,7 @@ class Usuario(models.Model):
 # ══════════════════════════════════════════════════════
 # PROVEEDOR
 # Diagrama: PK id_proovedor, nit_proovedor (UNIQUE),
-#           nombre_proovedor, telefono_proovedor,
+#           nombre_proovedor, telefono_proovedor, 
 #           correo_proovedor
 # ══════════════════════════════════════════════════════
 class Proveedor(models.Model):
@@ -179,10 +179,10 @@ class Proveedor(models.Model):
 # Relación: Catalogo 1:N Producto
 # ══════════════════════════════════════════════════════
 class Catalogo(models.Model):
-    nombre_catalogo = models.CharField(max_length=150)
-
-    creado_en      = models.DateTimeField(auto_now_add=True)
-    actualizado_en = models.DateTimeField(auto_now=True)
+    nombre_catalogo      = models.CharField(max_length=150)
+    descripcion_catalogo = models.TextField(blank=True, null=True)
+    creado_en            = models.DateTimeField(auto_now_add=True)
+    actualizado_en       = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table            = 'catalogos'

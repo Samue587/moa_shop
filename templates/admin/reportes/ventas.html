@@ -1,0 +1,160 @@
+{% extends "admin/base_admin.html" %}
+{% load humanize %}
+{% block title %}Reporte Ventas — MOA{% endblock %}
+{% block navbar_title %}💰 Reporte de Ventas{% endblock %}
+
+{% block content %}
+
+<!-- STATS -->
+<div class="stats-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr));margin-bottom:20px;">
+  <div class="stat-card" style="border-left-color:#144272;">
+    <div class="stat-icon" style="background:rgba(20,66,114,0.1);">🧾</div>
+    <div class="stat-info">
+      <div class="stat-number">{{ ventas|length }}</div>
+      <div class="stat-label">Ventas mostradas</div>
+    </div>
+  </div>
+  <div class="stat-card" style="border-left-color:#27ae60;">
+    <div class="stat-icon" style="background:rgba(39,174,96,0.1);">💵</div>
+    <div class="stat-info">
+      <div class="stat-number">${{ total_ingresos|floatformat:0|intcomma }}</div>
+      <div class="stat-label">Ingresos filtro actual</div>
+    </div>
+  </div>
+  <div class="stat-card" style="border-left-color:#e67e22;">
+    <div class="stat-icon" style="background:rgba(230,126,34,0.1);">📦</div>
+    <div class="stat-info">
+      <div class="stat-number">{{ total_productos }}</div>
+      <div class="stat-label">Productos vendidos</div>
+    </div>
+  </div>
+  {% if filtro_label %}
+  <div class="stat-card" style="border-left-color:#e67e22;background:linear-gradient(135deg,#e67e22,#d35400);color:white;">
+    <div class="stat-icon" style="background:rgba(255,255,255,0.15);">🔍</div>
+    <div class="stat-info">
+      <div class="stat-number" style="color:white;font-size:14px;">{{ filtro_label }}</div>
+      <div class="stat-label" style="color:rgba(255,255,255,0.8);">Filtro activo</div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- FILTROS -->
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-body" style="padding:20px 25px;">
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+      <a href="{% url 'reporte_ventas' %}?filtro=hoy"    class="btn btn-secondary btn-sm">📅 Hoy</a>
+      <a href="{% url 'reporte_ventas' %}?filtro=semana" class="btn btn-secondary btn-sm">📆 Esta Semana</a>
+      <a href="{% url 'reporte_ventas' %}?filtro=mes"    class="btn btn-secondary btn-sm">🗓️ Este Mes</a>
+      <a href="{% url 'reporte_ventas' %}"               class="btn btn-secondary btn-sm">🔄 Todas</a>
+    </div>
+
+    <form method="get" action="{% url 'reporte_ventas' %}"
+          style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;margin-bottom:14px;">
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">DESDE</label>
+        <input type="date" name="fecha_inicio" class="form-control" value="{{ fecha_inicio }}">
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">HASTA</label>
+        <input type="date" name="fecha_fin" class="form-control" value="{{ fecha_fin }}">
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">🔍 Buscar por Fecha</button>
+    </form>
+
+    <form method="get" action="{% url 'reporte_ventas' %}"
+          style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;margin-bottom:14px;">
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">BUSCAR POR CLIENTE</label>
+        <input type="text" name="busqueda_usuario" class="form-control"
+               placeholder="Nombre o email..." value="{{ busqueda_usuario }}">
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">🪪 Buscar Cliente</button>
+    </form>
+
+    <form method="get" action="{% url 'reporte_ventas' %}"
+          style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;">
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">BUSCAR POR PRODUCTO</label>
+        <input type="text" name="busqueda_producto" class="form-control"
+               placeholder="Nombre del producto..." value="{{ busqueda_producto }}">
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">📦 Buscar Producto</button>
+    </form>
+
+  </div>
+</div>
+
+<!-- TOP VENDEDORES -->
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-header"><h3>🏆 Clientes con Más Compras</h3></div>
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Cliente</th><th>Email</th><th>N° Compras</th><th>Total Gastado</th></tr>
+      </thead>
+      <tbody>
+        {% for u in top_usuarios %}
+        <tr>
+          <td><strong>{{ forloop.counter }}</strong></td>
+          <td>{{ u.usuario__nombres_usuario }} {{ u.usuario__apellidos_usuario }}</td>
+          <td style="font-size:12px;color:#7f8c8d;">{{ u.usuario__correo_usuario }}</td>
+          <td><span class="badge badge-info">{{ u.num_ventas }}</span></td>
+          <td><strong style="color:#144272;">${{ u.total_gastado|floatformat:0|intcomma }}</strong></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" style="text-align:center;color:#999;">Sin datos</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- TABLA VENTAS -->
+<div class="card">
+  <div class="card-header">
+    <h3>📋 Listado de Ventas</h3>
+    <div style="display:flex;gap:10px;">
+      <a href="{% url 'exportar_ventas_excel' %}" class="btn btn-success btn-sm">📊 Exportar Excel</a>
+      <a href="{% url 'exportar_ventas_pdf' %}"   class="btn btn-danger  btn-sm">📄 Exportar PDF</a>
+    </div>
+  </div>
+  {% if ventas %}
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>Fecha</th><th>Cliente</th><th>Correo</th>
+          <th>Ítems</th><th>Subtotal</th><th>IVA</th><th>Total</th><th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for venta in ventas %}
+        <tr>
+          <td><strong>#{{ venta.id }}</strong></td>
+          <td>
+            {{ venta.fecha|date:"d/m/Y" }}
+            <span style="color:#7f8c8d;font-size:12px;">{{ venta.fecha|date:"H:i" }}</span>
+          </td>
+          <td>{{ venta.usuario.get_full_name }}</td>
+          <td style="font-size:12px;color:#7f8c8d;">{{ venta.usuario.correo_usuario }}</td>
+          <td><span class="badge badge-info">{{ venta.detalles.count }}</span></td>
+          <td>${{ venta.subtotal|floatformat:0|intcomma }}</td>
+          <td style="color:#7f8c8d;">${{ venta.monto_iva|floatformat:0|intcomma }}</td>
+          <td><strong style="color:#144272;">${{ venta.monto_final|floatformat:0|intcomma }}</strong></td>
+          <td><a href="{% url 'detalle_venta' venta.id %}" class="btn btn-info btn-sm">👁️ Ver</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📭</div>
+    <p>No hay ventas con ese filtro.</p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

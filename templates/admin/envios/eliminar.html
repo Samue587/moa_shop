@@ -1,0 +1,63 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Eliminar Envío — TiendaMoa07{% endblock %}
+{% block menu_envios %}active{% endblock %}
+{% block navbar_title %}Eliminar Envío{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">🗑️ Eliminar Envío</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_envios' %}">Envíos</a> ›
+            Eliminar
+        </div>
+    </div>
+</div>
+
+<div class="card" style="max-width:560px; margin:0 auto;">
+    <div class="card-body" style="text-align:center; padding:48px 32px;">
+
+        <div style="font-size:64px; margin-bottom:16px;">⚠️</div>
+
+        <h2 style="color:#2c3e50; margin-bottom:12px;">
+            ¿Eliminar envío #{{ envio.numero_envio }}?
+        </h2>
+
+        <p style="color:#7f8c8d; margin-bottom:8px;">
+            Cliente: <strong>{{ envio.usuario.nombres_usuario }} {{ envio.usuario.apellidos_usuario }}</strong>
+        </p>
+        <p style="color:#7f8c8d; margin-bottom:8px;">
+            Destino: <strong>{{ envio.ciudad_envio }}, {{ envio.departamento_envio }}</strong>
+        </p>
+        <p style="color:#7f8c8d; margin-bottom:8px;">
+            Empresa: <strong>{{ envio.empresa_envio }}</strong>
+        </p>
+        <p style="color:#7f8c8d; margin-bottom:8px;">
+            Estado:
+            {% if envio.estado_envio == 'ENTREGADO' %}
+                <span class="badge badge-entregado">✅ Entregado</span>
+            {% elif envio.estado_envio == 'EN_CAMINO' %}
+                <span class="badge badge-en-camino">🚚 En camino</span>
+            {% elif envio.estado_envio == 'PENDIENTE' %}
+                <span class="badge badge-pendiente">⏳ Pendiente</span>
+            {% elif envio.estado_envio == 'CANCELADO' %}
+                <span class="badge badge-cancelado">❌ Cancelado</span>
+            {% endif %}
+        </p>
+
+        <p style="color:#e74c3c; margin-bottom:32px; margin-top:16px;">
+            Esta acción <strong>no se puede deshacer</strong>.
+        </p>
+
+        <div style="display:flex; gap:12px; justify-content:center;">
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">🗑️ Sí, eliminar</button>
+            </form>
+            <a href="{% url 'admin_envios' %}" class="btn btn-secondary">← Cancelar</a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

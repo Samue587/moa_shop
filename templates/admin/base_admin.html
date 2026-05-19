@@ -38,7 +38,10 @@
         .sidebar:hover .logo-sub  { opacity: 1; display: block; }
 
         /* ── MENÚ ── */
-        .menu { padding: 10px 0; }
+        .menu { padding: 10px 0; overflow-y: auto; height: calc(100vh - 80px); }
+        .menu::-webkit-scrollbar { width: 3px; }
+        .menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+
         .menu-section {
             padding: 8px 0 3px;
             font-size: 9px;
@@ -70,17 +73,15 @@
             white-space: nowrap;
             overflow: hidden;
         }
-        .menu-item:hover { background: rgba(255,255,255,0.1); color: white; border-left-color: #2ECC71; }
+        .menu-item:hover  { background: rgba(255,255,255,0.1); color: white; border-left-color: #2ECC71; }
         .menu-item.active { background: rgba(255,255,255,0.15); color: white; border-left-color: #2ECC71; }
 
-        .menu-icon { font-size: 20px; width: 24px; text-align: center; flex-shrink: 0; }
+        /* Reportes — color especial */
+        .menu-item.reporte:hover  { border-left-color: #f39c12; }
+        .menu-item.reporte.active { border-left-color: #f39c12; background: rgba(243,156,18,0.15); }
 
-        .menu-label {
-            font-size: 14px;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-            flex: 1;
-        }
+        .menu-icon  { font-size: 20px; width: 24px; text-align: center; flex-shrink: 0; }
+        .menu-label { font-size: 14px; opacity: 0; transition: opacity 0.2s ease; flex: 1; }
         .sidebar:hover .menu-label { opacity: 1; }
 
         .menu-badge {
@@ -253,12 +254,14 @@
     </div>
     <nav class="menu">
 
+        <!-- ── GENERAL ── -->
         <div class="menu-section">General</div>
         <a href="{% url 'admin_dashboard' %}" class="menu-item {% block menu_dashboard %}{% endblock %}">
             <span class="menu-icon">📊</span>
             <span class="menu-label">Dashboard</span>
         </a>
 
+        <!-- ── USUARIOS ── -->
         <div class="menu-section">Usuarios</div>
         <a href="{% url 'admin_usuarios' %}" class="menu-item {% block menu_usuarios %}{% endblock %}">
             <span class="menu-icon">🪪</span>
@@ -273,6 +276,7 @@
             <span class="menu-label">Permisos</span>
         </a>
 
+        <!-- ── CATÁLOGO ── -->
         <div class="menu-section">Catálogo</div>
         <a href="{% url 'admin_proveedores' %}" class="menu-item {% block menu_proveedores %}{% endblock %}">
             <span class="menu-icon">🏭</span>
@@ -291,12 +295,14 @@
             <span class="menu-label">Productos</span>
         </a>
 
+        <!-- ── INVENTARIO ── -->
         <div class="menu-section">Inventario</div>
         <a href="{% url 'admin_inventario' %}" class="menu-item {% block menu_inventario %}{% endblock %}">
             <span class="menu-icon">📥</span>
             <span class="menu-label">Entradas</span>
         </a>
 
+        <!-- ── VENTAS ── -->
         <div class="menu-section">Ventas</div>
         <a href="{% url 'admin_ventas' %}" class="menu-item {% block menu_ventas %}{% endblock %}">
             <span class="menu-icon">💰</span>
@@ -310,6 +316,14 @@
             {% endif %}
         </a>
 
+        <!-- ── REPORTES ── (un solo link al hub) -->
+        <div class="menu-section">Reportes</div>
+        <a href="{% url 'reportes_hub' %}" class="menu-item reporte {% block menu_reportes %}{% endblock %}">
+            <span class="menu-icon">📑</span>
+            <span class="menu-label">Reportes</span>
+        </a>
+
+        <!-- ── TIENDA ── -->
         <div class="menu-section">Tienda</div>
         <a href="{% url 'tienda' %}" class="menu-item">
             <span class="menu-icon">🛍️</span>

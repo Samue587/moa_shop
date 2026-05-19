@@ -75,9 +75,9 @@ DATABASES = {
         'ENGINE':   'django.db.backends.mysql',
         'NAME':     'TiendaMoa07',       # nombre de tu base de datos en MySQL
         'USER':     'root',              # tu usuario MySQL
-        'PASSWORD': '12345',  # tu contraseña MySQL
+        'PASSWORD': 'Level_one19',  # tu contraseña MySQL
         'HOST':     '127.0.0.1',
-        'PORT':     '3307',
+        'PORT':     '3306',
         'OPTIONS': {
             'charset': 'utf8mb4',
         },

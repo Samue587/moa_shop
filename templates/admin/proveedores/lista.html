@@ -1,5 +1,5 @@
 {% extends "admin/base_admin.html" %}
-{% block title %}Proveedores - MOA{% endblock %}
+{% block title %}Proveedores — TiendaMoa07{% endblock %}
 {% block menu_proveedores %}active{% endblock %}
 {% block navbar_title %}Proveedores{% endblock %}
  
@@ -8,32 +8,19 @@
     <div>
         <div class="page-title">🏭 Proveedores</div>
         <div class="breadcrumb">
-            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
-            Proveedores
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> › Proveedores
         </div>
     </div>
-    <a href="{% url 'crear_proveedor' %}" class="btn btn-primary">➕ Nuevo Proveedor</a>
+    <a href="{% url 'crear_proveedor' %}" class="btn btn-success">➕ Nuevo Proveedor</a>
 </div>
  
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">
-            {{ message }}
-        </div>
-    {% endfor %}
-{% endif %}
- 
 <div class="card">
-    <div class="card-body" style="padding:0;">
- 
-        {% if proveedores %}
-        <div style="padding:16px 20px; border-bottom:1px solid #e0e6ed;">
-            <span style="color:#7f8c8d; font-size:14px;">
-                Total: <strong>{{ proveedores|length }} proveedor(es)</strong>
-            </span>
-        </div>
- 
-        <table class="table">
+    <div class="card-header">
+        <h3>🏭 Proveedores registrados</h3>
+        <span style="color:#7f8c8d;font-size:13px;">{{ proveedores|length }} proveedor(es) en total</span>
+    </div>
+    <div class="table-responsive">
+        <table>
             <thead>
                 <tr>
                     <th>#</th>
@@ -41,73 +28,50 @@
                     <th>NIT / Doc.</th>
                     <th>Teléfono</th>
                     <th>Correo</th>
-                    <th>Ciudad</th>
-                    <th>Estado</th>
-                    <th style="text-align:center;">Acciones</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 {% for proveedor in proveedores %}
                 <tr>
-                    <td style="color:#7f8c8d; font-size:13px;">{{ forloop.counter }}</td>
+                    <td style="color:#7f8c8d;font-size:13px;">{{ forloop.counter }}</td>
                     <td>
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <div style="width:38px; height:38px; border-radius:8px; background:linear-gradient(135deg,#144272,#2a628f); display:flex; align-items:center; justify-content:center; color:#fff; font-size:16px; flex-shrink:0;">
-                                🏭
-                            </div>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <div style="width:38px;height:38px;border-radius:8px;background:linear-gradient(135deg,#144272,#205295);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0;">🏭</div>
                             <div>
-                                <div style="font-weight:600; color:#2c3e50;">{{ proveedor.nombre_proveedor }}</div>
-                                {% if proveedor.contacto_proveedor %}
-                                    <div style="font-size:12px; color:#7f8c8d;">👤 {{ proveedor.contacto_proveedor }}</div>
-                                {% endif %}
+                                <div style="font-weight:600;color:#2c3e50;">{{ proveedor.nombre_proveedor }}</div>
                             </div>
                         </div>
                     </td>
-                    <td style="font-size:13px; color:#2c3e50;">
-                        {{ proveedor.nit_proveedor|default:"—" }}
-                    </td>
-                    <td style="font-size:13px; color:#2c3e50;">
-                        {{ proveedor.telefono_proveedor|default:"—" }}
-                    </td>
-                    <td style="font-size:13px; color:#2c3e50;">
+                    <td style="font-size:13px;">{{ proveedor.nit_proveedor|default:"—" }}</td>
+                    <td style="font-size:13px;">{{ proveedor.telefono_proveedor|default:"—" }}</td>
+                    <td style="font-size:13px;">
                         {% if proveedor.correo_proveedor %}
-                            <a href="mailto:{{ proveedor.correo_proveedor }}" style="color:#144272; text-decoration:none;">
+                            <a href="mailto:{{ proveedor.correo_proveedor }}" style="color:#144272;text-decoration:none;">
                                 {{ proveedor.correo_proveedor }}
                             </a>
-                        {% else %}
-                            <span style="color:#bdc3c7;">—</span>
-                        {% endif %}
-                    </td>
-                    <td style="font-size:13px; color:#7f8c8d;">
-                        {{ proveedor.ciudad_proveedor|default:"—" }}
+                        {% else %}—{% endif %}
                     </td>
                     <td>
-                        {% if proveedor.estado_proveedor == 'ACTIVO' %}
-                            <span class="badge badge-success">✅ Activo</span>
-                        {% else %}
-                            <span class="badge badge-danger">❌ Inactivo</span>
-                        {% endif %}
+                        <div style="display:flex;gap:8px;">
+                            <a href="{% url 'editar_proveedor' proveedor.id %}" class="btn btn-warning btn-sm">✏️ Editar</a>
+                            <a href="{% url 'eliminar_proveedor' proveedor.id %}" class="btn btn-danger btn-sm">🗑️ Eliminar</a>
+                        </div>
                     </td>
-                    <td style="text-align:center;">
-                        <div style="display:flex; gap:6px; justify-content:center;">
-                            <a href="{% url 'editar_proveedor' proveedor.id %}" class="btn btn-sm btn-warning" title="Editar">✏️</a>
-                            <a href="{% url 'eliminar_proveedor' proveedor.id %}" class="btn btn-sm btn-danger" title="Eliminar">🗑️</a>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <div class="empty-icon">🏭</div>
+                            <p>No hay proveedores registrados. <a href="{% url 'crear_proveedor' %}">Crear el primero</a></p>
                         </div>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
- 
-        {% else %}
-        <div style="text-align:center; padding:60px 20px; color:#7f8c8d;">
-            <div style="font-size:56px; margin-bottom:16px;">📭</div>
-            <h3 style="font-size:18px; margin-bottom:8px; color:#2c3e50;">No hay proveedores registrados</h3>
-            <p style="font-size:14px; margin-bottom:24px;">Agrega tu primer proveedor para asociarlo a los productos.</p>
-            <a href="{% url 'crear_proveedor' %}" class="btn btn-primary">➕ Crear primer proveedor</a>
-        </div>
-        {% endif %}
- 
     </div>
 </div>
 {% endblock %}
+ 
