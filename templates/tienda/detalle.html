@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{% load humanize %}<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -193,7 +193,7 @@
                                 </div>
                             </div>
                             <div class="var-right">
-                                <div class="var-price">${{ var.precio_con_iva|floatformat:0 }}</div>
+                                <div class="var-price">${{ var.precio_con_iva|floatformat:0|intcomma }}</div>
                                 <div class="var-stock {% if var.stock_actual <= 5 %}low{% endif %}">
                                     {% if var.stock_actual <= 5 %}
                                         ¡Solo {{ var.stock_actual }} disponibles!
@@ -210,7 +210,7 @@
                 <!-- Precio dinámico -->
                 <div>
                     <div class="product-price" id="precio-display">
-                        ${{ variaciones.0.precio_con_iva|floatformat:0 }}
+                        ${{ variaciones.0.precio_con_iva|floatformat:0|intcomma }}
                     </div>
                     <div class="price-note">IVA incluido</div>
                 </div>
@@ -296,8 +296,9 @@
     }
 
     function actualizarPrecio(precio) {
-        const num = parseFloat(precio);
-        document.getElementById('precio-display').textContent = '$' + num.toLocaleString('es-CO', { maximumFractionDigits: 0 });
+        const num = parseInt(precio);
+        const formatted = num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        document.getElementById('precio-display').textContent = '$' + formatted;
     }
 
     function cambiarCantidad(delta) {

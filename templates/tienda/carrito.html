@@ -275,12 +275,9 @@
             </div>
 
             <div class="summary-actions">
-                <form action="{% url 'checkout_procesar' %}" method="post" style="margin:0;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn-checkout">
-                        💳 Proceder al pago
-                    </button>
-                </form>
+                    <a href="{% url 'checkout_formulario' %}" class="btn-checkout">
+                            💳 Proceder al pago
+                         </a>
 
                 <a href="{% url 'tienda' %}" class="btn-continue">
                     ← Seguir comprando

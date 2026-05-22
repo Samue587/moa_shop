@@ -320,9 +320,10 @@ class VariacionProducto(models.Model):
         return f"{self.producto.nombre_producto} | {self.talla} - {self.color} (SKU: {self.sku_unico})"
 
     @property
-    def precio_con_iva(self) -> float:
-        return self.precio_base * (1 + self.iva_porcentaje / 100)
-
+    def precio_con_iva(self) -> int:
+        return int(self.precio_base * (1 + self.iva_porcentaje / 100))
+    
+    
     @property
     def bajo_stock(self) -> bool:
         return self.stock_actual <= self.stock_minimo

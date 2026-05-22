@@ -25,7 +25,7 @@
       min-height: 100vh;
     }
 
-    /* ── NAVBAR ── */
+    /* NAVBAR */
     .navbar {
       background: var(--ink);
       padding: 0 2rem;
@@ -43,7 +43,7 @@
     }
     .navbar-brand span { color: var(--orange); }
 
-    /* ── HERO CONFIRMACIÓN ── */
+    /* HERO */
     .confirm-hero {
       background: linear-gradient(135deg, var(--navy) 0%, #0f1a2e 100%);
       padding: 3.5rem 2rem 3rem;
@@ -98,14 +98,14 @@
       position: relative;
     }
 
-    /* ── WRAPPER ── */
+    /* WRAPPER */
     .factura-wrapper {
-      max-width: 560px;
+      max-width: 580px;
       margin: 2.5rem auto 3rem;
       padding: 0 1.2rem;
     }
 
-    /* ── FACTURA CARD ── */
+    /* FACTURA CARD */
     .factura {
       background: var(--white);
       border-radius: 16px;
@@ -121,11 +121,7 @@
       align-items: center;
       justify-content: space-between;
     }
-    .fh-logo {
-      display: flex;
-      align-items: center;
-      gap: .7rem;
-    }
+    .fh-logo { display: flex; align-items: center; gap: .7rem; }
     .fh-logo-sq {
       width: 40px; height: 40px;
       background: rgba(255,255,255,.25);
@@ -169,7 +165,7 @@
     /* BODY */
     .factura-body { padding: 1.6rem 1.8rem; }
 
-    /* SECCIÓN CLIENTE + ESTADO */
+    /* CLIENTE + ESTADO */
     .sec-top {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -182,15 +178,9 @@
       color: var(--muted); letter-spacing: 2px;
       text-transform: uppercase; margin-bottom: .35rem;
     }
-    .cliente-nombre {
-      font-size: 1rem; font-weight: 700; color: var(--ink);
-    }
-    .cliente-email {
-      font-size: .75rem; color: var(--muted); margin-top: .15rem;
-    }
-    .estado-val {
-      font-size: 1rem; font-weight: 700; color: var(--ink);
-    }
+    .cliente-nombre { font-size: 1rem; font-weight: 700; color: var(--ink); }
+    .cliente-email  { font-size: .75rem; color: var(--muted); margin-top: .15rem; }
+    .estado-val     { font-size: 1rem; font-weight: 700; color: var(--ink); }
     .estado-badge {
       display: inline-flex; align-items: center; gap: .3rem;
       margin-top: .3rem;
@@ -198,7 +188,7 @@
       color: var(--green);
     }
 
-    /* SECCIÓN ENVÍO */
+    /* ENVIO */
     .sec-envio {
       padding: 1.3rem 0;
       border-bottom: 1px solid var(--border);
@@ -214,37 +204,31 @@
       grid-template-columns: 1fr 1fr;
       gap: .8rem 1.2rem;
     }
-    .envio-item {}
     .envio-item-label {
       font-size: .62rem; font-weight: 800;
       color: var(--muted); letter-spacing: 1.5px;
       text-transform: uppercase; margin-bottom: .25rem;
     }
-    .envio-item-val {
-      font-size: .88rem; font-weight: 700; color: var(--ink);
-    }
-    .envio-item-sub {
-      font-size: .72rem; color: var(--muted); margin-top: .1rem;
-    }
-    .fecha-llegada-val {
-      color: var(--green);
-    }
-    .badge-encamino {
+    .envio-item-val  { font-size: .88rem; font-weight: 700; color: var(--ink); }
+    .envio-item-sub  { font-size: .72rem; color: var(--muted); margin-top: .1rem; }
+    .fecha-llegada-val { color: var(--green); }
+
+    .badge-pendiente {
       display: inline-block;
-      background: rgba(34,197,94,.12);
-      color: var(--green);
-      border: 1px solid rgba(34,197,94,.35);
+      background: rgba(255,193,7,.12);
+      color: #b45309;
+      border: 1px solid rgba(255,193,7,.4);
       border-radius: 20px;
       padding: .15rem .6rem;
       font-size: .65rem; font-weight: 800;
       letter-spacing: 1px; text-transform: uppercase;
       margin-top: .3rem;
     }
-    .badge-pendiente {
+    .badge-encamino {
       display: inline-block;
-      background: rgba(255,193,7,.12);
-      color: #b45309;
-      border: 1px solid rgba(255,193,7,.4);
+      background: rgba(34,197,94,.12);
+      color: var(--green);
+      border: 1px solid rgba(34,197,94,.35);
       border-radius: 20px;
       padding: .15rem .6rem;
       font-size: .65rem; font-weight: 800;
@@ -289,18 +273,36 @@
       border-bottom: 1px dashed var(--border);
     }
     .prod-row:last-child { border-bottom: none; }
-    .prod-nombre {
-      font-size: .9rem; font-weight: 700; color: var(--ink);
-    }
-    .prod-variacion {
-      font-size: .72rem; color: var(--muted); margin-top: .1rem;
-    }
+    .prod-nombre    { font-size: .9rem; font-weight: 700; color: var(--ink); }
+    .prod-variacion { font-size: .72rem; color: var(--muted); margin-top: .1rem; }
     .prod-precio, .prod-cant, .prod-subtotal {
       text-align: right;
       font-size: .88rem; font-weight: 600; color: var(--ink);
     }
-    .prod-cant { color: var(--orange); font-weight: 800; }
+    .prod-cant     { color: var(--orange); font-weight: 800; }
     .prod-subtotal { font-weight: 800; }
+
+    /* DESGLOSE */
+    .desglose {
+      padding: 1rem 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+    }
+    .desglose-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: .82rem;
+      color: var(--muted);
+    }
+    .desglose-row.total-row {
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--ink);
+      border-top: 1px solid var(--border);
+      padding-top: .5rem;
+      margin-top: .3rem;
+    }
 
     /* TOTAL */
     .total-blk {
@@ -312,27 +314,20 @@
       align-items: center;
       margin-top: 1.3rem;
     }
-    .total-left {}
     .total-label-txt {
       font-size: .62rem; font-weight: 800;
       color: rgba(255,255,255,.5);
       letter-spacing: 2px; text-transform: uppercase;
     }
-    .total-qty {
-      font-size: .75rem; color: rgba(255,255,255,.3);
-      margin-top: .2rem;
-    }
+    .total-qty { font-size: .75rem; color: rgba(255,255,255,.3); margin-top: .2rem; }
     .total-monto {
       font-family: 'Darker Grotesque', sans-serif;
       font-size: 2.4rem; font-weight: 900;
       color: var(--orange); line-height: 1;
     }
-    .total-cop {
-      font-size: .65rem; color: rgba(255,255,255,.3);
-      text-align: right; margin-top: .2rem;
-    }
+    .total-cop { font-size: .65rem; color: rgba(255,255,255,.3); text-align: right; margin-top: .2rem; }
 
-    /* FOOTER FACTURA */
+    /* FOOTER */
     .factura-footer {
       background: #fafaf8;
       border-top: 1px solid var(--border);
@@ -342,57 +337,29 @@
       align-items: center;
       gap: 1rem;
     }
-    .footer-frase {
-      font-size: .75rem;
-      color: var(--muted);
-      font-style: italic;
-    }
-    .footer-loc {
-      font-size: .7rem; font-weight: 800;
-      color: var(--ink);
-      letter-spacing: 1px; text-align: right;
-      white-space: nowrap;
-    }
-    .footer-copy {
-      font-size: .62rem; color: var(--muted);
-      margin-top: .15rem; text-align: right;
-    }
+    .footer-frase   { font-size: .75rem; color: var(--muted); font-style: italic; }
+    .footer-loc     { font-size: .7rem; font-weight: 800; color: var(--ink); letter-spacing: 1px; text-align: right; white-space: nowrap; }
+    .footer-copy    { font-size: .62rem; color: var(--muted); margin-top: .15rem; text-align: right; }
 
     /* ACCIONES */
-    .actions-row {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1.5rem;
-    }
+    .actions-row { display: flex; gap: 1rem; margin-top: 1.5rem; }
     .btn-primary {
       flex: 1;
-      background: var(--orange);
-      color: var(--white);
-      border: none;
-      border-radius: 10px;
-      padding: .85rem;
+      background: var(--orange); color: var(--white);
+      border: none; border-radius: 10px; padding: .85rem;
       font-family: 'Darker Grotesque', sans-serif;
-      font-size: 1rem;
-      font-weight: 800;
-      cursor: pointer;
-      text-decoration: none;
-      text-align: center;
+      font-size: 1rem; font-weight: 800;
+      cursor: pointer; text-decoration: none; text-align: center;
       transition: background .2s;
     }
     .btn-primary:hover { background: #e85a25; }
     .btn-secondary {
       flex: 1;
-      background: transparent;
-      color: var(--ink);
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      padding: .85rem;
+      background: transparent; color: var(--ink);
+      border: 2px solid var(--border); border-radius: 10px; padding: .85rem;
       font-family: 'Darker Grotesque', sans-serif;
-      font-size: 1rem;
-      font-weight: 800;
-      cursor: pointer;
-      text-decoration: none;
-      text-align: center;
+      font-size: 1rem; font-weight: 800;
+      cursor: pointer; text-decoration: none; text-align: center;
       transition: border-color .2s;
     }
     .btn-secondary:hover { border-color: var(--ink); }
@@ -405,7 +372,7 @@
   <a href="{% url 'tienda' %}" class="navbar-brand">MOA<span>.</span></a>
 </nav>
 
-<!-- HERO CONFIRMACIÓN -->
+<!-- HERO -->
 <div class="confirm-hero">
   <div class="checkmark">✓</div>
   <h1>¡Pedido confirmado!</h1>
@@ -417,7 +384,7 @@
 <div class="factura-wrapper">
   <div class="factura">
 
-    <!-- HEADER NARANJA -->
+    <!-- HEADER -->
     <div class="factura-header">
       <div class="fh-logo">
         <div class="fh-logo-sq"><span>M</span></div>
@@ -450,27 +417,27 @@
         </div>
       </div>
 
-      <!-- DATOS DE ENVÍO -->
+      <!-- ENVIO -->
       {% if envio %}
       <div class="sec-envio">
-        <div class="sec-envio-title">🔸 Datos de envío</div>
+        <div class="sec-envio-title">📦 Datos de envío</div>
         <div class="envio-grid">
 
           <div class="envio-item">
             <div class="envio-item-label">Dirección</div>
             <div class="envio-item-val">{{ envio.direccion_envio }}</div>
             {% if envio.barrio_envio %}
-              <div class="envio-item-sub">{{ envio.barrio_envio }}, {{ envio.ciudad_envio }} {{ envio.departamento_envio }}</div>
+              <div class="envio-item-sub">{{ envio.barrio_envio }}, {{ envio.ciudad_envio }}, {{ envio.departamento_envio }}</div>
             {% else %}
               <div class="envio-item-sub">{{ envio.ciudad_envio }}, {{ envio.departamento_envio }}</div>
             {% endif %}
           </div>
 
           <div class="envio-item">
-            <div class="envio-item-label">Empresa</div>
+            <div class="envio-item-label">Empresa transportadora</div>
             <div class="envio-item-val">{{ envio.empresa_transportadora }}</div>
             {% if envio.numero_guia %}
-              <div class="envio-item-sub">N° envío: #{{ envio.numero_guia }}</div>
+              <div class="envio-item-sub">N° guía: {{ envio.numero_guia }}</div>
             {% endif %}
           </div>
 
@@ -485,16 +452,16 @@
               {% if envio.fecha_estipulada_llegada %}{{ envio.fecha_estipulada_llegada|date:"d/m/Y" }}{% else %}—{% endif %}
             </div>
             {% if envio.estado_envio == 'EN_TRANSITO' %}
-              <div class="badge-encamino">En camino</div>
+              <div class="badge-encamino">🚚 En camino</div>
             {% elif envio.estado_envio == 'ENTREGADO' %}
-              <div class="badge-entregado">Entregado</div>
+              <div class="badge-entregado">✓ Entregado</div>
             {% else %}
-              <div class="badge-pendiente">Pendiente</div>
+              <div class="badge-pendiente">⏳ Preparando</div>
             {% endif %}
           </div>
 
           <div class="envio-item" style="grid-column:1/-1;">
-            <div class="envio-item-label">Documento receptor</div>
+            <div class="envio-item-label">Teléfono de contacto</div>
             <div class="envio-item-val">{{ envio.telefono_llegada }}</div>
           </div>
 
@@ -502,7 +469,7 @@
       </div>
       {% endif %}
 
-      <!-- TABLA PRODUCTOS -->
+      <!-- PRODUCTOS -->
       <div class="sec-productos">
         <div class="tabla-header">
           <span class="th">Producto</span>
@@ -516,21 +483,37 @@
           <div>
             <div class="prod-nombre">{{ d.variacion.producto.nombre_producto }}</div>
             <div class="prod-variacion">
-              {% if d.variacion.talla %}{{ d.variacion.talla }}{% endif %}
+              {% if d.variacion.talla %}Talla: {{ d.variacion.talla }}{% endif %}
               {% if d.variacion.talla and d.variacion.color %} · {% endif %}
-              {% if d.variacion.color %}{{ d.variacion.color }}{% endif %}
+              {% if d.variacion.color %}Color: {{ d.variacion.color }}{% endif %}
             </div>
           </div>
           <div class="prod-precio">${{ d.precio_unitario|floatformat:0|intcomma }}</div>
-          <div class="prod-cant">x{{ d.cantidad }}</div>
+          <div class="prod-cant">×{{ d.cantidad }}</div>
           <div class="prod-subtotal">${{ d.subtotal|floatformat:0|intcomma }}</div>
         </div>
         {% endfor %}
       </div>
 
+      <!-- DESGLOSE -->
+      <div class="desglose">
+        <div class="desglose-row">
+          <span>Subtotal</span>
+          <span>${{ venta.subtotal|floatformat:0|intcomma }}</span>
+        </div>
+        <div class="desglose-row">
+          <span>IVA (19%)</span>
+          <span>${{ venta.monto_iva|floatformat:0|intcomma }}</span>
+        </div>
+        <div class="desglose-row">
+          <span>Envío</span>
+          <span style="color:var(--green); font-weight:700;">Gratis</span>
+        </div>
+      </div>
+
       <!-- TOTAL -->
       <div class="total-blk">
-        <div class="total-left">
+        <div>
           <div class="total-label-txt">Total pagado</div>
           <div class="total-qty">{{ detalles|length }} producto{% if detalles|length != 1 %}s{% endif %}</div>
         </div>
@@ -542,7 +525,7 @@
 
     </div><!-- factura-body -->
 
-    <!-- FOOTER FACTURA -->
+    <!-- FOOTER -->
     <div class="factura-footer">
       <div class="footer-frase">"Tu estilo, nuestra pasión. Gracias por elegirnos."</div>
       <div>
@@ -555,8 +538,8 @@
 
   <!-- ACCIONES -->
   <div class="actions-row">
-    <a href="{% url 'tienda' %}" class="btn-primary">Seguir comprando</a>
-    <a href="{% url 'perfil_usuario' %}" class="btn-secondary">Ver mis pedidos</div></a>
+    <a href="{% url 'tienda' %}" class="btn-primary">🛍️ Seguir comprando</a>
+    <a href="{% url 'perfil_usuario' %}" class="btn-secondary">📦 Ver mis pedidos</a>
   </div>
 
 </div><!-- factura-wrapper -->

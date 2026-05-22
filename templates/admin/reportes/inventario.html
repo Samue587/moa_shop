@@ -222,39 +222,31 @@
       </thead>
       <tbody>
         {% for v in variaciones %}
-        <tr>
-          <td><strong>{{ v.producto.nombre }}</strong></td>
-          <td>{{ v.producto.marca|default:"—" }}</td>
-          <td>{{ v.producto.categoria.nombre|default:"—" }}</td>
-          <td>{{ v.talla|default:"—" }}</td>
-          <td>
-            {% if v.color %}
-              <span style="display:inline-flex;align-items:center;gap:6px;">
-                <span style="width:12px;height:12px;border-radius:50%;background:{{ v.color }};border:1px solid #ccc;display:inline-block;"></span>
-                {{ v.color }}
-              </span>
-            {% else %}—{% endif %}
-          </td>
-          <td><strong>{{ v.stock }}</strong></td>
-          <td>{{ v.producto.ciudad|default:"—" }}</td>
-          <td>{{ v.producto.departamento|default:"—" }}</td>
-          <td>
-            {% if v.stock == 0 %}
-              <span class="badge" style="background:#e74c3c;color:#fff;">Agotado</span>
-            {% elif v.stock <= 5 %}
-              <span class="badge" style="background:#e67e22;color:#fff;">Bajo stock</span>
-            {% else %}
-              <span class="badge" style="background:#27ae60;color:#fff;">Disponible</span>
-            {% endif %}
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="9" style="text-align:center;padding:40px;color:#999;">
-            📭 No se encontraron productos con los filtros seleccionados.
-          </td>
-        </tr>
-        {% endfor %}
+<tr>
+  <td><strong>{{ v.producto.nombre_producto }}</strong></td>
+  <td>{{ v.producto.categoria.nombre|default:"—" }}</td>
+  <td>{{ v.talla|default:"—" }}</td>
+  <td>{{ v.color|default:"—" }}</td>
+  <td>{{ v.stock_actual }}</td>
+  <td>—</td>
+  <td>—</td>
+  <td>
+    {% if v.sin_stock %}
+      <span class="badge" style="background:#e74c3c;color:#fff;">Agotado</span>
+    {% elif v.bajo_stock %}
+      <span class="badge" style="background:#e67e22;color:#fff;">Bajo stock</span>
+    {% else %}
+      <span class="badge" style="background:#27ae60;color:#fff;">Disponible</span>
+    {% endif %}
+  </td>
+</tr>
+{% empty %}
+<tr>
+  <td colspan="9" style="text-align:center;padding:40px;color:#999;">
+    📭 No se encontraron productos con los filtros seleccionados.
+  </td>
+</tr>
+{% endfor %}
       </tbody>
     </table>
   </div>

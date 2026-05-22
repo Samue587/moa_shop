@@ -22,7 +22,6 @@
         }
         body { font-family: 'Instrument Sans', sans-serif; background: var(--light); color: var(--dark); }
 
-        /* NAVBAR */
         .navbar { background: var(--white); box-shadow: 0 2px 20px var(--shadow); position: sticky; top: 0; z-index: 100; }
         .navbar-container { max-width: 1200px; margin: 0 auto; padding: 0 30px; display: flex; justify-content: space-between; align-items: center; height: 70px; }
         .logo { font-family: 'Darker Grotesque', sans-serif; font-size: 30px; font-weight: 900; color: var(--primary); text-decoration: none; }
@@ -33,10 +32,8 @@
         .cart-count { background: var(--primary); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
         .btn-logout { background: var(--danger); color: white; padding: 10px 20px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 14px; }
 
-        /* LAYOUT */
         .container { max-width: 1200px; margin: 0 auto; padding: 40px 30px; display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
 
-        /* SIDEBAR */
         .perfil-sidebar { display: flex; flex-direction: column; gap: 20px; }
 
         .avatar-card { background: white; border-radius: 16px; box-shadow: 0 4px 15px var(--shadow); padding: 30px; text-align: center; }
@@ -61,7 +58,6 @@
         .nav-item.danger { color: var(--danger); }
         .nav-item.danger:hover { background: #fef0f0; }
 
-        /* CONTENT */
         .perfil-content { display: flex; flex-direction: column; gap: 25px; }
 
         .section-card { background: white; border-radius: 16px; box-shadow: 0 4px 15px var(--shadow); overflow: hidden; }
@@ -69,7 +65,6 @@
         .section-title { font-size: 18px; font-weight: 700; color: var(--dark); }
         .section-body { padding: 25px; }
 
-        /* FORM */
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
         .form-group { display: flex; flex-direction: column; gap: 8px; }
         .form-group.full { grid-column: span 2; }
@@ -79,16 +74,13 @@
         .btn-save { padding: 12px 30px; background: var(--primary); color: white; border: none; border-radius: 50px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; }
         .btn-save:hover { background: var(--primary-dark); transform: translateY(-2px); }
 
-        /* ALERTS */
         .alert { padding: 14px 20px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; display: flex; align-items: center; gap: 10px; }
         .alert-success { background: #d4edda; color: #155724; border-left: 4px solid var(--success); }
         .alert-error   { background: #f8d7da; color: #721c24; border-left: 4px solid var(--danger); }
 
-        /* HISTORIAL */
         .empty-history { text-align: center; padding: 50px 20px; color: var(--gray); }
         .empty-icon { font-size: 56px; margin-bottom: 16px; opacity: 0.4; }
 
-        /* TAB CONTENT */
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
@@ -124,7 +116,7 @@
             <div class="avatar-name">{{ usuario.nombres_usuario }} {{ usuario.apellidos_usuario }}</div>
             <div class="avatar-email">{{ usuario.correo_usuario }}</div>
             <span class="avatar-rol">
-                {% if usuario.rol.nombre_rol == 'administrador' %}👑 Administrador{% else %}🪪 Cliente{% endif %}
+                {% if usuario.is_admin %}👑 Administrador{% else %}🪪 Cliente{% endif %}
             </span>
         </div>
 
@@ -145,7 +137,7 @@
             <button class="nav-item" onclick="mostrarTab('password', this)">🛡️ Contraseña</button>
             <button class="nav-item" onclick="mostrarTab('historial', this)">📦 Mis pedidos</button>
             <a href="{% url 'tienda' %}" class="nav-item">🛍️ Ir a la tienda</a>
-            {% if usuario.rol.nombre_rol == 'administrador' %}
+            {% if usuario.is_admin %}
             <a href="{% url 'admin_dashboard' %}" class="nav-item">🏠 Panel Admin</a>
             {% endif %}
             <a href="{% url 'logout' %}" class="nav-item danger">🚪 Cerrar sesión</a>
@@ -229,7 +221,7 @@
             <div class="section-body">
                 {% if ventas %}
                     {% for venta in ventas %}
-                    {% with envio=venta.envio_set.first %}
+                    {% with envio=venta.envio %}
                     <div style="border:2px solid #f0f0f0; border-radius:14px; margin-bottom:20px; overflow:hidden; transition: border-color .2s;"
                          onmouseover="this.style.borderColor='#ddd'" onmouseout="this.style.borderColor='#f0f0f0'">
 
@@ -237,7 +229,7 @@
                         <div style="background:#f8f8f8; padding:14px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; border-bottom:1px solid #f0f0f0;">
                             <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
                                 <span style="font-size:15px; font-weight:700; color:var(--dark);">Pedido #{{ venta.id }}</span>
-                                <span style="font-size:12px; color:var(--gray);">📅 {{ venta.fecha_venta|date:"d/m/Y" }} {{ venta.fecha_venta|date:"H:i" }}</span>
+                                <span style="font-size:12px; color:var(--gray);">📅 {{ venta.fecha|date:"d/m/Y" }} {{ venta.fecha|date:"H:i" }}</span>
                             </div>
                             <span style="font-size:17px; font-weight:800; color:var(--secondary);">
                                 ${{ venta.monto_final|floatformat:0|intcomma }}
@@ -246,14 +238,14 @@
 
                         <!-- Productos -->
                         <div style="padding:16px 20px; border-bottom:1px solid #f0f0f0;">
-                            {% for detalle in venta.detalleventa_set.all %}
+                            {% for detalle in venta.detalles.all %}
                             <div style="display:flex; align-items:center; gap:12px; padding:6px 0;
                                         {% if not forloop.last %}border-bottom:1px dashed #f5f5f5;{% endif %}">
                                 <div style="width:42px; height:42px; border-radius:8px; background:#f0f4ff;
                                             display:flex; align-items:center; justify-content:center;
                                             font-size:18px; flex-shrink:0; overflow:hidden;">
-                                    {% if detalle.variacion.producto.foto_producto %}
-                                        <img src="/imagenes/{{ detalle.variacion.producto.foto_producto }}" alt=""
+                                    {% if detalle.variacion.producto.foto %}
+                                        <img src="/imagenes/{{ detalle.variacion.producto.foto }}" alt=""
                                              style="width:100%; height:100%; object-fit:cover;">
                                     {% else %}👗{% endif %}
                                 </div>
@@ -263,13 +255,13 @@
                                         {{ detalle.variacion.producto.nombre_producto }}
                                     </div>
                                     <div style="font-size:12px; color:var(--gray);">
-                                        Talla: {{ detalle.variacion.talla_variacion }} ·
-                                        Color: {{ detalle.variacion.color_variacion }} ·
-                                        Cant: {{ detalle.cantidad_detalle }}
+                                        Talla: {{ detalle.variacion.talla }} ·
+                                        Color: {{ detalle.variacion.color }} ·
+                                        Cant: {{ detalle.cantidad }}
                                     </div>
                                 </div>
                                 <div style="font-size:13px; font-weight:700; color:var(--dark); flex-shrink:0;">
-                                    ${{ detalle.subtotal_detalle|floatformat:0|intcomma }}
+                                    ${{ detalle.subtotal|floatformat:0|intcomma }}
                                 </div>
                             </div>
                             {% endfor %}
@@ -278,7 +270,6 @@
                         <!-- Bloque envío -->
                         <div style="padding:16px 20px;">
                             {% if envio %}
-                                <!-- Estado badge -->
                                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
                                     <div style="display:flex; align-items:center; gap:8px;">
                                         {% if envio.estado_envio == 'ENTREGADO' %}
@@ -290,14 +281,15 @@
                                         {% else %}
                                             <span style="background:#e3f2fd; color:#1565c0; padding:5px 14px; border-radius:50px; font-size:12px; font-weight:700;">⏳ Preparando</span>
                                         {% endif %}
-                                        <span style="font-size:12px; color:var(--gray);">{{ envio.empresa_envio }} · #{{ envio.numero_envio }}</span>
+                                        <span style="font-size:12px; color:var(--gray);">
+                                            {{ envio.empresa_transportadora|default:"—" }} · #{{ envio.numero_guia|default:"—" }}
+                                        </span>
                                     </div>
                                     <span style="font-size:12px; color:var(--gray);">
                                         📍 {{ envio.ciudad_envio }}, {{ envio.departamento_envio }}
                                     </span>
                                 </div>
 
-                                <!-- Barra de progreso -->
                                 {% if envio.estado_envio != 'CANCELADO' %}
                                 <div style="position:relative; margin-bottom:10px;">
                                     <div style="position:absolute; top:10px; left:10%; right:10%; height:3px; background:#e0e0e0; border-radius:2px;"></div>
@@ -307,7 +299,6 @@
                                     </div>
                                     <div style="display:flex; justify-content:space-between; position:relative; padding:0 10%;">
 
-                                        <!-- Paso 1: Preparando -->
                                         <div style="display:flex; flex-direction:column; align-items:center; gap:6px; z-index:1;">
                                             <div style="width:22px; height:22px; border-radius:50%; border:3px solid var(--primary); background:var(--primary); display:flex; align-items:center; justify-content:center;">
                                                 <div style="width:8px; height:8px; background:white; border-radius:50%;"></div>
@@ -316,7 +307,6 @@
                                             <span style="font-size:10px; color:var(--gray);">{{ envio.fecha_envio|date:"d/m" }}</span>
                                         </div>
 
-                                        <!-- Paso 2: En camino -->
                                         <div style="display:flex; flex-direction:column; align-items:center; gap:6px; z-index:1;">
                                             {% if envio.estado_envio == 'EN_CAMINO' or envio.estado_envio == 'ENTREGADO' %}
                                             <div style="width:22px; height:22px; border-radius:50%; border:3px solid var(--primary); background:var(--primary); display:flex; align-items:center; justify-content:center;">
@@ -330,7 +320,6 @@
                                             <span style="font-size:10px; color:var(--gray);">&nbsp;</span>
                                         </div>
 
-                                        <!-- Paso 3: Entregado -->
                                         <div style="display:flex; flex-direction:column; align-items:center; gap:6px; z-index:1;">
                                             {% if envio.estado_envio == 'ENTREGADO' %}
                                             <div style="width:22px; height:22px; border-radius:50%; border:3px solid var(--primary); background:var(--primary); display:flex; align-items:center; justify-content:center;">
@@ -341,23 +330,20 @@
                                             <div style="width:22px; height:22px; border-radius:50%; border:3px solid #e0e0e0; background:white;"></div>
                                             <span style="font-size:11px; color:var(--gray); white-space:nowrap;">Entregado</span>
                                             {% endif %}
-                                            <span style="font-size:10px; color:var(--gray);">Est. {{ envio.fecha_estimada_llegada|date:"d/m" }}</span>
+                                            <span style="font-size:10px; color:var(--gray);">Est. {{ envio.fecha_estipulada_llegada|date:"d/m" }}</span>
                                         </div>
 
                                     </div>
                                 </div>
                                 {% endif %}
 
-                                <!-- Dirección -->
                                 <div style="margin-top:12px; padding:10px 14px; background:#f8f8f8; border-radius:8px;
                                             font-size:12px; color:var(--gray); display:flex; align-items:center; gap:6px;">
                                     📬 <span>{{ envio.direccion_envio }}{% if envio.barrio_envio %}, {{ envio.barrio_envio }}{% endif %} — {{ envio.ciudad_envio }}, {{ envio.departamento_envio }}</span>
                                 </div>
 
                             {% else %}
-                                <!-- Sin envío aún -->
-                                <div style="display:flex; align-items:center; gap:10px; padding:10px 14px;
-                                            background:#f0f4ff; border-radius:8px;">
+                                <div style="display:flex; align-items:center; gap:10px; padding:10px 14px; background:#f0f4ff; border-radius:8px;">
                                     <span style="font-size:20px;">🕐</span>
                                     <div>
                                         <div style="font-size:13px; font-weight:600; color:#1565c0;">Pedido recibido</div>
@@ -396,7 +382,6 @@ function mostrarTab(tab, btn) {
     if (btn) btn.classList.add('active');
 }
 
-// Abrir tab contraseña si el mensaje lo menciona
 {% if messages %}
     {% for message in messages %}
         {% if 'contraseña' in message|lower %}

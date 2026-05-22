@@ -166,7 +166,7 @@ def registro_view(request):
             return render(request, 'registro.html', {'error': 'El email ya está registrado.'})
 
         try:
-            rol_cliente = Rol.objects.get(nombre_rol='CLIENTE')
+            rol_cliente = Rol.objects.get(nombre_rol='cliente')
         except Rol.DoesNotExist:
             return render(request, 'registro.html', {'error': 'Error del sistema. Contacte al administrador.'})
 
@@ -408,6 +408,10 @@ def carrito_limpiar(request):
 def checkout_procesar(request):
     usuario = get_usuario_sesion(request)
     carrito = _get_carrito(request)
+    list(messages.get_messages(request))
+    storage = messages.get_messages(request)
+    storage.used = True
+    
 
     if not carrito['items']:
         messages.error(request, 'El carrito está vacío.')
@@ -423,7 +427,7 @@ def checkout_procesar(request):
     }
 
     if request.method == 'GET':
-        return render(request, 'tienda/checkout.html', {**ctx_base, 'form': {}})
+        return render(request, 'tienda/checkout.html', {**ctx_base, 'form': {}, 'errores': []})
 
     direccion    = request.POST.get('direccion', '').strip()
     barrio       = request.POST.get('barrio', '').strip()
@@ -441,16 +445,18 @@ def checkout_procesar(request):
     if not telefono:     errores.append('El teléfono es obligatorio.')
 
     if errores:
-        for e in errores:
-            messages.error(request, e)
-        return render(request, 'tienda/checkout.html', {**ctx_base, 'form': request.POST})
+        return render(request, 'tienda/checkout.html', {
+            **ctx_base,
+            'form': request.POST,
+            'errores': errores,
+        })
 
     try:
         with transaction.atomic():
             # Calcular totales
-            subtotal = float(_calcular_total(carrito))
-            iva      = round(subtotal * 0.19, 2)
-            total    = round(subtotal + iva, 2)
+            total    = float(_calcular_total(carrito))
+            iva      = round(total * 0.19 / 1.19, 2)
+            subtotal = round(total - iva, 2)
 
             venta = Venta.objects.create(
                 usuario=usuario,
@@ -1064,7 +1070,6 @@ def crear_catalogo(request):
     if request.method == 'POST':
         nombre      = request.POST.get('nombre_catalogo', '').strip()
         descripcion = request.POST.get('descripcion_catalogo', '').strip()
-        estado      = request.POST.get('estado_catalogo', 'ACTIVO')
 
         if not nombre:
             messages.error(request, 'El nombre es obligatorio.')
@@ -1075,7 +1080,6 @@ def crear_catalogo(request):
         Catalogo.objects.create(
             nombre_catalogo      = nombre,
             descripcion_catalogo = descripcion or None,
-            estado_catalogo      = estado,
         )
         messages.success(request, f'Catálogo "{nombre}" creado.')
         return redirect('admin_catalogos')
@@ -1084,13 +1088,13 @@ def crear_catalogo(request):
         'form': {}, 'usuario': request.usuario
     })
 
+
 @admin_required
 def editar_catalogo(request, id):
     catalogo = get_object_or_404(Catalogo, pk=id)
     if request.method == 'POST':
         nombre      = request.POST.get('nombre_catalogo', '').strip()
         descripcion = request.POST.get('descripcion_catalogo', '').strip()
-        estado      = request.POST.get('estado_catalogo', 'ACTIVO')
 
         if not nombre:
             messages.error(request, 'El nombre es obligatorio.')
@@ -1098,9 +1102,8 @@ def editar_catalogo(request, id):
                 'catalogo': catalogo, 'form': request.POST, 'usuario': request.usuario
             })
 
-        catalogo.nombre_catalogo       = nombre
-        catalogo.descripcion_catalogo  = descripcion or None
-        catalogo.estado_catalogo       = estado
+        catalogo.nombre_catalogo      = nombre
+        catalogo.descripcion_catalogo = descripcion or None
         catalogo.save()
         messages.success(request, f'Catálogo "{nombre}" actualizado.')
         return redirect('admin_catalogos')
@@ -1112,15 +1115,10 @@ def editar_catalogo(request, id):
 @admin_required
 def eliminar_catalogo(request, id):
     catalogo = get_object_or_404(Catalogo, pk=id)
-    if request.method == 'POST':
-        nombre = catalogo.nombre_catalogo
-        catalogo.delete()
-        messages.success(request, f'Catálogo "{nombre}" eliminado.')
-        return redirect('admin_catalogos')
-    return render(request, 'admin/catalogos/eliminar.html', {
-        'catalogo': catalogo, 'usuario': request.usuario
-    })
-
+    nombre = catalogo.nombre_catalogo
+    catalogo.delete()
+    messages.success(request, f'Catálogo "{nombre}" eliminado.')
+    return redirect('admin_catalogos')
 
 # ╔══════════════════════════════════════════════════════════════════════╗
 # ║                         CATEGORÍAS                                   ║
@@ -1202,6 +1200,19 @@ def eliminar_categoria(request, id):
     productos_count = Producto.objects.filter(categoria=categoria).count()
 
     if request.method == 'POST':
+        tiene_historial = DetalleVenta.objects.filter(
+            variacion__producto__categoria=categoria
+        ).exists() or DetalleEntrada.objects.filter(
+            variacion__producto__categoria=categoria
+        ).exists()
+
+        if tiene_historial:
+            messages.error(request,
+                f'No se puede eliminar "{categoria.nombre}" '
+                f'porque tiene historial de ventas o entradas vinculado.'
+            )
+            return redirect('admin_categorias')
+
         nombre = categoria.nombre
         categoria.delete()
         messages.success(request, f'Categoría "{nombre}" y sus {productos_count} producto(s) eliminados.')
@@ -1353,12 +1364,24 @@ def editar_producto(request, id):
 @admin_required
 def eliminar_producto(request, id):
     producto = get_object_or_404(Producto, pk=id)
+
     if request.method == 'POST':
+        tiene_ventas   = DetalleVenta.objects.filter(variacion__producto=producto).exists()
+        tiene_entradas = DetalleEntrada.objects.filter(variacion__producto=producto).exists()
+
+        if tiene_ventas or tiene_entradas:
+            messages.error(request,
+                f'No se puede eliminar "{producto.nombre_producto}" '
+                f'porque tiene historial de ventas o entradas vinculado.'
+            )
+            return redirect('admin_productos')
+
         _eliminar_foto(producto.foto)
         nombre = producto.nombre_producto
         producto.delete()
         messages.success(request, f'Producto "{nombre}" eliminado.')
         return redirect('admin_productos')
+
     return render(request, 'admin/productos/eliminar.html', {
         'producto': producto, 'usuario': request.usuario
     })
@@ -1484,6 +1507,16 @@ def eliminar_variacion(request, producto_id, id):
     variacion = get_object_or_404(VariacionProducto, pk=id, producto=producto)
 
     if request.method == 'POST':
+        tiene_ventas   = variacion.detalles_venta.exists()
+        tiene_entradas = variacion.detalles_entrada.exists()
+
+        if tiene_ventas or tiene_entradas:
+            messages.error(request,
+                f'No se puede eliminar "{variacion.talla} - {variacion.color}" '
+                f'porque tiene historial vinculado. Pon el stock en 0 en su lugar.'
+            )
+            return redirect('admin_variaciones', producto_id=producto_id)
+
         label = f"{variacion.talla} - {variacion.color}"
         variacion.delete()
         producto.actualizar_estado()
@@ -1510,8 +1543,6 @@ def listar_entradas(request):
         'entradas': entradas, 'busqueda': busqueda, 'usuario': request.usuario
     })
 
-
-@admin_required
 @admin_required
 def crear_entrada(request):
     proveedores = Proveedor.objects.all()
@@ -1522,7 +1553,6 @@ def crear_entrada(request):
         fecha_entrada = request.POST.get('fecha_entrada')
         total_filas   = int(request.POST.get('totalFilas', 0))
 
-        # Recolecta filas dinámicas
         variacion_ids = []
         cantidades    = []
         precios       = []
@@ -1546,19 +1576,19 @@ def crear_entrada(request):
         try:
             with transaction.atomic():
                 entrada = Entrada.objects.create(
-                    proveedor=get_object_or_404(Proveedor, pk=proveedor_id),
-                    fecha_entrada=fecha_entrada,
-                    total_entrada=0,
+                 proveedor=get_object_or_404(Proveedor, pk=proveedor_id),
+                fecha_entrada=fecha_entrada,
+                total_entrada=0,
                 )
                 total = 0
                 for vid, cant, precio in zip(variacion_ids, cantidades, precios):
                     if not cant or int(cant) <= 0:
                         continue
                     detalle = DetalleEntrada.objects.create(
-                        entrada=entrada,
-                        variacion=get_object_or_404(VariacionProducto, pk=vid),
-                        cantidades=int(cant),
-                        precio_comprado=int(precio),
+                    entrada=entrada,
+                    variacion=get_object_or_404(VariacionProducto, pk=vid),
+                    cantidades=int(cant),
+                    precio_comprado=int(precio),
                     )
                     detalle.aplicar_stock()
                     total += int(cant)
@@ -1578,10 +1608,10 @@ def crear_entrada(request):
 
 @admin_required
 def detalle_entrada(request, id):
-    entrada  = get_object_or_404(Entrada.objects.select_related('proveedor'), pk=id)
+    entrada  = get_object_or_404( Entrada.objects.select_related('proveedor'), pk=id)
     detalles = DetalleEntrada.objects.select_related('variacion__producto').filter(entrada=entrada)
     return render(request, 'admin/inventario/detalle.html', {
-        'entrada': entrada, 'detalles': detalles, 'usuario': request.usuario
+        'entrada':entrada, 'detalles': detalles, 'usuario': request.usuario
     })
 
 
@@ -1945,62 +1975,122 @@ def envio_cambiar_estado(request, id):
 @admin_required
 def reporte_inventario(request):
     """Reporte 1 — Inventario por Producto"""
-    busqueda     = request.GET.get('q', '').strip()
-    categoria_id = request.GET.get('categoria', '')
-    filtro_stock = request.GET.get('stock', '')  # 'bajo', 'agotado', ''
- 
-    variaciones = VariacionProducto.objects.select_related(
+    filtro_talla      = request.GET.get('talla', '')
+    filtro_color      = request.GET.get('color', '')
+    filtro_categoria  = request.GET.get('categoria', '')
+    filtro_stock      = request.GET.get('estado_stock', '')
+    exportar          = request.GET.get('export', '')
+
+    variaciones_qs = VariacionProducto.objects.select_related(
         'producto__categoria', 'producto__proveedor'
     ).order_by('producto__nombre_producto', 'talla', 'color')
- 
-    if busqueda:
-        variaciones = variaciones.filter(
-            Q(producto__nombre_producto__icontains=busqueda) |
-            Q(talla__icontains=busqueda) |
-            Q(color__icontains=busqueda) |
-            Q(sku_unico__icontains=busqueda)
-        )
-    if categoria_id:
-        variaciones = variaciones.filter(producto__categoria_id=categoria_id)
-    if filtro_stock == 'bajo':
-        # bajo stock = stock_actual <= stock_minimo pero > 0
-        variaciones = [v for v in variaciones if v.bajo_stock and not v.sin_stock]
+
+    if filtro_talla:
+        variaciones_qs = variaciones_qs.filter(talla__icontains=filtro_talla)
+    if filtro_color:
+        variaciones_qs = variaciones_qs.filter(color__icontains=filtro_color)
+    if filtro_categoria:
+        variaciones_qs = variaciones_qs.filter(producto__categoria_id=filtro_categoria)
+    if filtro_stock == 'bajo_stock':
+        variaciones_qs = [v for v in variaciones_qs if v.bajo_stock and not v.sin_stock]
     elif filtro_stock == 'agotado':
-        variaciones = [v for v in variaciones if v.sin_stock]
+        variaciones_qs = [v for v in variaciones_qs if v.sin_stock]
+    elif filtro_stock == 'disponible':
+        variaciones_qs = [v for v in variaciones_qs if not v.sin_stock]
     else:
-        variaciones = list(variaciones)
- 
-    # Estadísticas
-    todas = VariacionProducto.objects.select_related('producto__categoria')
-    total_variaciones  = todas.count()
-    total_agotados     = sum(1 for v in todas if v.sin_stock)
-    total_bajo_stock   = sum(1 for v in todas if v.bajo_stock and not v.sin_stock)
-    stock_total_global = todas.aggregate(t=Sum('stock_actual'))['t'] or 0
- 
-    # Más vendidos por producto
-    top_productos = (
+        variaciones_qs = list(variaciones_qs)
+
+    # Estadísticas globales
+    todas             = VariacionProducto.objects.select_related('producto__categoria')
+    total_variaciones = todas.count()
+    total_agotados    = sum(1 for v in todas if v.sin_stock)
+    total_bajo_stock  = sum(1 for v in todas if v.bajo_stock and not v.sin_stock)
+    stock_total       = todas.aggregate(t=Sum('stock_actual'))['t'] or 0
+    total_productos   = Producto.objects.count()
+
+    # Rotación
+    top_vendidos = (
         DetalleVenta.objects
-        .values('variacion__producto__nombre_producto', 'variacion__producto__categoria__nombre')
-        .annotate(total_vendido=Sum('cantidad'))
-        .order_by('-total_vendido')[:10]
+        .values('variacion__producto__nombre_producto')
+        .annotate(unidades_vendidas=Sum('cantidad'))
+        .order_by('-unidades_vendidas')
     )
- 
-    categorias = Categoria.objects.filter(estado='ACTIVO')
- 
+    productos_mayor_rotacion = [
+        {'nombre': x['variacion__producto__nombre_producto'], 'unidades_vendidas': x['unidades_vendidas']}
+        for x in top_vendidos[:5]
+    ]
+    productos_menor_rotacion = [
+        {'nombre': x['variacion__producto__nombre_producto'], 'unidades_vendidas': x['unidades_vendidas']}
+        for x in top_vendidos.order_by('unidades_vendidas')[:5]
+    ]
+    total_mayor_rotacion = productos_mayor_rotacion[0]['unidades_vendidas'] if productos_mayor_rotacion else 0
+
+    # Filtros disponibles
+    tallas_disponibles     = VariacionProducto.objects.values_list('talla', flat=True).distinct().order_by('talla')
+    colores_disponibles    = VariacionProducto.objects.values_list('color', flat=True).distinct().order_by('color')
+    categorias_disponibles = Categoria.objects.filter(estado='ACTIVO')
+
+    # Exportar Excel
+    if exportar == 'excel':
+        try:
+            import openpyxl
+            from openpyxl.styles import Font, PatternFill, Alignment
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.title = 'Inventario'
+            headers = ['Producto', 'Categoría', 'Talla', 'Color', 'SKU', 'Stock', 'Stock Mínimo', 'Estado']
+            header_fill = PatternFill('solid', fgColor='144272')
+            for col, h in enumerate(headers, 1):
+                cell = ws.cell(row=1, column=col, value=h)
+                cell.font = Font(bold=True, color='FFFFFF')
+                cell.fill = header_fill
+                cell.alignment = Alignment(horizontal='center')
+            for row, v in enumerate(variaciones_qs, 2):
+                if v.sin_stock:
+                    estado = 'Agotado'
+                elif v.bajo_stock:
+                    estado = 'Bajo stock'
+                else:
+                    estado = 'Disponible'
+                ws.append([
+                    v.producto.nombre_producto,
+                    v.producto.categoria.nombre if v.producto.categoria else '—',
+                    v.talla,
+                    v.color,
+                    v.sku_unico,
+                    v.stock_actual,
+                    v.stock_minimo,
+                    estado,
+                ])
+            from django.http import HttpResponse
+            import io
+            buffer = io.BytesIO()
+            wb.save(buffer)
+            buffer.seek(0)
+            response = HttpResponse(buffer, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = 'attachment; filename="inventario.xlsx"'
+            return response
+        except ImportError:
+            messages.error(request, 'Ejecuta: pip install openpyxl')
+
     return render(request, 'admin/reportes/inventario.html', {
-        'variaciones':       variaciones,
-        'categorias':        categorias,
-        'busqueda':          busqueda,
-        'categoria_id':      categoria_id,
-        'filtro_stock':      filtro_stock,
-        'total_variaciones': total_variaciones,
-        'total_agotados':    total_agotados,
-        'total_bajo_stock':  total_bajo_stock,
-        'stock_total':       stock_total_global,
-        'top_productos':     top_productos,
-        'usuario':           request.usuario,
+        'variaciones':               variaciones_qs,
+        'total_variaciones':         total_variaciones,
+        'total_agotados':            total_agotados,
+        'total_bajo_stock':          total_bajo_stock,
+        'stock_total':               stock_total,
+        'total_productos':           total_productos,
+        'total_mayor_rotacion':      total_mayor_rotacion,
+        'productos_mayor_rotacion':  productos_mayor_rotacion,
+        'productos_menor_rotacion':  productos_menor_rotacion,
+        'tallas_disponibles':        tallas_disponibles,
+        'colores_disponibles':       colores_disponibles,
+        'categorias_disponibles':    categorias_disponibles,
+        'marcas_disponibles':        [],
+        'ciudades_disponibles':      [],
+        'departamentos_disponibles': [],
+        'usuario':                   request.usuario,
     })
- 
  
 @admin_required
 def reporte_ventas(request):
