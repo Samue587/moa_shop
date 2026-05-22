@@ -68,21 +68,39 @@ TEMPLATES = [
 ]
 
 # ══════════════════════════════════════════════════════
-# BASE DE DATOS — MySQL
+# BASE DE DATOS — Railway MySQL
 # ══════════════════════════════════════════════════════
-DATABASES = {
-    'default': {
-        'ENGINE':   'django.db.backends.mysql',
-        'NAME':     'TiendaMoa07',       # nombre de tu base de datos en MySQL
-        'USER':     'root',              # tu usuario MySQL
-        'PASSWORD': 'Level_one19',  # tu contraseña MySQL
-        'HOST':     '127.0.0.1',
-        'PORT':     '3306',
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-        },
+
+if os.getenv('MYSQLHOST'):
+    # Railway / Producción
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.getenv('MYSQLDATABASE'),
+            'USER': os.getenv('MYSQLUSER'),
+            'PASSWORD': os.getenv('MYSQLPASSWORD'),
+            'HOST': os.getenv('MYSQLHOST'),
+            'PORT': os.getenv('MYSQLPORT'),
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+            },
+        }
     }
-}
+else:
+    # Local
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'TiendaMoa07',
+            'USER': 'root',
+            'PASSWORD': 'Level_one19',
+            'HOST': '127.0.0.1',
+            'PORT': '3306',
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+            },
+        }
+    }
 
 # ══════════════════════════════════════════════════════
 # AUTENTICACIÓN PERSONALIZADA
