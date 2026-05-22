@@ -20,7 +20,7 @@
             z-index: 100;
             transition: width 0.3s ease;
         }
-        .sidebar:hover { width: 260px; }
+        .sidebar.expanded { width: 260px; }
 
         /* ── LOGO ── */
         .logo {
@@ -29,16 +29,21 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
             white-space: nowrap;
             overflow: hidden;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-height: 72px;
         }
-        .logo-icon { font-size: 28px; display: block; transition: opacity 0.15s ease; }
-        .logo-text { font-size: 20px; font-weight: bold; opacity: 0; display: none; white-space: nowrap; transition: opacity 0.2s ease; }
-        .logo-sub  { font-size: 11px; opacity: 0; display: none; margin-top: 3px; transition: opacity 0.2s ease; color: rgba(255,255,255,0.5); }
-        .sidebar:hover .logo-icon { opacity: 0; display: none; }
-        .sidebar:hover .logo-text { opacity: 1; display: block; }
-        .sidebar:hover .logo-sub  { opacity: 1; display: block; }
+        .logo-icon { font-size: 28px; flex-shrink: 0; }
+        .logo-texts { display: none; flex-direction: column; }
+        .logo-text { font-size: 18px; font-weight: bold; white-space: nowrap; }
+        .logo-sub  { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; white-space: nowrap; }
+        .sidebar.expanded .logo-texts { display: flex; }
 
         /* ── MENÚ ── */
-        .menu { padding: 10px 0; overflow-y: auto; height: calc(100vh - 80px); }
+        .menu { padding: 10px 0; overflow-y: auto; height: calc(100vh - 72px); }
         .menu::-webkit-scrollbar { width: 3px; }
         .menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
 
@@ -55,7 +60,7 @@
             transition: all 0.2s ease;
             height: 24px;
         }
-        .sidebar:hover .menu-section {
+        .sidebar.expanded .menu-section {
             color: rgba(255,255,255,0.35);
             padding: 8px 20px 3px;
             text-align: left;
@@ -75,14 +80,12 @@
         }
         .menu-item:hover  { background: rgba(255,255,255,0.1); color: white; border-left-color: #2ECC71; }
         .menu-item.active { background: rgba(255,255,255,0.15); color: white; border-left-color: #2ECC71; }
-
-        /* Reportes — color especial */
         .menu-item.reporte:hover  { border-left-color: #f39c12; }
         .menu-item.reporte.active { border-left-color: #f39c12; background: rgba(243,156,18,0.15); }
 
         .menu-icon  { font-size: 20px; width: 24px; text-align: center; flex-shrink: 0; }
         .menu-label { font-size: 14px; opacity: 0; transition: opacity 0.2s ease; flex: 1; }
-        .sidebar:hover .menu-label { opacity: 1; }
+        .sidebar.expanded .menu-label { opacity: 1; }
 
         .menu-badge {
             margin-right: 14px;
@@ -96,7 +99,7 @@
             transition: opacity 0.2s ease;
             flex-shrink: 0;
         }
-        .sidebar:hover .menu-badge { opacity: 1; }
+        .sidebar.expanded .menu-badge { opacity: 1; }
 
         /* ── MAIN ── */
         .main-content {
@@ -107,10 +110,14 @@
             min-height: 100vh;
             transition: margin-left 0.3s ease;
         }
+        .main-content.shifted { margin-left: 260px; }
 
         /* ── NAVBAR ── */
         .navbar { background: white; padding: 18px 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 99; }
+        .navbar-left { display: flex; align-items: center; gap: 16px; }
         .navbar-left h2 { color: #2c3e50; font-size: 20px; font-weight: 600; }
+        .toggle-btn { background: none; border: none; cursor: pointer; font-size: 22px; color: #144272; padding: 4px 8px; border-radius: 6px; transition: background 0.2s; }
+        .toggle-btn:hover { background: #f0f4f8; }
         .navbar-right { display: flex; align-items: center; gap: 20px; }
         .user-info { display: flex; align-items: center; gap: 10px; }
         .user-avatar { width: 38px; height: 38px; background: linear-gradient(135deg, #144272 0%, #205295 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 15px; }
@@ -235,8 +242,9 @@
         /* ── RESPONSIVE ── */
         @media (max-width: 768px) {
             .sidebar { width: 0; }
-            .sidebar:hover { width: 260px; }
+            .sidebar.expanded { width: 260px; }
             .main-content { margin-left: 0; }
+            .main-content.shifted { margin-left: 0; }
             .form-row, .form-row-3 { grid-template-columns: 1fr; }
             .content { padding: 20px; }
             .navbar { padding: 15px 20px; }
@@ -245,23 +253,23 @@
 </head>
 <body>
 
-<!-- ══ SIDEBAR ══ -->
-<aside class="sidebar">
-    <div class="logo">
-        <span class="logo-icon">🏷️</span>
-        <h1 class="logo-text">TiendaMoa07</h1>
-        <span class="logo-sub">Panel de Administración</span>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+    <div class="logo" onclick="toggleSidebar()">
+        <span class="logo-icon">🏪</span>
+        <div class="logo-texts">
+            <span class="logo-text">TiendaMoa07</span>
+            <span class="logo-sub">Panel de Administración</span>
+        </div>
     </div>
     <nav class="menu">
 
-        <!-- ── GENERAL ── -->
         <div class="menu-section">General</div>
         <a href="{% url 'admin_dashboard' %}" class="menu-item {% block menu_dashboard %}{% endblock %}">
             <span class="menu-icon">📊</span>
             <span class="menu-label">Dashboard</span>
         </a>
 
-        <!-- ── USUARIOS ── -->
         <div class="menu-section">Usuarios</div>
         <a href="{% url 'admin_usuarios' %}" class="menu-item {% block menu_usuarios %}{% endblock %}">
             <span class="menu-icon">🪪</span>
@@ -276,7 +284,6 @@
             <span class="menu-label">Permisos</span>
         </a>
 
-        <!-- ── CATÁLOGO ── -->
         <div class="menu-section">Catálogo</div>
         <a href="{% url 'admin_proveedores' %}" class="menu-item {% block menu_proveedores %}{% endblock %}">
             <span class="menu-icon">🏭</span>
@@ -295,18 +302,13 @@
             <span class="menu-label">Productos</span>
         </a>
 
-        <!-- ── INVENTARIO ── -->
         <div class="menu-section">Inventario</div>
         <a href="{% url 'admin_inventario' %}" class="menu-item {% block menu_inventario %}{% endblock %}">
             <span class="menu-icon">📥</span>
             <span class="menu-label">Entradas</span>
         </a>
 
-        <!-- ── VENTAS ── -->
-        <div class="menu-section">Ventas</div>
-        <a href="{% url 'admin_ventas' %}" class="menu-item {% block menu_ventas %}{% endblock %}">
-            <span class="menu-icon">💰</span>
-            <span class="menu-label">Ventas</span>
+       
         </a>
         <a href="{% url 'admin_envios' %}" class="menu-item {% block menu_envios %}{% endblock %}">
             <span class="menu-icon">🚚</span>
@@ -316,14 +318,12 @@
             {% endif %}
         </a>
 
-        <!-- ── REPORTES ── (un solo link al hub) -->
         <div class="menu-section">Reportes</div>
         <a href="{% url 'reportes_hub' %}" class="menu-item reporte {% block menu_reportes %}{% endblock %}">
             <span class="menu-icon">📑</span>
             <span class="menu-label">Reportes</span>
         </a>
 
-        <!-- ── TIENDA ── -->
         <div class="menu-section">Tienda</div>
         <a href="{% url 'tienda' %}" class="menu-item">
             <span class="menu-icon">🛍️</span>
@@ -333,36 +333,32 @@
     </nav>
 </aside>
 
-<!-- ══ MAIN ══ -->
-<main class="main-content">
-    <nav class="navbar">
+<!-- MAIN -->
+<main class="main-content" id="mainContent">
+    <div class="navbar">
         <div class="navbar-left">
-            <h2>{% block navbar_title %}Panel Admin{% endblock %}</h2>
+            <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+            <h2>{% block navbar_title %}Admin{% endblock %}</h2>
         </div>
         <div class="navbar-right">
+            {% if request.usuario %}
             <div class="user-info">
-                <div class="user-avatar">{{ usuario.nombres_usuario|first|upper }}</div>
+                <div class="user-avatar">{{ request.usuario.nombres_usuario|first|upper }}</div>
                 <div>
-                    <div class="user-name">{{ usuario.get_full_name }}</div>
-                    <div class="user-role">{{ usuario.rol.nombre_rol }}</div>
+                    <div class="user-name">{{ request.usuario.nombres_usuario }}</div>
+                    <div class="user-role">{{ request.usuario.rol.nombre_rol }}</div>
                 </div>
             </div>
+            {% endif %}
             <a href="{% url 'logout' %}" class="btn-logout">🚪 Salir</a>
         </div>
-    </nav>
+    </div>
 
     <div class="content">
         {% if messages %}
             {% for message in messages %}
-                <div class="alert
-                    {% if message.tags == 'error' %}alert-error
-                    {% elif message.tags == 'warning' %}alert-warning
-                    {% elif message.tags == 'info' %}alert-info
-                    {% else %}alert-success{% endif %}">
-                    {% if message.tags == 'error' %}⚠️
-                    {% elif message.tags == 'warning' %}⚡
-                    {% elif message.tags == 'info' %}ℹ️
-                    {% else %}✅{% endif %}
+                <div class="alert alert-{% if message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% elif message.tags == 'info' %}info{% else %}success{% endif %}">
+                    {% if message.tags == 'error' %}⚠️{% elif message.tags == 'warning' %}⚡{% elif message.tags == 'info' %}ℹ️{% else %}✅{% endif %}
                     {{ message }}
                 </div>
             {% endfor %}
@@ -371,6 +367,25 @@
         {% block content %}{% endblock %}
     </div>
 </main>
+
+<script>
+function toggleSidebar() {
+    const sidebar     = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    sidebar.classList.toggle('expanded');
+    mainContent.classList.toggle('shifted');
+    localStorage.setItem('sidebarExpanded', sidebar.classList.contains('expanded'));
+}
+
+// Recordar estado del sidebar
+window.addEventListener('DOMContentLoaded', function() {
+    const expanded = localStorage.getItem('sidebarExpanded') === 'true';
+    if (expanded) {
+        document.getElementById('sidebar').classList.add('expanded');
+        document.getElementById('mainContent').classList.add('shifted');
+    }
+});
+</script>
 
 </body>
 </html>

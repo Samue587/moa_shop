@@ -1893,61 +1893,34 @@ def editar_envio(request, id):
     envio = get_object_or_404(Envio.objects.select_related('venta__usuario'), pk=id)
 
     if request.method == 'POST':
-        departamento     = request.POST.get('departamento_envio', '').strip()
-        ciudad           = request.POST.get('ciudad_envio', '').strip()
-        barrio           = request.POST.get('barrio_envio', '').strip()
-        direccion        = request.POST.get('direccion_envio', '').strip()
-        tipo_vivienda    = request.POST.get('tipo_vivienda', envio.tipo_vivienda)
-        especificaciones = request.POST.get('especificaciones_llegada', '').strip()
-        telefono         = request.POST.get('telefono_llegada', '').strip()
-        empresa          = request.POST.get('empresa_transportadora', '').strip()
-        numero_guia      = request.POST.get('numero_guia', '').strip()
-        estado           = request.POST.get('estado_envio', envio.estado_envio)
-        fecha_envio      = request.POST.get('fecha_envio')
-        fecha_llegada    = request.POST.get('fecha_estipulada_llegada')
-        costo            = request.POST.get('costo_envio', '0')
-
-        if not departamento or not ciudad or not direccion or not telefono:
-            messages.error(request, 'Departamento, ciudad, dirección y teléfono son obligatorios.')
-            return render(request, 'admin/envios/editar.html', {
-                'envio': envio, 'form': request.POST,
-                'departamentos': sorted(CIUDADES_POR_DEPARTAMENTO.keys()),
-                'ciudades_por_departamento': CIUDADES_POR_DEPARTAMENTO,
-                'usuario': request.usuario
-            })
+        estado        = request.POST.get('estado_envio', envio.estado_envio)
+        empresa       = request.POST.get('empresa_transportadora', '').strip()
+        numero_guia   = request.POST.get('numero_guia', '').strip()
+        costo         = request.POST.get('costo_envio', '0')
+        fecha_envio   = request.POST.get('fecha_envio')
+        fecha_llegada = request.POST.get('fecha_estipulada_llegada')
 
         if numero_guia and Envio.objects.filter(numero_guia=numero_guia).exclude(pk=id).exists():
             messages.error(request, f'Ya existe otro envío con número de guía "{numero_guia}".')
             return render(request, 'admin/envios/editar.html', {
-                'envio': envio, 'form': request.POST,
-                'departamentos': sorted(CIUDADES_POR_DEPARTAMENTO.keys()),
-                'ciudades_por_departamento': CIUDADES_POR_DEPARTAMENTO,
-                'usuario': request.usuario
+                'envio': envio, 'usuario': request.usuario
             })
 
-        envio.departamento_envio       = departamento
-        envio.ciudad_envio             = ciudad
-        envio.barrio_envio             = barrio or None
-        envio.direccion_envio          = direccion
-        envio.tipo_vivienda            = tipo_vivienda
-        envio.especificaciones_llegada = especificaciones or None
-        envio.telefono_llegada         = telefono
-        envio.empresa_transportadora   = empresa or None
-        envio.numero_guia              = numero_guia or None
-        envio.estado_envio             = estado
-        envio.fecha_envio              = fecha_envio
-        envio.fecha_estipulada_llegada = fecha_llegada
-        envio.costo_envio              = Decimal(costo)
+        envio.estado_envio           = estado
+        envio.empresa_transportadora = empresa or None
+        envio.numero_guia            = numero_guia or None
+        envio.costo_envio            = Decimal(costo) if costo else 0
+        if fecha_envio:
+            envio.fecha_envio = fecha_envio
+        if fecha_llegada:
+            envio.fecha_estipulada_llegada = fecha_llegada
         envio.save()
 
         messages.success(request, f'Envío #{id} actualizado.')
         return redirect('admin_envios')
 
     return render(request, 'admin/envios/editar.html', {
-        'envio': envio, 'form': {},
-        'departamentos': sorted(CIUDADES_POR_DEPARTAMENTO.keys()),
-        'ciudades_por_departamento': CIUDADES_POR_DEPARTAMENTO,
-        'usuario': request.usuario
+        'envio': envio, 'usuario': request.usuario
     })
 
 
@@ -2178,9 +2151,11 @@ def reporte_ventas(request):
 @admin_required
 def reporte_categorias(request):
     """Reporte 3 — Ventas por Categoría"""
+    from django.db.models import F, ExpressionWrapper, FloatField
+
     fecha_inicio = request.GET.get('fecha_inicio', '')
     fecha_fin    = request.GET.get('fecha_fin', '')
- 
+
     detalles_qs = DetalleVenta.objects.select_related(
         'variacion__producto__categoria', 'venta'
     )
@@ -2189,34 +2164,8 @@ def reporte_categorias(request):
             venta__fecha__date__gte=fecha_inicio,
             venta__fecha__date__lte=fecha_fin
         )
- 
-    # Ventas agrupadas por categoría
-    por_categoria = (
-        detalles_qs
-        .values('variacion__producto__categoria__nombre')
-        .annotate(
-            total_unidades=Sum('cantidad'),
-            total_ingresos=Sum('subtotal'),   # subtotal es property, usamos precio*cant
-            num_ventas=Count('venta', distinct=True),
-        )
-        .order_by('-total_ingresos')
-    )
-    # subtotal es @property, no un campo DB → calculamos con precio_unitario*cantidad
-    por_categoria = (
-        detalles_qs
-        .values('variacion__producto__categoria__nombre')
-        .annotate(
-            total_unidades=Sum('cantidad'),
-            total_ingresos=Sum(
-                models_producto_ingreso()
-            ),
-            num_ventas=Count('venta', distinct=True),
-        )
-        .order_by('-total_ingresos')
-    )
- 
-    # Usamos annotate con expresión directa
-    from django.db.models import F, ExpressionWrapper, FloatField
+
+    # Ventas agrupadas por categoría usando precio_unitario * cantidad
     por_categoria = (
         detalles_qs
         .annotate(ingreso_item=ExpressionWrapper(
@@ -2230,9 +2179,9 @@ def reporte_categorias(request):
         )
         .order_by('-total_ingresos')
     )
- 
+
     total_global = sum(c['total_ingresos'] or 0 for c in por_categoria)
- 
+
     # Producto más vendido por categoría
     top_por_cat = (
         DetalleVenta.objects
@@ -2246,7 +2195,7 @@ def reporte_categorias(request):
         .annotate(total_und=Sum('cantidad'), total_ing=Sum('ingreso_item'))
         .order_by('variacion__producto__categoria__nombre', '-total_und')
     )
- 
+
     return render(request, 'admin/reportes/categorias.html', {
         'por_categoria': list(por_categoria),
         'total_global':  total_global,

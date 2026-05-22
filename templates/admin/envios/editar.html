@@ -1,191 +1,110 @@
 {% extends 'admin/base_admin.html' %}
 {% load humanize %}
-{% block title %}Detalle Envío #{{ envio.numero_envio }} — TiendaMoa07{% endblock %}
+{% block title %}Editar Envío #{{ envio.id }} — TiendaMoa07{% endblock %}
 {% block menu_envios %}active{% endblock %}
-{% block navbar_title %}Detalle de Envío{% endblock %}
+{% block navbar_title %}Editar Envío{% endblock %}
 
 {% block content %}
 <div class="page-header">
     <div>
-        <div class="page-title">🚚 Envío #{{ envio.numero_envio }}</div>
+        <div class="page-title">🚚 Editar Envío #{{ envio.id }}</div>
         <div class="breadcrumb">
             <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
             <a href="{% url 'admin_envios' %}">Envíos</a> ›
-            Detalle
+            Editar
         </div>
-    </div>
-    <div style="display:flex; gap:10px;">
-        <a href="{% url 'editar_envio' envio.id %}" class="btn btn-warning">✏️ Editar</a>
-        <a href="{% url 'admin_envios' %}"          class="btn btn-secondary">← Volver</a>
     </div>
 </div>
 
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">{{ message }}</div>
+    {% endfor %}
+{% endif %}
 
-    <!-- INFO ENVÍO -->
-    <div class="card">
-        <div class="card-header"><h3>📦 Información del envío</h3></div>
+<form method="post">
+    {% csrf_token %}
+
+    <!-- Info del cliente (solo lectura) -->
+    <div class="card" style="max-width:700px; margin-bottom:24px;">
+        <div class="card-header"><h3>👤 Información del Cliente</h3></div>
         <div class="card-body">
-            <table style="width:100%;">
-                <tr>
-                    <td style="color:#7f8c8d; padding:8px 0; width:45%;">N° Envío</td>
-                    <td><strong>#{{ envio.numero_envio }}</strong></td>
-                </tr>
-                <tr>
-                    <td style="color:#7f8c8d; padding:8px 0;">Empresa</td>
-                    <td>{{ envio.empresa_envio }}</td>
-                </tr>
-                <tr>
-                    <td style="color:#7f8c8d; padding:8px 0;">Fecha envío</td>
-                    <td>{{ envio.fecha_envio|date:"d/m/Y" }}</td>
-                </tr>
-                <tr>
-                    <td style="color:#7f8c8d; padding:8px 0;">Llegada estimada</td>
-                    <td>{{ envio.fecha_estimada_llegada|date:"d/m/Y" }}</td>
-                </tr>
-                <tr>
-                    <td style="color:#7f8c8d; padding:8px 0;">Costo</td>
-                    <td>
-                        {% if envio.costo_envio == 0 %}
-                            <span style="color:#27ae60; font-weight:600;">Gratis</span>
-                        {% else %}
-                            $ {{ envio.costo_envio|floatformat:0|intcomma }}
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td style="color:#7f8c8d; padding:8px 0;">Estado</td>
-                    <td>
-                        {% if envio.estado_envio == 'ENTREGADO' %}
-                            <span class="badge badge-entregado">✅ Entregado</span>
-                        {% elif envio.estado_envio == 'EN_CAMINO' %}
-                            <span class="badge badge-en-camino">🚚 En camino</span>
-                        {% elif envio.estado_envio == 'PENDIENTE' %}
-                            <span class="badge badge-pendiente">⏳ Pendiente</span>
-                        {% elif envio.estado_envio == 'CANCELADO' %}
-                            <span class="badge badge-cancelado">❌ Cancelado</span>
-                        {% else %}
-                            <span class="badge badge-warning">{{ envio.estado_envio }}</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% if envio.especificaciones_llegada %}
-                <tr>
-                    <td style="color:#7f8c8d; padding:8px 0;">Especificaciones</td>
-                    <td>{{ envio.especificaciones_llegada }}</td>
-                </tr>
-                {% endif %}
-            </table>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div>
+                    <div style="font-size:12px; color:#7f8c8d; font-weight:600; margin-bottom:4px;">CLIENTE</div>
+                    <div style="font-size:15px; font-weight:700; color:#2c3e50;">{{ envio.venta.usuario.nombres_usuario }} {{ envio.venta.usuario.apellidos_usuario }}</div>
+                </div>
+                <div>
+                    <div style="font-size:12px; color:#7f8c8d; font-weight:600; margin-bottom:4px;">CORREO</div>
+                    <div style="font-size:14px; color:#2c3e50;">{{ envio.venta.usuario.correo_usuario }}</div>
+                </div>
+                <div>
+                    <div style="font-size:12px; color:#7f8c8d; font-weight:600; margin-bottom:4px;">DIRECCIÓN</div>
+                    <div style="font-size:14px; color:#2c3e50;">{{ envio.direccion_envio }}{% if envio.barrio_envio %}, {{ envio.barrio_envio }}{% endif %}</div>
+                </div>
+                <div>
+                    <div style="font-size:12px; color:#7f8c8d; font-weight:600; margin-bottom:4px;">CIUDAD / DEPTO</div>
+                    <div style="font-size:14px; color:#2c3e50;">{{ envio.ciudad_envio }}, {{ envio.departamento_envio }}</div>
+                </div>
+                <div>
+                    <div style="font-size:12px; color:#7f8c8d; font-weight:600; margin-bottom:4px;">TELÉFONO</div>
+                    <div style="font-size:14px; color:#2c3e50;">{{ envio.telefono_llegada|default:"—" }}</div>
+                </div>
+                <div>
+                    <div style="font-size:12px; color:#7f8c8d; font-weight:600; margin-bottom:4px;">VENTA</div>
+                    <div style="font-size:14px; color:#2c3e50;">Pedido #{{ envio.venta.id }}</div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- DATOS DESTINATARIO -->
-    <div class="card">
-        <div class="card-header"><h3>📍 Datos del destinatario</h3></div>
+    <!-- Campos editables -->
+    <div class="card" style="max-width:700px; margin-bottom:24px;">
+        <div class="card-header"><h3>🚛 Información de Transporte</h3></div>
         <div class="card-body">
-            <table style="width:100%;">
-                <tr>
-                    <td style="color:#7f8c8d; padding:8px 0; width:45%;">Cliente</td>
-                    <td>
-                        <strong>
-                            {# Nuevo modelo: nombres_usuario + apellidos_usuario #}
-                            {{ envio.usuario.nombres_usuario }} {{ envio.usuario.apellidos_usuario }}
-                        </strong>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="color:#7f8c8d; padding:8px 0;">Correo</td>
-                    <td>{{ envio.usuario.correo_usuario }}</td>
-                </tr>
-                <tr>
-                    <td style="color:#7f8c8d; padding:8px 0;">Documento</td>
-                    <td>{{ envio.usuario.numero_documento }}</td>
-                </tr>
-                <tr>
-                    <td style="color:#7f8c8d; padding:8px 0;">Dirección</td>
-                    <td>{{ envio.direccion_envio }}</td>
-                </tr>
-                {% if envio.barrio_envio %}
-                <tr>
-                    <td style="color:#7f8c8d; padding:8px 0;">Barrio</td>
-                    <td>{{ envio.barrio_envio }}</td>
-                </tr>
-                {% endif %}
-                <tr>
-                    <td style="color:#7f8c8d; padding:8px 0;">Ciudad</td>
-                    <td>{{ envio.ciudad_envio }}</td>
-                </tr>
-                <tr>
-                    <td style="color:#7f8c8d; padding:8px 0;">Departamento</td>
-                    <td>{{ envio.departamento_envio }}</td>
-                </tr>
-                {% if envio.telefono_llegada %}
-                <tr>
-                    <td style="color:#7f8c8d; padding:8px 0;">Teléfono llegada</td>
-                    <td>{{ envio.telefono_llegada }}</td>
-                </tr>
-                {% endif %}
-                <tr>
-                    <td style="color:#7f8c8d; padding:8px 0;">Venta</td>
-                    <td>
-                        <a href="{% url 'detalle_venta' envio.venta.id %}" class="btn btn-info btn-sm">
-                            Ver Venta #{{ envio.venta.id }}
-                        </a>
-                    </td>
-                </tr>
-            </table>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Estado del envío</label>
+                    <select name="estado_envio" class="form-control">
+                        {% for val, label in envio.ESTADO_CHOICES %}
+                            <option value="{{ val }}" {% if envio.estado_envio == val %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Empresa transportadora</label>
+                    <input type="text" name="empresa_transportadora" class="form-control" value="{{ envio.empresa_transportadora|default:'' }}">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Número de guía</label>
+                    <input type="text" name="numero_guia" class="form-control" value="{{ envio.numero_guia|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Costo de envío</label>
+                    <input type="number" name="costo_envio" class="form-control" value="{{ envio.costo_envio }}" min="0" step="0.01">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Fecha de envío</label>
+                    <input type="datetime-local" name="fecha_envio" class="form-control"
+                           value="{{ envio.fecha_envio|date:'Y-m-d' }}T{{ envio.fecha_envio|date:'H:i' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Fecha estimada de llegada</label>
+                    <input type="date" name="fecha_estipulada_llegada" class="form-control"
+                           value="{{ envio.fecha_estipulada_llegada|date:'Y-m-d' }}">
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- PRODUCTOS DE LA VENTA -->
-<div class="card" style="margin-top:24px;">
-    <div class="card-header"><h3>🛍️ Productos de la venta</h3></div>
-    <div class="card-body" style="padding:0;">
-        <table>
-            <thead>
-                <tr>
-                    <th>Producto</th>
-                    <th>Talla / Color</th>
-                    <th>Cantidad</th>
-                    <th>Subtotal</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for d in detalles %}
-                <tr>
-                    {# Nuevo modelo: detalle -> variacion -> producto #}
-                    <td>{{ d.variacion.producto.nombre_producto }}</td>
-                    <td>{{ d.variacion.talla_variacion }} / {{ d.variacion.color_variacion }}</td>
-                    <td>{{ d.cantidad_detalle }}</td>
-                    <td>$ {{ d.subtotal_detalle|floatformat:0|intcomma }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" class="empty-state"><p>No hay productos en esta venta.</p></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div style="display:flex; gap:12px; max-width:700px;">
+        <button type="submit" class="btn btn-success">💾 Guardar cambios</button>
+        <a href="{% url 'admin_envios' %}" class="btn btn-secondary">❌ Cancelar</a>
     </div>
-</div>
-
-<!-- CAMBIAR ESTADO RÁPIDO -->
-<div class="card" style="margin-top:24px;">
-    <div class="card-header"><h3>⚡ Cambiar estado</h3></div>
-    <div class="card-body">
-        <form method="post" action="{% url 'envio_cambiar_estado' envio.id %}"
-              style="display:flex; gap:12px; align-items:center;">
-            {% csrf_token %}
-            <select name="estado" class="form-control" style="max-width:220px;">
-                <option value="PENDIENTE" {% if envio.estado_envio == 'PENDIENTE' %}selected{% endif %}>⏳ Pendiente</option>
-                <option value="EN_CAMINO" {% if envio.estado_envio == 'EN_CAMINO' %}selected{% endif %}>🚚 En camino</option>
-                <option value="ENTREGADO" {% if envio.estado_envio == 'ENTREGADO' %}selected{% endif %}>✅ Entregado</option>
-                <option value="CANCELADO" {% if envio.estado_envio == 'CANCELADO' %}selected{% endif %}>❌ Cancelado</option>
-            </select>
-            <button type="submit" class="btn btn-success">Actualizar estado</button>
-        </form>
-    </div>
-</div>
+</form>
 
 {% endblock %}
