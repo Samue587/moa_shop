@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 # SEGURIDAD
 # ══════════════════════════════════════════════════════
 SECRET_KEY = 'django-insecure-cambia-esto-por-una-clave-segura-en-produccion'
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 # ══════════════════════════════════════════════════════
