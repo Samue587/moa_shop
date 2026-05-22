@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 # ══════════════════════════════════════════════════════
 # SEGURIDAD
 # ══════════════════════════════════════════════════════
-SECRET_KEY = 'django-insecure-cambia-esto-por-una-clave-segura-en-produccion'
+SECRET_KEY = 'WxRBkz9vMM-cyOKJd7ihcWTnYvlJtUeF6et-4pnxG81j2QQAyJmgK8s1Xk7KMnLdVDc'
 DEBUG = False
 ALLOWED_HOSTS = ['*']
 
@@ -133,7 +133,7 @@ CSRF_TRUSTED_ORIGINS = [
 # ARCHIVOS ESTÁTICOS
 # ══════════════════════════════════════════════════════
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_DIRS = []
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # ← añadido
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # ← añadido
 
