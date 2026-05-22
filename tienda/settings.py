@@ -1,16 +1,19 @@
 import os
-import logging  # ← agrega esta línea
+import logging
 from pathlib import Path
+
 # ══════════════════════════════════════════════════════
 # RUTAS BASE
 # ══════════════════════════════════════════════════════
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+logger = logging.getLogger(__name__)
+
 # ══════════════════════════════════════════════════════
 # SEGURIDAD
 # ══════════════════════════════════════════════════════
 SECRET_KEY = 'django-insecure-cambia-esto-por-una-clave-segura-en-produccion'
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ['*']
 
 # ══════════════════════════════════════════════════════
@@ -23,8 +26,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.humanize',  # para |intcomma en templates
-    'AppMoa',                   # app principal
+    'django.contrib.humanize',
+    'AppMoa',
 ]
 
 # ══════════════════════════════════════════════════════
@@ -32,6 +35,7 @@ INSTALLED_APPS = [
 # ══════════════════════════════════════════════════════
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # ← añadido
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -48,7 +52,6 @@ WSGI_APPLICATION = 'tienda.wsgi.application'
 
 # ══════════════════════════════════════════════════════
 # TEMPLATES
-# Busca en TiendaMoa07/templates/
 # ══════════════════════════════════════════════════════
 TEMPLATES = [
     {
@@ -70,7 +73,6 @@ TEMPLATES = [
 # ══════════════════════════════════════════════════════
 # BASE DE DATOS — Railway MySQL
 # ══════════════════════════════════════════════════════
-
 if os.getenv('MYSQLHOST'):
     DATABASES = {
         'default': {
@@ -82,10 +84,10 @@ if os.getenv('MYSQLHOST'):
             'PORT': os.getenv('MYSQLPORT'),
             'OPTIONS': {
                 'charset': 'utf8mb4',
-                'connect_timeout': 30,        # ← agrega esto
-                'ssl_disabled': True,         # ← agrega esto
+                'connect_timeout': 30,
+                'ssl_disabled': True,
             },
-            'CONN_MAX_AGE': 0,               # ← agrega esto
+            'CONN_MAX_AGE': 0,
         }
     }
 else:
@@ -104,14 +106,8 @@ else:
         }
     }
 
-    import logging
-logger = logging.getLogger(__name__)
-logger.warning(f"MYSQLHOST = {os.getenv('MYSQLHOST')}")
-logger.warning(f"MYSQLPORT = {os.getenv('MYSQLPORT')}")
-
 # ══════════════════════════════════════════════════════
 # AUTENTICACIÓN PERSONALIZADA
-# Usamos nuestro propio backend con email + contrasena
 # ══════════════════════════════════════════════════════
 AUTHENTICATION_BACKENDS = [
     'AppMoa.backends.EmailBackend',
@@ -121,7 +117,7 @@ AUTHENTICATION_BACKENDS = [
 # SESIONES
 # ══════════════════════════════════════════════════════
 SESSION_ENGINE             = 'django.contrib.sessions.backends.db'
-SESSION_COOKIE_AGE         = 86400          # 24 horas
+SESSION_COOKIE_AGE         = 86400
 SESSION_SAVE_EVERY_REQUEST = True
 
 # ══════════════════════════════════════════════════════
@@ -136,12 +132,12 @@ CSRF_TRUSTED_ORIGINS = [
 # ARCHIVOS ESTÁTICOS
 # ══════════════════════════════════════════════════════
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]   # opcional para archivos estáticos globales
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # ← añadido
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # ← añadido
 
 # ══════════════════════════════════════════════════════
 # MEDIA — imágenes de productos
-# Acceso:  /imagenes/<nombre_archivo>
-# Disco:   TiendaMoa07/imagenes/<nombre_archivo>
 # ══════════════════════════════════════════════════════
 MEDIA_URL  = '/imagenes/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'imagenes')
@@ -153,9 +149,8 @@ LANGUAGE_CODE = 'es-co'
 TIME_ZONE     = 'America/Bogota'
 USE_I18N      = True
 USE_L10N      = True
-USE_TZ        = False   # hora local Bogotá, no UTC
+USE_TZ        = False
 
-# Formato peso colombiano
 DECIMAL_SEPARATOR      = ','
 THOUSAND_SEPARATOR     = '.'
 NUMBER_GROUPING        = 3
