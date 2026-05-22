@@ -1,6 +1,6 @@
-from pathlib import Path
 import os
-
+import logging  # ← agrega esta línea
+from pathlib import Path
 # ══════════════════════════════════════════════════════
 # RUTAS BASE
 # ══════════════════════════════════════════════════════
