@@ -72,7 +72,6 @@ TEMPLATES = [
 # ══════════════════════════════════════════════════════
 
 if os.getenv('MYSQLHOST'):
-    # Railway / Producción
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -83,7 +82,10 @@ if os.getenv('MYSQLHOST'):
             'PORT': os.getenv('MYSQLPORT'),
             'OPTIONS': {
                 'charset': 'utf8mb4',
+                'connect_timeout': 30,        # ← agrega esto
+                'ssl_disabled': True,         # ← agrega esto
             },
+            'CONN_MAX_AGE': 0,               # ← agrega esto
         }
     }
 else:
@@ -101,6 +103,11 @@ else:
             },
         }
     }
+
+    import logging
+logger = logging.getLogger(__name__)
+logger.warning(f"MYSQLHOST = {os.getenv('MYSQLHOST')}")
+logger.warning(f"MYSQLPORT = {os.getenv('MYSQLPORT')}")
 
 # ══════════════════════════════════════════════════════
 # AUTENTICACIÓN PERSONALIZADA
