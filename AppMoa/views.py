@@ -17,6 +17,10 @@ from django.db.models.functions import TruncDay
 from AppMoa.decorators import permiso_requerido
 
 
+from django.http import HttpResponse
+from django.core.mail import send_mail
+from django.conf import settings
+
 from .models import (
     Rol, Permiso, RolPermiso, Usuario,
     Proveedor, Catalogo, Categoria, Producto, VariacionProducto,
@@ -2491,3 +2495,15 @@ def reporte_clientes(request):
 def reportes_hub(request):
     return render(request, 'admin/reportes/reportes_hub.html')
     
+def test_email(request):
+    try:
+        send_mail(
+            subject='Prueba de correo MOA',
+            message='Si recibes esto, el email funciona correctamente.',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[settings.EMAIL_HOST_USER],
+            fail_silently=False,
+        )
+        return HttpResponse('✅ Correo enviado exitosamente')
+    except Exception as e:
+        return HttpResponse(f'❌ Error: {str(e)}')
