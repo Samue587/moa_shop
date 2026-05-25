@@ -29,11 +29,11 @@
             <table style="width:100%;">
                 <tr>
                     <td style="color:#7f8c8d; padding:8px 0; width:45%;">N° Envío</td>
-                    <td><strong>#{{ envio.numero_envio }}</strong></td>
+                    <td><strong>#{{ envio.numero_guia }}</strong></td>
                 </tr>
                 <tr>
                     <td style="color:#7f8c8d; padding:8px 0;">Empresa</td>
-                    <td>{{ envio.empresa_envio }}</td>
+                    <td>{{ envio.empresa_transportadora }}</td>
                 </tr>
                 <tr>
                     <td style="color:#7f8c8d; padding:8px 0;">Fecha envío</td>
@@ -41,7 +41,7 @@
                 </tr>
                 <tr>
                     <td style="color:#7f8c8d; padding:8px 0;">Llegada estimada</td>
-                    <td>{{ envio.fecha_estimada_llegada|date:"d/m/Y" }}</td>
+                    <td>{{ envio.fecha_estipulada_llegada|date:"d/m/Y" }}</td>
                 </tr>
                 <tr>
                     <td style="color:#7f8c8d; padding:8px 0;">Costo</td>

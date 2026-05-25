@@ -55,9 +55,10 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Precio Base <span class="required">*</span></label>
-                    <input type="number" name="precio_base" class="form-control"
-                           placeholder="0.00" step="0.01" min="0"
-                           value="{{ form.precio_base|default:'' }}" required>
+                    <input type="number"
+                        name="precio_base"
+                        id="precio_base"
+                        readonly>
                     <span class="form-help">Precio antes de IVA.</span>
                 </div>
                 <div class="form-group">
@@ -66,15 +67,23 @@
                            placeholder="19" step="0.1" min="0"
                            value="{{ form.iva_porcentaje|default:'19' }}">
                 </div>
+                <div class="form-group">
+                    <label class="form-label">Precio Final</label>
+
+                    <input type="number"
+                        name="precio_venta"
+                        id="precio_venta"
+                        class="form-control"
+                        readonly>
+
+                    <span class="form-help">
+                        Precio final con IVA incluido.
+                    </span>
+                </div>
             </div>
  
             <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Stock Actual <span class="required">*</span></label>
-                    <input type="number" name="stock_actual" class="form-control"
-                           placeholder="0" min="0"
-                           value="{{ form.stock_actual|default:'0' }}" required>
-                </div>
+        
                 <div class="form-group">
                     <label class="form-label">Stock Mínimo</label>
                     <input type="number" name="stock_minimo" class="form-control"
@@ -91,4 +100,56 @@
         </form>
     </div>
 </div>
+<script>
+
+const precioCompra = document.querySelector(
+    '[name="precio_compra"]'
+)
+
+const precioBase = document.querySelector(
+    '#precio_base'
+)
+
+const precioVenta = document.querySelector(
+    '#precio_venta'
+)
+
+const iva = document.querySelector(
+    '[name="iva_porcentaje"]'
+)
+
+function calcularPrecios() {
+
+    let compra = parseFloat(
+        precioCompra.value
+    ) || 0
+
+    let ivaValor = parseFloat(
+        iva.value
+    ) || 0
+
+    // GANANCIA 50%
+    let base = compra * 1.50
+
+    // IVA
+    let final = base * (
+        1 + (ivaValor / 100)
+    )
+
+    precioBase.value = base.toFixed(2)
+
+    precioVenta.value = final.toFixed(2)
+}
+
+precioCompra.addEventListener(
+    'input',
+    calcularPrecios
+)
+
+iva.addEventListener(
+    'input',
+    calcularPrecios
+)
+
+</script>
 {% endblock %}

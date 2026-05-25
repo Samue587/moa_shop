@@ -13,18 +13,38 @@ from decimal import Decimal
 # Diagrama: PK id_roles, nombre_roles
 # ══════════════════════════════════════════════════════
 class Rol(models.Model):
-    nombre_rol = models.CharField(max_length=150, unique=True)
 
-    creado_en      = models.DateTimeField(auto_now_add=True)
-    actualizado_en = models.DateTimeField(auto_now=True)
+    nombre_rol = models.CharField(
+        max_length=150,
+        unique=True
+    )
+
+    permisos = models.ManyToManyField(
+        'Permiso',
+        through='RolPermiso',
+        related_name='roles'
+    )
+
+    creado_en = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    actualizado_en = models.DateTimeField(
+        auto_now=True
+    )
 
     class Meta:
-        db_table            = 'roles'
-        verbose_name        = 'Rol'
+
+        db_table = 'roles'
+
+        verbose_name = 'Rol'
+
         verbose_name_plural = 'Roles'
-        ordering            = ['nombre_rol']
+
+        ordering = ['nombre_rol']
 
     def __str__(self):
+
         return self.nombre_rol
 
 
@@ -279,9 +299,19 @@ class Producto(models.Model):
         resultado = self.variaciones.aggregate(total=Sum('stock_actual'))
         return resultado['total'] or 0
 
-    def actualizar_estado(self) -> None:
-        """Marca NO_DISPONIBLE si todas las variaciones tienen stock 0."""
-        self.estado = 'DISPONIBLE' if self.stock_total > 0 else 'NO_DISPONIBLE'
+    
+    def actualizar_estado(self):
+
+        variaciones = self.variaciones.all()
+
+        disponible = variaciones.filter(
+            stock_actual__gte=models.F('stock_minimo')
+        ).exists()
+
+        if disponible:
+            self.estado = 'DISPONIBLE'
+        else:
+            self.estado = 'NO_DISPONIBLE'
 
 
 # ══════════════════════════════════════════════════════
@@ -309,6 +339,19 @@ class VariacionProducto(models.Model):
 
     creado_en      = models.DateTimeField(auto_now_add=True)
     actualizado_en = models.DateTimeField(auto_now=True)
+    
+    def save(self, *args, **kwargs):
+
+        super().save(*args, **kwargs)
+
+        producto = self.producto
+
+        producto.actualizar_estado()
+
+        producto.save(update_fields=['estado', 'actualizado_en'])
+            
+    
+
 
     class Meta:
         db_table            = 'variacion_producto'
@@ -399,15 +442,12 @@ class DetalleEntrada(models.Model):
         return f"Entrada #{self.entrada.id} | {self.variacion.sku_unico} × {self.cantidades}"
 
     def aplicar_stock(self) -> None:
-        """
-        Suma las cantidades recibidas al stock_actual de la variación.
-        Llamar dentro de transaction.atomic() al registrar la entrada.
-        """
+
         self.variacion.stock_actual += self.cantidades
         self.variacion.save(update_fields=['stock_actual', 'actualizado_en'])
 
         producto = self.variacion.producto
-        if producto.estado == 'NO_DISPONIBLE' and self.variacion.stock_actual > 0:
+        if producto.estado == 'NO_DISPONIBLE' and self.variacion.stock_actual >= self.variacion.stock_minimo:
             producto.estado = 'DISPONIBLE'
             producto.save(update_fields=['estado', 'actualizado_en'])
 

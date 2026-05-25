@@ -32,7 +32,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>N° Envío</th>
+                        <th>Numero Guía</th>
                         <th>Cliente</th>
                         <th>Destino</th>
                         <th>Empresa</th>
@@ -46,7 +46,7 @@
                 <tbody>
                     {% for envio in envios %}
                     <tr>
-                        <td><strong>#{{ envio.numero_envio }}</strong></td>
+                        <td><strong>#{{ envio.numero_guia }}</strong></td>
                         <td>
                             {# Nuevo modelo: nombres_usuario + apellidos_usuario #}
                             {{ envio.usuario.nombres_usuario }} {{ envio.usuario.apellidos_usuario }}<br>
@@ -56,9 +56,9 @@
                             {{ envio.ciudad_envio }}, {{ envio.departamento_envio }}<br>
                             <small style="color:#7f8c8d;">{{ envio.direccion_envio }}</small>
                         </td>
-                        <td>{{ envio.empresa_envio }}</td>
+                        <td>{{ envio.empresa_transportadora }}</td>
                         <td>{{ envio.fecha_envio|date:"d/m/Y" }}</td>
-                        <td>{{ envio.fecha_estimada_llegada|date:"d/m/Y" }}</td>
+                        <td>{{ envio.fecha_estipulada_llegada|date:"d/m/Y" }}</td>
                         <td>
                             {% if envio.costo_envio == 0 %}
                                 <span style="color:#27ae60; font-weight:600;">Gratis</span>

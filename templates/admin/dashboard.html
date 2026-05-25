@@ -6,267 +6,277 @@
 
 {% block content %}
 
-<!-- STATS -->
-<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; margin-bottom:24px;">
+<!-- ══ STATS ══ -->
+<div class="stats-grid">
 
-  <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #3498db;">
-    <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">Usuarios registrados</div>
-    <div style="font-size:28px; font-weight:800; color:#3498db;">{{ total_usuarios }}</div>
-    <div style="font-size:12px; color:#aab; margin-top:2px;">cuentas en el sistema</div>
-  </div>
-
-  <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #8e44ad;">
-    <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">Proveedores</div>
-    <div style="font-size:28px; font-weight:800; color:#8e44ad;">{{ total_proveedores }}</div>
-    <div style="font-size:12px; color:#aab; margin-top:2px;">proveedores activos</div>
-  </div>
-
-  <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #1abc9c;">
-    <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">Productos</div>
-    <div style="font-size:28px; font-weight:800; color:#1abc9c;">{{ total_productos }}</div>
-    {% if productos_agotados %}
-    <div style="font-size:12px; color:#e74c3c; margin-top:2px; font-weight:600;">⚠️ {{ productos_agotados }} sin stock</div>
-    {% else %}
-    <div style="font-size:12px; color:#aab; margin-top:2px;">en catálogo</div>
-    {% endif %}
-  </div>
-
-  <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #f39c12;">
-    <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">Ventas hoy</div>
-    <div style="font-size:28px; font-weight:800; color:#f39c12;" id="ventasHoyValor">{{ ventas_hoy }}</div>
-    <div style="font-size:12px; color:#27ae60; margin-top:2px; display:flex; align-items:center; gap:4px; font-weight:600;">
-      <span style="width:6px;height:6px;border-radius:50%;background:#27ae60;display:inline-block;animation:blink 1.5s infinite;"></span>
-      En tiempo real
+    <div class="stat-card" style="border-left-color:#3498db;">
+        <div class="stat-icon bg-blue">🪪</div>
+        <div class="stat-info">
+            <div class="stat-number">{{ total_usuarios }}</div>
+            <div class="stat-label">Usuarios registrados</div>
+        </div>
     </div>
-  </div>
 
-  <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #27ae60;">
-    <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">Total ventas</div>
-    <div style="font-size:28px; font-weight:800; color:#27ae60;" id="totalVentasValor">{{ total_ventas }}</div>
-    <div style="font-size:12px; color:#aab; margin-top:2px;">ventas históricas</div>
-  </div>
-
-  <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #e74c3c; cursor:pointer;"
-       onclick="location.href='{% url 'admin_envios' %}'">
-    <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">Envíos pendientes</div>
-    <div style="font-size:28px; font-weight:800; color:{% if envios_pendientes > 0 %}#e74c3c{% else %}#27ae60{% endif %};" id="enviosPendientesValor">{{ envios_pendientes }}</div>
-    {% if envios_pendientes > 0 %}
-    <div style="font-size:12px; color:#e74c3c; margin-top:2px; font-weight:600;">⚠️ Requieren atención</div>
-    {% else %}
-    <div style="font-size:12px; color:#27ae60; margin-top:2px; font-weight:600;">✅ Todo al día</div>
-    {% endif %}
-  </div>
-
-</div>
-
-<!-- MÓDULOS -->
-<div class="card" style="margin-bottom:24px;">
-  <div class="card-header">
-    <h3>📋 Módulos del Sistema</h3>
-  </div>
-  <div class="card-body">
-    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px;">
-
-      {% for modulo in modulos %}
-      <a href="{{ modulo.url }}" style="text-decoration:none;">
-        <div style="background:#f8f9fa; border-radius:10px; padding:20px 14px; text-align:center; transition:all 0.25s; border:2px solid transparent;"
-             onmouseover="this.style.borderColor='#144272';this.style.background='#fff';this.style.transform='translateY(-3px)';"
-             onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';this.style.transform='translateY(0)';">
-          <div style="font-size:34px;margin-bottom:10px;">{{ modulo.icono }}</div>
-          <div style="font-weight:700;color:#2c3e50;font-size:14px;">{{ modulo.nombre }}</div>
-          <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">{{ modulo.descripcion }}</div>
+    <div class="stat-card" style="border-left-color:#8e44ad;">
+        <div class="stat-icon bg-purple">🏭</div>
+        <div class="stat-info">
+            <div class="stat-number">{{ total_proveedores }}</div>
+            <div class="stat-label">Proveedores activos</div>
         </div>
-      </a>
-      {% empty %}
-
-      <a href="{% url 'admin_usuarios' %}" style="text-decoration:none;">
-        <div style="background:#f8f9fa; border-radius:10px; padding:20px 14px; text-align:center; transition:all 0.25s; border:2px solid transparent;"
-             onmouseover="this.style.borderColor='#144272';this.style.background='#fff';"
-             onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
-          <div style="font-size:34px;margin-bottom:10px;">🪪</div>
-          <div style="font-weight:700;color:#2c3e50;font-size:14px;">Usuarios</div>
-          <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Gestión de cuentas</div>
-        </div>
-      </a>
-
-      <a href="{% url 'admin_roles' %}" style="text-decoration:none;">
-        <div style="background:#f8f9fa; border-radius:10px; padding:20px 14px; text-align:center; transition:all 0.25s; border:2px solid transparent;"
-             onmouseover="this.style.borderColor='#144272';this.style.background='#fff';"
-             onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
-          <div style="font-size:34px;margin-bottom:10px;">🛡️</div>
-          <div style="font-weight:700;color:#2c3e50;font-size:14px;">Roles</div>
-          <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Control de acceso</div>
-        </div>
-      </a>
-
-      <a href="{% url 'admin_permisos' %}" style="text-decoration:none;">
-        <div style="background:#f8f9fa; border-radius:10px; padding:20px 14px; text-align:center; transition:all 0.25s; border:2px solid transparent;"
-             onmouseover="this.style.borderColor='#144272';this.style.background='#fff';"
-             onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
-          <div style="font-size:34px;margin-bottom:10px;">🔑</div>
-          <div style="font-weight:700;color:#2c3e50;font-size:14px;">Permisos</div>
-          <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Permisos granulares</div>
-        </div>
-      </a>
-
-      <a href="{% url 'admin_proveedores' %}" style="text-decoration:none;">
-        <div style="background:#f8f9fa; border-radius:10px; padding:20px 14px; text-align:center; transition:all 0.25s; border:2px solid transparent;"
-             onmouseover="this.style.borderColor='#144272';this.style.background='#fff';"
-             onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
-          <div style="font-size:34px;margin-bottom:10px;">🏭</div>
-          <div style="font-weight:700;color:#2c3e50;font-size:14px;">Proveedores</div>
-          <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Gestión de proveedores</div>
-        </div>
-      </a>
-
-      <a href="{% url 'admin_catalogos' %}" style="text-decoration:none;">
-        <div style="background:#f8f9fa; border-radius:10px; padding:20px 14px; text-align:center; transition:all 0.25s; border:2px solid transparent;"
-             onmouseover="this.style.borderColor='#144272';this.style.background='#fff';"
-             onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
-          <div style="font-size:34px;margin-bottom:10px;">📋</div>
-          <div style="font-weight:700;color:#2c3e50;font-size:14px;">Catálogos</div>
-          <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Colecciones de productos</div>
-        </div>
-      </a>
-
-      <a href="{% url 'admin_categorias' %}" style="text-decoration:none;">
-        <div style="background:#f8f9fa; border-radius:10px; padding:20px 14px; text-align:center; transition:all 0.25s; border:2px solid transparent;"
-             onmouseover="this.style.borderColor='#144272';this.style.background='#fff';"
-             onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
-          <div style="font-size:34px;margin-bottom:10px;">📚</div>
-          <div style="font-weight:700;color:#2c3e50;font-size:14px;">Categorías</div>
-          <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Organización de productos</div>
-        </div>
-      </a>
-
-      <a href="{% url 'admin_productos' %}" style="text-decoration:none;">
-        <div style="background:#f8f9fa; border-radius:10px; padding:20px 14px; text-align:center; transition:all 0.25s; border:2px solid transparent;"
-             onmouseover="this.style.borderColor='#144272';this.style.background='#fff';"
-             onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
-          <div style="font-size:34px;margin-bottom:10px;">📦</div>
-          <div style="font-weight:700;color:#2c3e50;font-size:14px;">Productos</div>
-          <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Catálogo y variaciones</div>
-        </div>
-      </a>
-
-      <a href="{% url 'admin_inventario' %}" style="text-decoration:none;">
-        <div style="background:#f8f9fa; border-radius:10px; padding:20px 14px; text-align:center; transition:all 0.25s; border:2px solid transparent;"
-             onmouseover="this.style.borderColor='#144272';this.style.background='#fff';"
-             onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
-          <div style="font-size:34px;margin-bottom:10px;">📥</div>
-          <div style="font-weight:700;color:#2c3e50;font-size:14px;">Inventario</div>
-          <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Entradas de mercancía</div>
-        </div>
-      </a>
-
-      <a href="{% url 'admin_envios' %}" style="text-decoration:none;">
-        <div style="background:#f8f9fa; border-radius:10px; padding:20px 14px; text-align:center; transition:all 0.25s; border:2px solid transparent;"
-             onmouseover="this.style.borderColor='#144272';this.style.background='#fff';"
-             onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
-          <div style="font-size:34px;margin-bottom:10px;">🚚</div>
-          <div style="font-weight:700;color:#2c3e50;font-size:14px;">Envíos</div>
-          <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Seguimiento de pedidos</div>
-        </div>
-      </a>
-
-      <a href="{% url 'reportes_hub' %}" style="text-decoration:none;">
-        <div style="background:#f8f9fa; border-radius:10px; padding:20px 14px; text-align:center; transition:all 0.25s; border:2px solid transparent;"
-             onmouseover="this.style.borderColor='#144272';this.style.background='#fff';"
-             onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
-          <div style="font-size:34px;margin-bottom:10px;">📊</div>
-          <div style="font-weight:700;color:#2c3e50;font-size:14px;">Reportes</div>
-          <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Centro de reportes</div>
-        </div>
-      </a>
-
-      <a href="{% url 'tienda' %}" style="text-decoration:none;">
-        <div style="background:#f8f9fa; border-radius:10px; padding:20px 14px; text-align:center; transition:all 0.25s; border:2px solid transparent;"
-             onmouseover="this.style.borderColor='#27ae60';this.style.background='#fff';"
-             onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
-          <div style="font-size:34px;margin-bottom:10px;">🛍️</div>
-          <div style="font-weight:700;color:#2c3e50;font-size:14px;">Ver Tienda</div>
-          <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Vista pública</div>
-        </div>
-      </a>
-
-      {% endfor %}
     </div>
-  </div>
-</div>
 
-<!-- PRODUCTOS RECIENTES -->
-<div class="card">
-  <div class="card-header">
-    <h3>📦 Productos Recientes</h3>
-    <a href="{% url 'admin_productos' %}" class="btn btn-primary btn-sm">Ver todos</a>
-  </div>
-  <div class="table-responsive">
-    <table>
-      <thead>
-        <tr>
-          <th>Foto</th>
-          <th>Producto</th>
-          <th>Categoría</th>
-          <th>Proveedor</th>
-          <th>Stock Total</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for producto in productos_recientes %}
-        <tr>
-          <td>
-            {% if producto.foto %}
-              <img src="{{ producto.foto_url }}" class="product-thumb" alt="{{ producto.nombre_producto }}">
-            {% else %}
-              <div class="no-thumb">📦</div>
-            {% endif %}
-          </td>
-          <td><strong>{{ producto.nombre_producto }}</strong></td>
-          <td>{{ producto.categoria.nombre }}</td>
-          <td>{{ producto.proveedor.nombre_proveedor }}</td>
-          <td>
-            {% with stock=producto.stock_total %}
-              {% if stock == 0 %}
-                <span class="stock-cero">0 uds</span>
-              {% elif stock <= 5 %}
-                <span class="stock-bajo">{{ stock }} uds</span>
-              {% else %}
-                <span class="stock-ok">{{ stock }} uds</span>
-              {% endif %}
-            {% endwith %}
-          </td>
-          <td>
-            {% if producto.estado == 'DISPONIBLE' %}
-              <span class="badge badge-disponible">Disponible</span>
-            {% else %}
-              <span class="badge badge-no-disponible">No disponible</span>
-            {% endif %}
-          </td>
-          <td>
-            <a href="{% url 'editar_producto' producto.id %}" class="btn btn-warning btn-sm">✏️ Editar</a>
-            <a href="{% url 'admin_variaciones' producto.id %}" class="btn btn-info btn-sm">🎨 Variaciones</a>
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="7">
-            <div class="empty-state">
-              <div class="empty-icon">📦</div>
-              <p>No hay productos registrados aún.</p>
+    <div class="stat-card" style="border-left-color:#1abc9c;">
+        <div class="stat-icon bg-teal">📦</div>
+        <div class="stat-info">
+            <div class="stat-number">{{ total_productos }}</div>
+            <div class="stat-label">
+                Productos
+                {% if productos_agotados %}
+                    <br><span style="color:#e74c3c;font-size:11px;">⚠️ {{ productos_agotados }} sin stock</span>
+                {% endif %}
             </div>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+        </div>
+    </div>
+
+    <div class="stat-card" style="border-left-color:#f39c12;">
+        <div class="stat-icon bg-orange">💰</div>
+        <div class="stat-info">
+            <div class="stat-number" id="ventasHoyValor">{{ ventas_hoy }}</div>
+            <div class="stat-label">
+                Ventas hoy
+                <br><span style="color:#27ae60;font-size:11px;display:flex;align-items:center;gap:4px;">
+                    <span style="width:6px;height:6px;border-radius:50%;background:#27ae60;display:inline-block;animation:blink 1.5s infinite;"></span>
+                    En tiempo real
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card" style="border-left-color:#27ae60;">
+        <div class="stat-icon bg-green">📊</div>
+        <div class="stat-info">
+            <div class="stat-number" id="totalVentasValor">{{ total_ventas }}</div>
+            <div class="stat-label">Total ventas históricas</div>
+        </div>
+    </div>
+
+    <div class="stat-card" style="border-left-color:#e74c3c; cursor:pointer;" onclick="location.href='{% url 'admin_envios' %}'">
+        <div class="stat-icon bg-red">🚚</div>
+        <div class="stat-info">
+            <div class="stat-number" id="enviosPendientesValor"
+                 style="color:{% if envios_pendientes > 0 %}#e74c3c{% else %}#27ae60{% endif %}">
+                {{ envios_pendientes }}
+            </div>
+            <div class="stat-label">
+                Envíos pendientes
+                {% if envios_pendientes > 0 %}
+                    <br><span style="color:#e74c3c;font-size:11px;">⚠️ Requieren atención</span>
+                {% else %}
+                    <br><span style="color:#27ae60;font-size:11px;">✅ Todo al día</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ══ MÓDULOS ══ -->
+<div class="card" style="margin-bottom: 30px;">
+    <div class="card-header">
+        <h3>📋 Módulos del Sistema</h3>
+    </div>
+    <div class="card-body">
+        <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap:16px;">
+
+            <!-- Usuarios -->
+            <a href="{% url 'admin_usuarios' %}" style="text-decoration:none;">
+                <div style="background:#f8f9fa; border-radius:10px; padding:22px 16px; text-align:center; transition:all 0.3s; border:2px solid transparent;"
+                     onmouseover="this.style.borderColor='#144272';this.style.background='#fff';"
+                     onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
+                    <div style="font-size:36px;margin-bottom:10px;">🪪</div>
+                    <div style="font-weight:600;color:#2c3e50;font-size:14px;">Usuarios</div>
+                    <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Gestión de cuentas</div>
+                </div>
+            </a>
+
+            <!-- Roles -->
+            <a href="{% url 'admin_roles' %}" style="text-decoration:none;">
+                <div style="background:#f8f9fa; border-radius:10px; padding:22px 16px; text-align:center; transition:all 0.3s; border:2px solid transparent;"
+                     onmouseover="this.style.borderColor='#144272';this.style.background='#fff';"
+                     onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
+                    <div style="font-size:36px;margin-bottom:10px;">🛡️</div>
+                    <div style="font-weight:600;color:#2c3e50;font-size:14px;">Roles</div>
+                    <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Control de acceso</div>
+                </div>
+            </a>
+
+            
+
+            <!-- Proveedores — NUEVO -->
+            <a href="{% url 'admin_proveedores' %}" style="text-decoration:none;">
+                <div style="background:#f8f9fa; border-radius:10px; padding:22px 16px; text-align:center; transition:all 0.3s; border:2px solid transparent;"
+                     onmouseover="this.style.borderColor='#144272';this.style.background='#fff';"
+                     onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
+                    <div style="font-size:36px;margin-bottom:10px;">🏭</div>
+                    <div style="font-weight:600;color:#2c3e50;font-size:14px;">Proveedores</div>
+                    <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Gestión de proveedores</div>
+                </div>
+            </a>
+
+            <!-- Catálogos — NUEVO -->
+            <a href="{% url 'admin_catalogos' %}" style="text-decoration:none;">
+                <div style="background:#f8f9fa; border-radius:10px; padding:22px 16px; text-align:center; transition:all 0.3s; border:2px solid transparent;"
+                     onmouseover="this.style.borderColor='#144272';this.style.background='#fff';"
+                     onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
+                    <div style="font-size:36px;margin-bottom:10px;">📋</div>
+                    <div style="font-weight:600;color:#2c3e50;font-size:14px;">Catálogos</div>
+                    <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Colecciones de productos</div>
+                </div>
+            </a>
+
+            <!-- Categorías -->
+            <a href="{% url 'admin_categorias' %}" style="text-decoration:none;">
+                <div style="background:#f8f9fa; border-radius:10px; padding:22px 16px; text-align:center; transition:all 0.3s; border:2px solid transparent;"
+                     onmouseover="this.style.borderColor='#144272';this.style.background='#fff';"
+                     onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
+                    <div style="font-size:36px;margin-bottom:10px;">📚</div>
+                    <div style="font-weight:600;color:#2c3e50;font-size:14px;">Categorías</div>
+                    <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Organización de productos</div>
+                </div>
+            </a>
+
+            <!-- Productos -->
+            <a href="{% url 'admin_productos' %}" style="text-decoration:none;">
+                <div style="background:#f8f9fa; border-radius:10px; padding:22px 16px; text-align:center; transition:all 0.3s; border:2px solid transparent;"
+                     onmouseover="this.style.borderColor='#144272';this.style.background='#fff';"
+                     onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
+                    <div style="font-size:36px;margin-bottom:10px;">📦</div>
+                    <div style="font-weight:600;color:#2c3e50;font-size:14px;">Productos</div>
+                    <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Catálogo y variaciones</div>
+                </div>
+            </a>
+
+            <!-- Inventario — NUEVO -->
+            <a href="{% url 'admin_inventario' %}" style="text-decoration:none;">
+                <div style="background:#f8f9fa; border-radius:10px; padding:22px 16px; text-align:center; transition:all 0.3s; border:2px solid transparent;"
+                     onmouseover="this.style.borderColor='#144272';this.style.background='#fff';"
+                     onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
+                    <div style="font-size:36px;margin-bottom:10px;">📥</div>
+                    <div style="font-weight:600;color:#2c3e50;font-size:14px;">Inventario</div>
+                    <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Entradas de mercancía</div>
+                </div>
+            </a>
+
+            <!-- Ventas -->
+            <a href="{% url 'admin_ventas' %}" style="text-decoration:none;">
+                <div style="background:#f8f9fa; border-radius:10px; padding:22px 16px; text-align:center; transition:all 0.3s; border:2px solid transparent;"
+                     onmouseover="this.style.borderColor='#144272';this.style.background='#fff';"
+                     onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
+                    <div style="font-size:36px;margin-bottom:10px;">💰</div>
+                    <div style="font-weight:600;color:#2c3e50;font-size:14px;">Ventas</div>
+                    <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Historial y reportes</div>
+                </div>
+            </a>
+
+            <!-- Envíos -->
+            <a href="{% url 'admin_envios' %}" style="text-decoration:none;">
+                <div style="background:#f8f9fa; border-radius:10px; padding:22px 16px; text-align:center; transition:all 0.3s; border:2px solid transparent;"
+                     onmouseover="this.style.borderColor='#144272';this.style.background='#fff';"
+                     onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
+                    <div style="font-size:36px;margin-bottom:10px;">🚚</div>
+                    <div style="font-weight:600;color:#2c3e50;font-size:14px;">Envíos</div>
+                    <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Seguimiento de pedidos</div>
+                </div>
+            </a>
+
+            <!-- Tienda -->
+            <a href="{% url 'tienda' %}" style="text-decoration:none;">
+                <div style="background:#f8f9fa; border-radius:10px; padding:22px 16px; text-align:center; transition:all 0.3s; border:2px solid transparent;"
+                     onmouseover="this.style.borderColor='#27ae60';this.style.background='#fff';"
+                     onmouseout="this.style.borderColor='transparent';this.style.background='#f8f9fa';">
+                    <div style="font-size:36px;margin-bottom:10px;">🛍️</div>
+                    <div style="font-weight:600;color:#2c3e50;font-size:14px;">Ver Tienda</div>
+                    <div style="font-size:11px;color:#7f8c8d;margin-top:4px;">Vista pública</div>
+                </div>
+            </a>
+
+        </div>
+    </div>
+</div>
+
+<!-- ══ PRODUCTOS RECIENTES ══ -->
+<div class="card">
+    <div class="card-header">
+        <h3>📦 Productos Recientes</h3>
+        <a href="{% url 'admin_productos' %}" class="btn btn-primary btn-sm">Ver todos</a>
+    </div>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Foto</th>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th>Proveedor</th>
+                    <th>Stock Total</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos_recientes %}
+                <tr>
+                    <td>
+                        {% if producto.foto %}
+                            <img src="{{ producto.foto_url }}" class="product-thumb" alt="{{ producto.nombre_producto }}">
+                        {% else %}
+                            <div class="no-thumb">📦</div>
+                        {% endif %}
+                    </td>
+                    <td><strong>{{ producto.nombre_producto }}</strong></td>
+                    <td>{{ producto.categoria.nombre }}</td>
+                    <td>{{ producto.proveedor.nombre_proveedor }}</td>
+                    <td>
+                        {% with stock=producto.stock_total %}
+                            {% if stock == 0 %}
+                                <span class="stock-cero">0 uds</span>
+                            {% elif stock <= 5 %}
+                                <span class="stock-bajo">{{ stock }} uds</span>
+                            {% else %}
+                                <span class="stock-ok">{{ stock }} uds</span>
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td>
+                        {% if producto.estado == 'DISPONIBLE' %}
+                            <span class="badge badge-disponible">Disponible</span>
+                        {% else %}
+                            <span class="badge badge-no-disponible">No disponible</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'editar_producto' producto.id %}" class="btn btn-warning btn-sm">✏️ Editar</a>
+                        <a href="{% url 'admin_variaciones' producto.id %}" class="btn btn-info btn-sm">🎨 Variaciones</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <div class="empty-icon">📦</div>
+                            <p>No hay productos registrados aún.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <style>
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
-  .stat-number.updated { color:#f39c12; transform:scale(1.1); transition:all 0.3s; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+    .stat-number.updated { color:#f39c12; transform:scale(1.1); transition:all 0.3s; }
 </style>
 
 <script>
@@ -276,9 +286,9 @@ async function actualizarStats() {
     try {
         const res  = await fetch(URL_STATS);
         const data = await res.json();
-        actualizarValor('ventasHoyValor',       data.ventas_hoy);
-        actualizarValor('totalVentasValor',      data.total_ventas);
-        actualizarValor('enviosPendientesValor', data.envios_pendientes);
+        actualizarValor('ventasHoyValor',        data.ventas_hoy);
+        actualizarValor('totalVentasValor',       data.total_ventas);
+        actualizarValor('enviosPendientesValor',  data.envios_pendientes);
     } catch(e) {}
 }
 

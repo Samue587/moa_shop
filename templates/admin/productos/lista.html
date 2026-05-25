@@ -4,131 +4,131 @@
 {% block navbar_title %}Gestión de Productos{% endblock %}
  
 {% block content %}
-<div class="page-header">
-    <div>
-        <div class="page-title">📦 Catálogo de Productos</div>
-        <div class="breadcrumb">
-            <a href="{% url 'admin_dashboard' %}">Dashboard</a> › Productos
+    <div class="page-header">
+        <div>
+            <div class="page-title">📦 Catálogo de Productos</div>
+            <div class="breadcrumb">
+                <a href="{% url 'admin_dashboard' %}">Dashboard</a> › Productos
+            </div>
         </div>
+        <a href="{% url 'crear_producto' %}" class="btn btn-success">➕ Nuevo Producto</a>
     </div>
-    <a href="{% url 'crear_producto' %}" class="btn btn-success">➕ Nuevo Producto</a>
-</div>
- 
-<!-- FILTROS -->
-<div class="card" style="margin-bottom:20px;">
-    <div class="card-body" style="padding:16px 25px;">
-        <form method="get" action="{% url 'admin_productos' %}" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
-            <input type="text" name="q" class="search-input" style="flex:1;min-width:200px;"
-                   placeholder="🔍 Buscar por nombre..." value="{{ busqueda|default:'' }}">
-            <select name="categoria" class="form-control" style="width:200px;">
-                <option value="">Todas las categorías</option>
-                {% for cat in categorias %}
-                    <option value="{{ cat.id }}" {% if request.GET.categoria == cat.id|stringformat:"s" %}selected{% endif %}>
-                        {{ cat.nombre }}
-                    </option>
-                {% endfor %}
-            </select>
-            <button type="submit" class="btn btn-primary">Filtrar</button>
-            {% if busqueda or request.GET.categoria %}
-                <a href="{% url 'admin_productos' %}" class="btn btn-secondary">Limpiar</a>
-            {% endif %}
-        </form>
-    </div>
-</div>
- 
-<!-- GRID DE PRODUCTOS -->
-{% if productos %}
-<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;">
-    {% for producto in productos %}
-    <div style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,0.08);transition:all 0.3s;"
-         onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 8px 25px rgba(0,0,0,0.12)'"
-         onmouseout="this.style.transform='';this.style.boxShadow='0 4px 15px rgba(0,0,0,0.08)'">
- 
-        <!-- Imagen -->
-        <div style="width:100%;height:200px;background:linear-gradient(135deg,#144272,#205295);display:flex;align-items:center;justify-content:center;overflow:hidden;">
-            {% if producto.foto %}
-                <img src="{{ producto.foto_url }}" alt="{{ producto.nombre_producto }}"
-                     style="width:100%;height:100%;object-fit:cover;">
-            {% else %}
-                <span style="font-size:60px;">📦</span>
-            {% endif %}
-        </div>
- 
-        <!-- Info -->
-        <div style="padding:18px;">
-            <h3 style="font-size:16px;font-weight:600;color:#2c3e50;margin-bottom:6px;">
-                {{ producto.nombre_producto }}
-            </h3>
-            <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
-                <span style="background:#f0f4f8;color:#555;font-size:11px;padding:3px 8px;border-radius:4px;">
-                    📚 {{ producto.categoria.nombre }}
-                </span>
-                <span style="background:#f0f4f8;color:#555;font-size:11px;padding:3px 8px;border-radius:4px;">
-                    🏭 {{ producto.proveedor.nombre_proveedor }}
-                </span>
-                {% if producto.catalogo %}
-                <span style="background:#e8f4fd;color:#1565c0;font-size:11px;padding:3px 8px;border-radius:4px;">
-                    📋 {{ producto.catalogo.nombre_catalogo }}
-                </span>
+    
+    <!-- FILTROS -->
+    <div class="card" style="margin-bottom:20px;">
+        <div class="card-body" style="padding:16px 25px;">
+            <form method="get" action="{% url 'admin_productos' %}" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+                <input type="text" name="q" class="search-input" style="flex:1;min-width:200px;"
+                    placeholder="🔍 Buscar por nombre..." value="{{ busqueda|default:'' }}">
+                <select name="categoria" class="form-control" style="width:200px;">
+                    <option value="">Todas las categorías</option>
+                    {% for cat in categorias %}
+                        <option value="{{ cat.id }}" {% if request.GET.categoria == cat.id|stringformat:"s" %}selected{% endif %}>
+                            {{ cat.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+                {% if busqueda or request.GET.categoria %}
+                    <a href="{% url 'admin_productos' %}" class="btn btn-secondary">Limpiar</a>
                 {% endif %}
-            </div>
- 
-            <!-- Stock total -->
-            <div style="margin-bottom:10px;">
-                {% with stock=producto.stock_total %}
-                    {% if stock == 0 %}
-                        <span class="stock-cero">📦 Sin stock (0 uds)</span>
-                    {% elif stock <= 5 %}
-                        <span class="stock-bajo">📦 Stock bajo ({{ stock }} uds)</span>
-                    {% else %}
-                        <span class="stock-ok">📦 {{ stock }} unidades</span>
-                    {% endif %}
-                {% endwith %}
-            </div>
- 
-            <!-- Estado -->
-            <div style="margin-bottom:14px;">
-                {% if producto.estado == 'DISPONIBLE' %}
-                    <span class="badge badge-disponible">✅ Disponible</span>
+            </form>
+        </div>
+    </div>
+    
+    <!-- GRID DE PRODUCTOS -->
+    {% if productos %}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;">
+        {% for producto in productos %}
+        <div style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,0.08);transition:all 0.3s;"
+            onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 8px 25px rgba(0,0,0,0.12)'"
+            onmouseout="this.style.transform='';this.style.boxShadow='0 4px 15px rgba(0,0,0,0.08)'">
+    
+            <!-- Imagen -->
+            <div style="width:100%;height:200px;background:linear-gradient(135deg,#144272,#205295);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                {% if producto.foto %}
+                    <img src="{{ producto.foto_url }}" alt="{{ producto.nombre_producto }}"
+                        style="width:100%;height:100%;object-fit:cover;">
                 {% else %}
-                    <span class="badge badge-no-disponible">⚠️ No Disponible</span>
+                    <span style="font-size:60px;">📦</span>
                 {% endif %}
             </div>
- 
-            <!-- Acciones -->
-            <div style="display:flex;gap:6px;padding-top:12px;border-top:1px solid #f0f0f0;flex-wrap:wrap;">
-                <a href="{% url 'editar_producto' producto.id %}" class="btn btn-warning btn-sm" style="flex:1;justify-content:center;">✏️ Editar</a>
-                <a href="{% url 'admin_variaciones' producto.id %}" class="btn btn-info btn-sm" style="flex:1;justify-content:center;">🎨 Variaciones</a>
-                <a href="{% url 'eliminar_producto' producto.id %}" class="btn btn-danger btn-sm" style="flex:1;justify-content:center;">🗑️</a>
+    
+            <!-- Info -->
+            <div style="padding:18px;">
+                <h3 style="font-size:16px;font-weight:600;color:#2c3e50;margin-bottom:6px;">
+                    {{ producto.nombre_producto }}
+                </h3>
+                <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+                    <span style="background:#f0f4f8;color:#555;font-size:11px;padding:3px 8px;border-radius:4px;">
+                        📚 {{ producto.categoria.nombre }}
+                    </span>
+                    <span style="background:#f0f4f8;color:#555;font-size:11px;padding:3px 8px;border-radius:4px;">
+                        🏭 {{ producto.proveedor.nombre_proveedor }}
+                    </span>
+                    {% if producto.catalogo %}
+                    <span style="background:#e8f4fd;color:#1565c0;font-size:11px;padding:3px 8px;border-radius:4px;">
+                        📋 {{ producto.catalogo.nombre_catalogo }}
+                    </span>
+                    {% endif %}
+                </div>
+    
+                <!-- Stock total -->
+                <div style="margin-bottom:10px;">
+                    {% with stock=producto.stock_total %}
+                        {% if stock == 0 %}
+                            <span class="stock-cero">📦 Sin stock (0 uds)</span>
+                        {% elif stock <= 5 %}
+                            <span class="stock-bajo">📦 Stock bajo ({{ stock }} uds)</span>
+                        {% else %}
+                            <span class="stock-ok">📦 {{ stock }} unidades</span>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+    
+                <!-- Estado -->
+                <div style="margin-bottom:14px;">
+                    {% if producto.estado == 'DISPONIBLE' %}
+                        <span class="badge badge-disponible">✅ Disponible</span>
+                    {% else %}
+                        <span class="badge badge-no-disponible">⚠️ No Disponible</span>
+                    {% endif %}
+                </div>
+    
+                <!-- Acciones -->
+                <div style="display:flex;gap:6px;padding-top:12px;border-top:1px solid #f0f0f0;flex-wrap:wrap;">
+                    <a href="{% url 'editar_producto' producto.id %}" class="btn btn-warning btn-sm" style="flex:1;justify-content:center;">✏️ Editar</a>
+                    <a href="{% url 'admin_variaciones' producto.id %}" class="btn btn-info btn-sm" style="flex:1;justify-content:center;">🎨 Variaciones</a>
+                    <a href="{% url 'eliminar_producto' producto.id %}" class="btn btn-danger btn-sm" style="flex:1;justify-content:center;">🗑️</a>
+                </div>
             </div>
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-</div>
- 
-<!-- PAGINACIÓN -->
-{% if productos.has_other_pages %}
-<div class="pagination" style="margin-top:30px;">
-    {% if productos.has_previous %}
-        <a href="?page={{ productos.previous_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}" class="page-link">« Anterior</a>
-    {% endif %}
-    {% for num in productos.paginator.page_range %}
-        <a href="?page={{ num }}{% if busqueda %}&q={{ busqueda }}{% endif %}"
-           class="page-link {% if productos.number == num %}active{% endif %}">{{ num }}</a>
-    {% endfor %}
-    {% if productos.has_next %}
-        <a href="?page={{ productos.next_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}" class="page-link">Siguiente »</a>
-    {% endif %}
-</div>
-{% endif %}
- 
-{% else %}
-<div class="card">
-    <div class="empty-state">
-        <div class="empty-icon">📦</div>
-        <p>No hay productos registrados. <a href="{% url 'crear_producto' %}">Crear el primero</a></p>
+    
+    <!-- PAGINACIÓN -->
+    {% if productos.has_other_pages %}
+    <div class="pagination" style="margin-top:30px;">
+        {% if productos.has_previous %}
+            <a href="?page={{ productos.previous_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}" class="page-link">« Anterior</a>
+        {% endif %}
+        {% for num in productos.paginator.page_range %}
+            <a href="?page={{ num }}{% if busqueda %}&q={{ busqueda }}{% endif %}"
+            class="page-link {% if productos.number == num %}active{% endif %}">{{ num }}</a>
+        {% endfor %}
+        {% if productos.has_next %}
+            <a href="?page={{ productos.next_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}" class="page-link">Siguiente »</a>
+        {% endif %}
     </div>
-</div>
-{% endif %}
+    {% endif %}
+    
+    {% else %}
+    <div class="card">
+        <div class="empty-state">
+            <div class="empty-icon">📦</div>
+            <p>No hay productos registrados. <a href="{% url 'crear_producto' %}">Crear el primero</a></p>
+        </div>
+    </div>
+    {% endif %}
  
 {% endblock %}
