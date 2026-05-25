@@ -89,6 +89,64 @@
         @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
         .form-group { margin-bottom: 16px; }
         .form-group:last-child { margin-bottom: 0; }
+        /* ─────────────────────────────
+   DIRECCIÓN COLOMBIA
+───────────────────────────── */
+
+.direccion-box {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.direccion-grid {
+    display: grid;
+    grid-template-columns:
+        1.5fr
+        1fr
+        .8fr
+        1fr
+        1fr
+        auto
+        1fr
+        .8fr
+        auto
+        1fr;
+    gap: 10px;
+    align-items: center;
+}
+
+.direccion-grid span {
+    font-weight: 700;
+    color: var(--muted);
+    text-align: center;
+    font-size: 18px;
+}
+
+/* Preview dirección */
+#direccion_preview {
+    font-weight: 600;
+    color: var(--navy);
+    background: #f3f4f6;
+    border: 2px dashed var(--border);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .direccion-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .direccion-grid span {
+        display: none;
+    }
+}
+
+@media (max-width: 500px) {
+    .direccion-grid {
+        grid-template-columns: 1fr;
+    }
+}
         label {
             display: block; font-size: 13px; font-weight: 600;
             color: var(--dark); margin-bottom: 6px;
@@ -223,12 +281,69 @@
                 <div class="card-title">📦 Datos de envío</div>
                 <div class="card-body">
 
-                    <div class="form-group">
+                    <div class="direccion-box">
+
                         <label>Dirección <span class="req">*</span></label>
-                        <input type="text" name="direccion"
-                               placeholder="Ej: Calle 123 # 45-67"
-                               value="{{ form.direccion|default:'' }}"
-                               required>
+
+                        <div class="direccion-grid">
+
+                            <!-- Tipo vía principal -->
+                            <select id="tipo_via">
+                                <option value="Calle">Calle</option>
+                                <option value="Carrera">Carrera</option>
+                                <option value="Diagonal">Diagonal</option>
+                                <option value="Transversal">Transversal</option>
+                                <option value="Avenida">Avenida</option>
+                            </select>
+
+                            <!-- Número principal -->
+                            <input type="text" id="numero1" placeholder="123">
+
+                            <!-- Letra -->
+                            <input type="text" id="letra1" placeholder="A">
+
+                            <!-- BIS -->
+                            <select id="bis">
+                                <option value=""> </option>
+                                <option value="Bis">Bis</option>
+                            </select>
+
+                            <!-- Cardinal -->
+                            <select id="cardinal1">
+                                <option value=""> </option>
+                                <option value="Norte">Norte</option>
+                                <option value="Sur">Sur</option>
+                                <option value="Este">Este</option>
+                                <option value="Oeste">Oeste</option>
+                            </select>
+
+                            <span>#</span>
+
+                            <!-- Número secundario -->
+                            <input type="text" id="numero2" placeholder="45">
+
+                            <!-- Letra secundaria -->
+                            <input type="text" id="letra2" placeholder="B">
+
+                            <span>-</span>
+
+                            <!-- Placa -->
+                            <input type="text" id="numero3" placeholder="67">
+
+                        </div>
+
+                        <!-- Complemento -->
+                        <input type="text"
+                            id="complemento"
+                            placeholder="Apartamento, torre, interior, etc">
+
+                        <!-- Preview -->
+                        <input type="text"
+                            id="direccion_preview"
+                            name="direccion"
+                            readonly
+                            required>
+
                     </div>
 
                     <div class="form-group">
@@ -268,10 +383,7 @@
                                required>
                     </div>
 
-                    <div class="form-group">
-                        <label>Empresa de envío</label>
-                        <input type="text" name="empresa" value="Interrapidísimo" readonly>
-                    </div>
+                   
 
                 </div>
             </div>
@@ -388,6 +500,61 @@
         cargarCiudades(selDepto.value);
     }
 })();
+
+
+const campos = [
+    'tipo_via',
+    'numero1',
+    'letra1',
+    'bis',
+    'cardinal1',
+    'numero2',
+    'letra2',
+    'numero3',
+    'complemento'
+];
+
+campos.forEach(id => {
+    document.getElementById(id).addEventListener('input', actualizarDireccion);
+    document.getElementById(id).addEventListener('change', actualizarDireccion);
+});
+
+function actualizarDireccion() {
+
+    const tipoVia   = document.getElementById('tipo_via').value;
+    const numero1   = document.getElementById('numero1').value;
+    const letra1    = document.getElementById('letra1').value;
+    const bis       = document.getElementById('bis').value;
+    const cardinal1 = document.getElementById('cardinal1').value;
+    const numero2   = document.getElementById('numero2').value;
+    const letra2    = document.getElementById('letra2').value;
+    const numero3   = document.getElementById('numero3').value;
+    const complemento = document.getElementById('complemento').value;
+
+    let direccion = `${tipoVia} ${numero1}`;
+
+    if (letra1) direccion += letra1.toUpperCase();
+
+    if (bis) direccion += ` ${bis}`;
+
+    if (cardinal1) direccion += ` ${cardinal1}`;
+
+    direccion += ` # ${numero2}`;
+
+    if (letra2) direccion += letra2.toUpperCase();
+
+    direccion += ` - ${numero3}`;
+
+    if (complemento) direccion += ` ${complemento}`;
+
+    document.getElementById('direccion_preview').value = direccion;
+}
+
+actualizarDireccion();
+
+
+
+
 </script>
 
 </body>

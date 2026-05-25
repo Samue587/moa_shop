@@ -14,6 +14,8 @@ from django.utils import timezone
 from django.conf import settings
 from django.db.models import Sum, Count, F, ExpressionWrapper, FloatField
 from django.db.models.functions import TruncDay
+from AppMoa.decorators import permiso_requerido
+
 
 from .models import (
     Rol, Permiso, RolPermiso, Usuario,
@@ -22,6 +24,23 @@ from .models import (
     Venta, DetalleVenta,
     Envio,
 )
+
+#=================PERMISOS=========================================
+
+def permisos_usuario(request):
+
+    permisos = []
+
+    if request.user.is_authenticated:
+
+        permisos = request.user.rol.permisos.values_list(
+            'slug',
+            flat=True
+        )
+
+    return {
+        'permisos_usuario': permisos
+    }
 
 UPLOAD_DIR = settings.MEDIA_ROOT
 
@@ -48,6 +67,7 @@ CIUDADES_POR_DEPARTAMENTO = {
     'Sucre':              ['Sincelejo', 'Corozal'],
     'Tolima':             ['Ibagué', 'Espinal', 'Honda'],
     'Valle del Cauca':    ['Cali', 'Buenaventura', 'Palmira', 'Tuluá'],
+    'Putumayo':           ['Mocoa', 'Puerto Asís', 'Orito', 'La Hormiga']
 }
 
 
@@ -494,7 +514,7 @@ def checkout_procesar(request):
                 tipo_vivienda=tipo_vivienda,
                 especificaciones_llegada=especificaciones or None,
                 telefono_llegada=telefono,
-                empresa_transportadora=empresa,
+                empresa_transportadora='SIN ASIGNAR TRANSPORTISTA',
                 estado_envio='PENDIENTE',
                 fecha_envio=date.today(),
                 fecha_estipulada_llegada=date.today() + timedelta(days=3),
@@ -645,14 +665,27 @@ def models_stock_minimo():
 # ╚══════════════════════════════════════════════════════════════════════╝
 
 @admin_required
+@permiso_requerido('ver_roles')
 def listar_roles(request):
     roles = Rol.objects.prefetch_related('rol_permisos__permiso').order_by('id')
     return render(request, 'admin/roles/lista.html', {
         'roles': roles, 'usuario': request.usuario
     })
+    
+def asignar_permisos():
 
+    admin = Rol.objects.get(
+        nombre_rol='Administrador'
+    )
+
+    admin.permisos.set(
+        Permiso.objects.all()
+    )
+
+   
 
 @admin_required
+@permiso_requerido('crear_roles')
 def crear_rol(request):
     permisos = Permiso.objects.all().order_by('slug')
     if request.method == 'POST':
@@ -682,6 +715,7 @@ def crear_rol(request):
 
 
 @admin_required
+@permiso_requerido('editar_roles')
 def editar_rol(request, id):
     rol      = get_object_or_404(Rol, pk=id)
     permisos = Permiso.objects.all().order_by('slug')
@@ -728,6 +762,7 @@ def editar_rol(request, id):
 
 
 @admin_required
+@permiso_requerido('eliminar_roles')
 def eliminar_rol(request, id):
     rol            = get_object_or_404(Rol, pk=id)
     usuarios_count = Usuario.objects.filter(rol=rol).count()
@@ -825,6 +860,7 @@ def eliminar_permiso(request, id):
 # ╚══════════════════════════════════════════════════════════════════════╝
 
 @admin_required
+@permiso_requerido('ver_usuarios')
 def listar_usuarios(request):
     busqueda = request.GET.get('q', '').strip()
     usuarios = Usuario.objects.select_related('rol').order_by('-creado_en')
@@ -840,6 +876,7 @@ def listar_usuarios(request):
 
 
 @admin_required
+@permiso_requerido('crear_usuarios')
 def crear_usuario(request):
     roles = Rol.objects.all()
     if request.method == 'POST':
@@ -884,6 +921,7 @@ def crear_usuario(request):
 
 
 @admin_required
+@permiso_requerido('editar_usuarios')
 def editar_usuario(request, id):
     usr   = get_object_or_404(Usuario.objects.select_related('rol'), pk=id)
     roles = Rol.objects.all()
@@ -937,6 +975,7 @@ def editar_usuario(request, id):
 
 
 @admin_required
+@permiso_requerido('eliminar_usuarios')
 def eliminar_usuario(request, id):
     usr = get_object_or_404(Usuario, pk=id)
     if request.method == 'POST':
@@ -954,6 +993,7 @@ def eliminar_usuario(request, id):
 # ╚══════════════════════════════════════════════════════════════════════╝
 
 @admin_required
+@permiso_requerido('ver_proovedores')
 def listar_proveedores(request):
     busqueda    = request.GET.get('q', '').strip()
     proveedores = Proveedor.objects.order_by('nombre_proveedor')
@@ -968,6 +1008,7 @@ def listar_proveedores(request):
 
 
 @admin_required
+@permiso_requerido('crear_proovedores')
 def crear_proveedor(request):
     if request.method == 'POST':
         nit      = request.POST.get('nit_proveedor', '').strip()
@@ -998,6 +1039,7 @@ def crear_proveedor(request):
     return render(request, 'admin/proveedores/crear.html', {'form': {}, 'usuario': request.usuario})
 
 @admin_required
+@permiso_requerido('editar_proovedores')
 def editar_proveedor(request, id):
     proveedor = get_object_or_404(Proveedor, pk=id)
 
@@ -1041,6 +1083,7 @@ def editar_proveedor(request, id):
 
 
 @admin_required
+@permiso_requerido('eliminar_proovedores')
 def eliminar_proveedor(request, id):
     proveedor = get_object_or_404(Proveedor, pk=id)
     if request.method == 'POST':
@@ -1058,6 +1101,7 @@ def eliminar_proveedor(request, id):
 # ╚══════════════════════════════════════════════════════════════════════╝
 
 @admin_required
+@permiso_requerido('ver_catalogos')
 def listar_catalogos(request):
     catalogos = Catalogo.objects.order_by('nombre_catalogo')
     return render(request, 'admin/catalogos/lista.html', {
@@ -1066,6 +1110,7 @@ def listar_catalogos(request):
 
 
 @admin_required
+@permiso_requerido('crear_catalogos')
 def crear_catalogo(request):
     if request.method == 'POST':
         nombre      = request.POST.get('nombre_catalogo', '').strip()
@@ -1090,6 +1135,7 @@ def crear_catalogo(request):
 
 
 @admin_required
+@permiso_requerido('crear_catalogos')
 def editar_catalogo(request, id):
     catalogo = get_object_or_404(Catalogo, pk=id)
     if request.method == 'POST':
@@ -1113,6 +1159,7 @@ def editar_catalogo(request, id):
     })
 
 @admin_required
+@permiso_requerido('eliminar_catalogos')
 def eliminar_catalogo(request, id):
     catalogo = get_object_or_404(Catalogo, pk=id)
     nombre = catalogo.nombre_catalogo
@@ -1125,6 +1172,7 @@ def eliminar_catalogo(request, id):
 # ╚══════════════════════════════════════════════════════════════════════╝
 
 @admin_required
+@permiso_requerido('ver_categorias')
 def listar_categorias(request):
     categorias = Categoria.objects.all().order_by('-id')
     return render(request, 'admin/categorias/lista.html', {
@@ -1133,6 +1181,7 @@ def listar_categorias(request):
 
 
 @admin_required
+@permiso_requerido('crear_categorias')
 def crear_categoria(request):
     if request.method == 'POST':
         nombre      = request.POST.get('nombre', '').strip()
@@ -1155,6 +1204,7 @@ def crear_categoria(request):
 
 
 @admin_required
+@permiso_requerido('editar_categorias')
 def editar_categoria(request, id):
     categoria = get_object_or_404(Categoria, pk=id)
 
@@ -1195,6 +1245,7 @@ def editar_categoria(request, id):
 
 
 @admin_required
+@permiso_requerido('eliminar_categorias')
 def eliminar_categoria(request, id):
     categoria       = get_object_or_404(Categoria, pk=id)
     productos_count = Producto.objects.filter(categoria=categoria).count()
@@ -1252,6 +1303,7 @@ def _eliminar_foto(nombre_foto):
 
 
 @admin_required
+@permiso_requerido('ver_productos')
 def listar_productos(request):
     busqueda   = request.GET.get('q', '').strip()
     categoria_id = request.GET.get('categoria', '')
@@ -1273,6 +1325,7 @@ def listar_productos(request):
 
 
 @admin_required
+@permiso_requerido('crear_productos')
 def crear_producto(request):
     categorias  = Categoria.objects.filter(estado='ACTIVO')
     proveedores = Proveedor.objects.all()
@@ -1315,6 +1368,7 @@ def crear_producto(request):
 
 
 @admin_required
+@permiso_requerido('editar_productos')
 def editar_producto(request, id):
     producto    = get_object_or_404(Producto.objects.select_related('categoria', 'proveedor', 'catalogo'), pk=id)
     categorias  = Categoria.objects.filter(estado='ACTIVO')
@@ -1359,9 +1413,12 @@ def editar_producto(request, id):
         'proveedores': proveedores, 'catalogos': catalogos,
         'form': {}, 'usuario': request.usuario
     })
+    
+
 
 
 @admin_required
+@permiso_requerido('eliminar_productos')
 def eliminar_producto(request, id):
     producto = get_object_or_404(Producto, pk=id)
 
@@ -1392,6 +1449,7 @@ def eliminar_producto(request, id):
 # ╚══════════════════════════════════════════════════════════════════════╝
 
 @admin_required
+@permiso_requerido('ver_variaciones')
 def listar_variaciones(request, producto_id):
     producto    = get_object_or_404(Producto, pk=producto_id)
     variaciones = VariacionProducto.objects.filter(producto=producto).order_by('talla', 'color')
@@ -1401,6 +1459,7 @@ def listar_variaciones(request, producto_id):
 
 
 @admin_required
+@permiso_requerido('crear_variaciones')
 def crear_variacion(request, producto_id):
     producto = get_object_or_404(Producto, pk=producto_id)
 
@@ -1451,6 +1510,7 @@ def crear_variacion(request, producto_id):
 
 
 @admin_required
+@permiso_requerido('editar_variaciones')
 def editar_variacion(request, producto_id, id):
     producto  = get_object_or_404(Producto, pk=producto_id)
     variacion = get_object_or_404(VariacionProducto, pk=id, producto=producto)
@@ -1502,6 +1562,7 @@ def editar_variacion(request, producto_id, id):
 
 
 @admin_required
+@permiso_requerido('eliminar_variaciones')
 def eliminar_variacion(request, producto_id, id):
     producto  = get_object_or_404(Producto, pk=producto_id)
     variacion = get_object_or_404(VariacionProducto, pk=id, producto=producto)
@@ -1534,6 +1595,7 @@ def eliminar_variacion(request, producto_id, id):
 # ╚══════════════════════════════════════════════════════════════════════╝
 
 @admin_required
+@permiso_requerido('ver_entradas')
 def listar_entradas(request):
     busqueda = request.GET.get('q', '').strip()
     entradas = Entrada.objects.select_related('proveedor').order_by('-fecha_entrada')
@@ -1544,6 +1606,7 @@ def listar_entradas(request):
     })
 
 @admin_required
+@permiso_requerido('crear_entradas')
 def crear_entrada(request):
     proveedores = Proveedor.objects.all()
     variaciones = VariacionProducto.objects.select_related('producto').order_by('producto__nombre_producto', 'talla')
@@ -1616,6 +1679,7 @@ def detalle_entrada(request, id):
 
 
 @admin_required
+@permiso_requerido('eliminar_entradas')
 def eliminar_entrada(request, id):
     entrada = get_object_or_404(Entrada, pk=id)
     if request.method == 'POST':
@@ -1632,6 +1696,7 @@ def eliminar_entrada(request, id):
 # ╚══════════════════════════════════════════════════════════════════════╝
 
 @admin_required
+@permiso_requerido('ver_ventas')
 def listar_ventas(request):
     busqueda_usuario  = request.GET.get('busqueda_usuario', '').strip()
     busqueda_producto = request.GET.get('busqueda_producto', '').strip()
@@ -1864,6 +1929,7 @@ def exportar_ventas_pdf(request):
 # ╚══════════════════════════════════════════════════════════════════════╝
 
 @admin_required
+@permiso_requerido('ver_envios')
 def listar_envios(request):
     busqueda = request.GET.get('q', '').strip()
     envios   = Envio.objects.select_related('venta__usuario', 'usuario').order_by('-id')
@@ -1889,42 +1955,108 @@ def detalle_envio(request, id):
 
 
 @admin_required
+@permiso_requerido('editar_envios')
 def editar_envio(request, id):
-    envio = get_object_or_404(Envio.objects.select_related('venta__usuario'), pk=id)
+
+    envio = get_object_or_404(
+        Envio.objects.select_related('venta__usuario'),
+        pk=id
+    )
 
     if request.method == 'POST':
-        estado        = request.POST.get('estado_envio', envio.estado_envio)
-        empresa       = request.POST.get('empresa_transportadora', '').strip()
-        numero_guia   = request.POST.get('numero_guia', '').strip()
-        costo         = request.POST.get('costo_envio', '0')
-        fecha_envio   = request.POST.get('fecha_envio')
-        fecha_llegada = request.POST.get('fecha_estipulada_llegada')
 
-        if numero_guia and Envio.objects.filter(numero_guia=numero_guia).exclude(pk=id).exists():
-            messages.error(request, f'Ya existe otro envío con número de guía "{numero_guia}".')
+        departamento     = request.POST.get('departamento_envio', '').strip()
+        ciudad            = request.POST.get('ciudad_envio', '').strip()
+        barrio            = request.POST.get('barrio_envio', '').strip()
+        direccion         = request.POST.get('direccion_envio', '').strip()
+        tipo_vivienda     = request.POST.get('tipo_vivienda', envio.tipo_vivienda)
+        especificaciones  = request.POST.get('especificaciones_llegada', '').strip()
+        telefono          = request.POST.get('telefono_llegada', '').strip()
+
+        empresa           = request.POST.get('empresa_transportadora', '').strip()
+        numero_guia       = request.POST.get('numero_guia', '').strip()
+        estado            = request.POST.get('estado_envio', envio.estado_envio)
+
+        fecha_envio       = request.POST.get('fecha_envio')
+        fecha_llegada     = request.POST.get('fecha_estipulada_llegada')
+
+        costo             = request.POST.get('costo_envio', '0')
+
+        # SOLO validar si vienen esos campos
+        if 'direccion_envio' in request.POST:
+
+            if not departamento or not ciudad or not direccion or not telefono:
+
+                messages.error(
+                    request,
+                    'Departamento, ciudad, dirección y teléfono son obligatorios.'
+                )
+
+                return render(request, 'admin/envios/editar.html', {
+                    'envio': envio,
+                    'form': request.POST,
+                    'departamentos': sorted(CIUDADES_POR_DEPARTAMENTO.keys()),
+                    'ciudades_por_departamento': CIUDADES_POR_DEPARTAMENTO,
+                    'usuario': request.usuario
+                })
+
+        if numero_guia and Envio.objects.filter(
+            numero_guia=numero_guia
+        ).exclude(pk=id).exists():
+
+            messages.error(
+                request,
+                f'Ya existe otro envío con número de guía "{numero_guia}".'
+            )
+
             return render(request, 'admin/envios/editar.html', {
-                'envio': envio, 'usuario': request.usuario
+                'envio': envio,
+                'form': request.POST,
+                'departamentos': sorted(CIUDADES_POR_DEPARTAMENTO.keys()),
+                'ciudades_por_departamento': CIUDADES_POR_DEPARTAMENTO,
+                'usuario': request.usuario
             })
 
-        envio.estado_envio           = estado
-        envio.empresa_transportadora = empresa or None
-        envio.numero_guia            = numero_guia or None
-        envio.costo_envio            = Decimal(costo) if costo else 0
-        if fecha_envio:
-            envio.fecha_envio = fecha_envio
-        if fecha_llegada:
-            envio.fecha_estipulada_llegada = fecha_llegada
+        envio.departamento_envio       = departamento or envio.departamento_envio
+        envio.ciudad_envio             = ciudad or envio.ciudad_envio
+        envio.barrio_envio             = barrio or envio.barrio_envio
+        envio.direccion_envio          = direccion or envio.direccion_envio
+        envio.tipo_vivienda            = tipo_vivienda
+
+        envio.especificaciones_llegada = especificaciones or envio.especificaciones_llegada
+        envio.telefono_llegada         = telefono or envio.telefono_llegada
+
+        envio.empresa_transportadora   = empresa or envio.empresa_transportadora
+        envio.numero_guia              = numero_guia or envio.numero_guia
+
+        envio.estado_envio             = estado
+
+        envio.fecha_envio = fecha_envio or envio.fecha_envio
+        envio.fecha_estipulada_llegada = (
+            fecha_llegada or envio.fecha_estipulada_llegada
+        )
+
+        envio.costo_envio = Decimal(costo)
+
         envio.save()
 
-        messages.success(request, f'Envío #{id} actualizado.')
+        messages.success(
+            request,
+            f'Envío #{id} actualizado correctamente.'
+        )
+
         return redirect('admin_envios')
 
     return render(request, 'admin/envios/editar.html', {
-        'envio': envio, 'usuario': request.usuario
+        'envio': envio,
+        'form': {},
+        'departamentos': sorted(CIUDADES_POR_DEPARTAMENTO.keys()),
+        'ciudades_por_departamento': CIUDADES_POR_DEPARTAMENTO,
+        'usuario': request.usuario
     })
 
-
 @admin_required
+@permiso_requerido('eliminar_envios')
 def eliminar_envio(request, id):
     envio = get_object_or_404(Envio, pk=id)
     if request.method == 'POST':
@@ -2151,11 +2283,9 @@ def reporte_ventas(request):
 @admin_required
 def reporte_categorias(request):
     """Reporte 3 — Ventas por Categoría"""
-    from django.db.models import F, ExpressionWrapper, FloatField
-
     fecha_inicio = request.GET.get('fecha_inicio', '')
     fecha_fin    = request.GET.get('fecha_fin', '')
-
+ 
     detalles_qs = DetalleVenta.objects.select_related(
         'variacion__producto__categoria', 'venta'
     )
@@ -2164,8 +2294,34 @@ def reporte_categorias(request):
             venta__fecha__date__gte=fecha_inicio,
             venta__fecha__date__lte=fecha_fin
         )
-
-    # Ventas agrupadas por categoría usando precio_unitario * cantidad
+ 
+    # Ventas agrupadas por categoría
+    por_categoria = (
+        detalles_qs
+        .values('variacion__producto__categoria__nombre')
+        .annotate(
+            total_unidades=Sum('cantidad'),
+            total_ingresos=Sum('subtotal'),   # subtotal es property, usamos precio*cant
+            num_ventas=Count('venta', distinct=True),
+        )
+        .order_by('-total_ingresos')
+    )
+    # subtotal es @property, no un campo DB → calculamos con precio_unitario*cantidad
+    por_categoria = (
+        detalles_qs
+        .values('variacion__producto__categoria__nombre')
+        .annotate(
+            total_unidades=Sum('cantidad'),
+            total_ingresos=Sum(
+                models_producto_ingreso()
+            ),
+            num_ventas=Count('venta', distinct=True),
+        )
+        .order_by('-total_ingresos')
+    )
+ 
+    # Usamos annotate con expresión directa
+    from django.db.models import F, ExpressionWrapper, FloatField
     por_categoria = (
         detalles_qs
         .annotate(ingreso_item=ExpressionWrapper(
@@ -2179,9 +2335,9 @@ def reporte_categorias(request):
         )
         .order_by('-total_ingresos')
     )
-
+ 
     total_global = sum(c['total_ingresos'] or 0 for c in por_categoria)
-
+ 
     # Producto más vendido por categoría
     top_por_cat = (
         DetalleVenta.objects
@@ -2195,7 +2351,7 @@ def reporte_categorias(request):
         .annotate(total_und=Sum('cantidad'), total_ing=Sum('ingreso_item'))
         .order_by('variacion__producto__categoria__nombre', '-total_und')
     )
-
+ 
     return render(request, 'admin/reportes/categorias.html', {
         'por_categoria': list(por_categoria),
         'total_global':  total_global,
