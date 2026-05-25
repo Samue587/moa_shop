@@ -3,7 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
-
+from AppMoa import views
 urlpatterns = [
     # Panel admin de Django (opcional, puedes quitarlo)
     path('django-admin/', admin.site.urls),
