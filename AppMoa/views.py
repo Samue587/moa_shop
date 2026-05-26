@@ -1,5 +1,6 @@
 import os
 import uuid
+import resend
 from decimal import Decimal
 from datetime import date, timedelta
 
@@ -7,17 +8,18 @@ from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
 from django.core.paginator import Paginator
 from django.db import transaction
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, Count, F, ExpressionWrapper, FloatField
+from django.db.models.functions import TruncDay
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.conf import settings
-from django.db.models import Sum, Count, F, ExpressionWrapper, FloatField
-from django.db.models.functions import TruncDay
-from AppMoa.decorators import permiso_requerido
 
-import resend
+from AppMoa.decorators import permiso_requerido
 from .models import TokenReset
+
+# ── Configuración Resend ──
+resend.api_key = os.getenv('RESEND_API_KEY', '')
 
 
 from .models import (
@@ -2498,7 +2500,7 @@ def reportes_hub(request):
 
 
 # ══════════════════════════════════════════════════════
-# RESTABLECIMIENTO DE CONTRASEÑA 1
+# RESTABLECIMIENTO DE CONTRASEÑA
 # ══════════════════════════════════════════════════════
 def solicitar_reset(request):
     if request.method == 'POST':
@@ -2533,8 +2535,6 @@ def solicitar_reset(request):
             })
         except Usuario.DoesNotExist:
             pass
-        except Exception as e:
-            print(f"ERROR RESEND: {e}")
         return redirect('reset_enviado')
     return render(request, 'registration/password_reset_form.html')
 
@@ -2572,5 +2572,4 @@ def confirmar_reset(request, token):
 
 def reset_completo(request):
     return render(request, 'registration/password_reset_complete.html')
-
 
