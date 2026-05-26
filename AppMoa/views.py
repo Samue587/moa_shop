@@ -2533,6 +2533,8 @@ def solicitar_reset(request):
             })
         except Usuario.DoesNotExist:
             pass
+        except Exception as e:
+            print(f"ERROR RESEND: {e}")
         return redirect('reset_enviado')
     return render(request, 'registration/password_reset_form.html')
 
