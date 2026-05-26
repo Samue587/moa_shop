@@ -12,6 +12,14 @@ urlpatterns = [
     path('registro/', views.registro_view, name='registro'),
 
     # ══════════════════════════════════════════════════════
+    # RESTABLECIMIENTO DE CONTRASEÑA
+    # ══════════════════════════════════════════════════════
+    path('password-reset/', views.solicitar_reset, name='password_reset'),
+    path('password-reset/done/', views.reset_enviado, name='reset_enviado'),
+    path('reset-password/<uuid:token>/', views.confirmar_reset, name='confirmar_reset'),
+    path('reset-password/complete/', views.reset_completo, name='reset_completo'),
+
+    # ══════════════════════════════════════════════════════
     # TIENDA PÚBLICA
     # ══════════════════════════════════════════════════════
     path('tienda/',                           views.tienda,           name='tienda'),
@@ -133,16 +141,13 @@ urlpatterns = [
     path('admin/envios/eliminar/<int:id>/',  views.eliminar_envio,       name='eliminar_envio'),
     path('admin/envios/estado/<int:id>/',    views.envio_cambiar_estado, name='envio_cambiar_estado'),
 
-  # ══════════════════════════════════════════════════════
-  # ADMIN — REPORTES  (agregar en urls.py)
-  # ══════════════════════════════════════════════════════
-   path('admin/reportes/inventario/', views.reporte_inventario, name='reporte_inventario'),
-   path('admin/reportes/ventas/',     views.reporte_ventas,     name='reporte_ventas'),
-   path('admin/reportes/categorias/', views.reporte_categorias, name='reporte_categorias'),
-   path('admin/reportes/envios/',     views.reporte_envios,     name='reporte_envios'),
-   path('admin/reportes/clientes/',   views.reporte_clientes,   name='reporte_clientes'),
-   path('admin/reportes/', views.reportes_hub, name='reportes_hub'),
-
-
-
+    # ══════════════════════════════════════════════════════
+    # ADMIN — REPORTES
+    # ══════════════════════════════════════════════════════
+    path('admin/reportes/inventario/', views.reporte_inventario, name='reporte_inventario'),
+    path('admin/reportes/ventas/',     views.reporte_ventas,     name='reporte_ventas'),
+    path('admin/reportes/categorias/', views.reporte_categorias, name='reporte_categorias'),
+    path('admin/reportes/envios/',     views.reporte_envios,     name='reporte_envios'),
+    path('admin/reportes/clientes/',   views.reporte_clientes,   name='reporte_clientes'),
+    path('admin/reportes/',            views.reportes_hub,       name='reportes_hub'),
 ]

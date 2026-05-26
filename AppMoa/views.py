@@ -16,8 +16,8 @@ from django.db.models import Sum, Count, F, ExpressionWrapper, FloatField
 from django.db.models.functions import TruncDay
 from AppMoa.decorators import permiso_requerido
 
-
-
+import resend
+from .models import TokenReset
 
 
 from .models import (
@@ -2495,5 +2495,80 @@ def reportes_hub(request):
     return render(request, 'admin/reportes/reportes_hub.html')
 
     
+
+
+# ══════════════════════════════════════════════════════
+# RESTABLECIMIENTO DE CONTRASEÑA 1
+# ══════════════════════════════════════════════════════
+def solicitar_reset(request):
+    if request.method == 'POST':
+        correo = request.POST.get('correo', '').strip()
+        try:
+            usuario = Usuario.objects.get(correo_usuario=correo)
+            TokenReset.objects.filter(usuario=usuario, usado=False).update(usado=True)
+            token = TokenReset.objects.create(usuario=usuario)
+            enlace = request.build_absolute_uri(f'/reset-password/{token.token}/')
+            resend.Emails.send({
+                "from": "TiendaMoa <onboarding@resend.dev>",
+                "to": usuario.correo_usuario,
+                "subject": "Restablecer contraseña - TiendaMoa",
+                "html": f"""
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #144272;">🏷️ TiendaMoa</h2>
+                    <p>Hola <strong>{usuario.nombres_usuario}</strong>,</p>
+                    <p>Recibimos una solicitud para restablecer tu contraseña.</p>
+                    <a href="{enlace}" style="
+                        display: inline-block;
+                        padding: 14px 28px;
+                        background: linear-gradient(135deg, #667eea, #764ba2);
+                        color: white;
+                        text-decoration: none;
+                        border-radius: 10px;
+                        font-weight: bold;
+                        margin: 20px 0;
+                    ">Restablecer contraseña</a>
+                    <p style="color: #888; font-size: 13px;">Este enlace expira en 24 horas. Si no solicitaste esto, ignora este correo.</p>
+                </div>
+                """,
+            })
+        except Usuario.DoesNotExist:
+            pass
+        return redirect('reset_enviado')
+    return render(request, 'registration/password_reset_form.html')
+
+
+def reset_enviado(request):
+    return render(request, 'registration/password_reset_done.html')
+
+
+def confirmar_reset(request, token):
+    try:
+        token_obj = TokenReset.objects.get(token=token)
+    except TokenReset.DoesNotExist:
+        return render(request, 'registration/password_reset_confirm.html', {'validlink': False})
+
+    if not token_obj.esta_vigente():
+        return render(request, 'registration/password_reset_confirm.html', {'validlink': False})
+
+    error = None
+    if request.method == 'POST':
+        nueva = request.POST.get('new_password1', '')
+        confirmar = request.POST.get('new_password2', '')
+        if nueva != confirmar:
+            error = 'Las contraseñas no coinciden.'
+        elif len(nueva) < 6:
+            error = 'La contraseña debe tener al menos 6 caracteres.'
+        else:
+            token_obj.usuario.set_password(nueva)
+            token_obj.usuario.save()
+            token_obj.usado = True
+            token_obj.save()
+            return redirect('reset_completo')
+
+    return render(request, 'registration/password_reset_confirm.html', {'validlink': True, 'error': error})
+
+
+def reset_completo(request):
+    return render(request, 'registration/password_reset_complete.html')
 
 

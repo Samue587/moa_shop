@@ -168,14 +168,13 @@
                 </div>
             </div>
 
-            <div class="form-options">
-                <div class="checkbox-wrapper">
-                    <input type="checkbox" id="remember" name="remember">
-                    <label for="remember">Recordarme</label>
-                </div>
-                  <!-- AGREGAR ESTO -->
-                 <a href="/password-reset/" style="color: #667eea; text-decoration: none; font-size: 14px;">¿Olvidaste tu contraseña?</a>
-            </div>
+              <div class="form-options">
+               <div class="checkbox-wrapper">
+              <input type="checkbox" id="remember" name="remember">
+               <label for="remember">Recordarme</label>
+           </div>
+              <a href="{% url 'password_reset' %}" style="color: #667eea; text-decoration: none; font-size: 14px;">¿Olvidaste tu contraseña?</a>
+           </div>
 
             <button type="submit" class="btn-login">Iniciar Sesión</button>
         </form>
