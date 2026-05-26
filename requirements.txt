@@ -6,9 +6,6 @@ reportlab==4.4.10
 openpyxl==3.1.5
 gunicorn
 whitenoise
-<<<<<<< HEAD
 cryptography    
-=======
 cryptography    
 resend
->>>>>>> 80652bf46c1dc99bae8fb73815ca7fa19f7c918d
