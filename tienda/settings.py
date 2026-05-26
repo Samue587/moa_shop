@@ -98,15 +98,12 @@ else:
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'tiendamoa07',
             'USER': 'root',
-<<<<<<< HEAD
             'PASSWORD': '',
             'HOST': '127.0.0.1',
             'PORT': '3307',
-=======
             'PASSWORD': 'Level_one19',
             'HOST': '127.0.0.1',
             'PORT': '3306',
->>>>>>> 80652bf46c1dc99bae8fb73815ca7fa19f7c918d
             'OPTIONS': {
                 'charset': 'utf8mb4',
             },
@@ -174,7 +171,6 @@ USE_THOUSAND_SEPARATOR = True
 # ══════════════════════════════════════════════════════
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-<<<<<<< HEAD
 
 # ══════════════════════════════════════════════════════
 # EMAIL — Restablecimiento de contraseña
@@ -192,7 +188,6 @@ DEFAULT_FROM_EMAIL  = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 # ══════════════════════════════════════════════════════
 import resend
 resend.api_key = os.getenv('RESEND_API_KEY', '')
->>>>>>> 80652bf46c1dc99bae8fb73815ca7fa19f7c918d
 
 # URLs de redirección tras login/logout
 LOGIN_URL           = '/login/'
