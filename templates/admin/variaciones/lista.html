@@ -1,0 +1,111 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Variaciones — {{ producto.nombre_producto }}{% endblock %}
+{% block menu_productos %}active{% endblock %}
+{% block navbar_title %}Variaciones del Producto{% endblock %}
+ 
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">🎨 Variaciones — {{ producto.nombre_producto }}</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_productos' %}">Productos</a> ›
+            <a href="{% url 'editar_producto' producto.id %}">{{ producto.nombre_producto }}</a> ›
+            Variaciones
+        </div>
+    </div>
+    <a href="{% url 'crear_variacion' producto.id %}" class="btn btn-success">➕ Nueva Variación</a>
+</div>
+ 
+<!-- Info del producto -->
+<div class="card" style="margin-bottom:20px;">
+    <div class="card-body" style="padding:16px 25px;display:flex;align-items:center;gap:20px;">
+        {% if producto.foto %}
+            <img src="{{ producto.foto_url }}" style="width:64px;height:64px;object-fit:cover;border-radius:8px;">
+        {% else %}
+            <div style="width:64px;height:64px;background:#f0f4f8;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px;">📦</div>
+        {% endif %}
+        <div>
+            <strong style="font-size:16px;color:#2c3e50;">{{ producto.nombre_producto }}</strong><br>
+            <span style="font-size:13px;color:#7f8c8d;">{{ producto.categoria.nombre }} · {{ producto.proveedor.nombre_proveedor }}</span><br>
+            {% if producto.estado == 'DISPONIBLE' %}
+                <span class="badge badge-disponible" style="margin-top:4px;">✅ Disponible</span>
+            {% else %}
+                <span class="badge badge-no-disponible" style="margin-top:4px;">⚠️ No Disponible</span>
+            {% endif %}
+        </div>
+        <div style="margin-left:auto;text-align:right;">
+            <div style="font-size:28px;font-weight:700;color:#2c3e50;">{{ producto.stock_total }}</div>
+            <div style="font-size:12px;color:#7f8c8d;">unidades totales</div>
+        </div>
+    </div>
+</div>
+ 
+<div class="card">
+    <div class="card-header">
+        <h3>🎨 Variaciones registradas</h3>
+        <span style="color:#7f8c8d;font-size:13px;">{{ variaciones|length }} variación(es)</span>
+    </div>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Talla</th>
+                    <th>Color</th>
+                    <th>SKU</th>
+                    <th>Precio Compra</th>
+                    <th>Precio Base</th>
+                    <th>IVA</th>
+                    <th>Precio Final</th>
+                    <th>Stock</th>
+                    <th>Mín.</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in variaciones %}
+                <tr>
+                    <td><strong>{{ v.talla }}</strong></td>
+                    <td>
+                        <span style="display:inline-flex;align-items:center;gap:6px;">
+                            <span>{{ v.color }}</span>
+                        </span>
+                    </td>
+                    <td><code style="background:#f0f4f8;padding:2px 6px;border-radius:4px;font-size:12px;">{{ v.sku_unico }}</code></td>
+                    <td>${{ v.precio_compra|floatformat:0 }}</td>
+                    <td>${{ v.precio_base|floatformat:0 }}</td>
+                    <td>{{ v.iva_porcentaje }}%</td>
+                    <td style="font-weight:600;color:#27ae60;">${{ v.precio_con_iva|floatformat:0 }}</td>
+                    <td>
+                        {% if v.stock_actual == 0 %}
+                            <span class="stock-cero">{{ v.stock_actual }}</span>
+                        {% elif v.bajo_stock %}
+                            <span class="stock-bajo">{{ v.stock_actual }} ⚠️</span>
+                        {% else %}
+                            <span class="stock-ok">{{ v.stock_actual }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="color:#7f8c8d;">{{ v.stock_minimo }}</td>
+                    <td>
+                        <div style="display:flex;gap:6px;">
+                            <a href="{% url 'editar_variacion' producto.id v.id %}" class="btn btn-warning btn-sm">✏️</a>
+                            <a href="{% url 'eliminar_variacion' producto.id v.id %}" class="btn btn-danger btn-sm">🗑️</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10">
+                        <div class="empty-state">
+                            <div class="empty-icon">🎨</div>
+                            <p>No hay variaciones. <a href="{% url 'crear_variacion' producto.id %}">Agregar la primera</a></p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+ 

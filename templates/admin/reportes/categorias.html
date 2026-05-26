@@ -1,0 +1,112 @@
+{% extends "admin/base_admin.html" %}
+{% load humanize %}
+{% block title %}Reporte Categorías — MOA{% endblock %}
+{% block navbar_title %}🏷️ Reporte por Categoría{% endblock %}
+
+{% block content %}
+
+<!-- STATS -->
+<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; margin-bottom:24px;">
+
+  <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #144272;">
+    <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">Ingresos totales</div>
+    <div style="font-size:28px; font-weight:800; color:#144272;">${{ total_global|floatformat:0|intcomma }}</div>
+    <div style="font-size:12px; color:#aab; margin-top:2px;">en el período seleccionado</div>
+  </div>
+
+  <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #8e44ad;">
+    <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">Categorías con ventas</div>
+    <div style="font-size:28px; font-weight:800; color:#8e44ad;">{{ por_categoria|length }}</div>
+    <div style="font-size:12px; color:#aab; margin-top:2px;">categorías activas</div>
+  </div>
+
+</div>
+
+<!-- FILTRO FECHAS -->
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-body" style="padding:20px 25px;">
+    <form method="get" action="{% url 'reporte_categorias' %}"
+          style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;">
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">DESDE</label>
+        <input type="date" name="fecha_inicio" class="form-control" value="{{ fecha_inicio }}">
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">HASTA</label>
+        <input type="date" name="fecha_fin" class="form-control" value="{{ fecha_fin }}">
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">🔍 Buscar</button>
+    </form>
+  </div>
+</div>
+
+<!-- TABLA POR CATEGORÍA -->
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+    <h3>📊 Ventas por Categoría</h3>
+    <a href="?{{ request.GET.urlencode }}&export=excel" class="btn btn-success btn-sm">📊 Exportar Excel</a>
+  </div>
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Categoría</th>
+          <th>N° Ventas</th>
+          <th>Unidades Vendidas</th>
+          <th>Ingresos</th>
+          <th>% del Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cat in por_categoria %}
+        <tr>
+          <td><strong>{{ forloop.counter }}</strong></td>
+          <td><strong>{{ cat.variacion__producto__categoria__nombre|default:"Sin categoría" }}</strong></td>
+          <td><span class="badge badge-info">{{ cat.num_ventas }}</span></td>
+          <td>{{ cat.total_unidades }}</td>
+          <td><strong style="color:#144272;">${{ cat.total_ingresos|floatformat:0|intcomma }}</strong></td>
+          <td>
+            {% if total_global and cat.total_ingresos %}
+              {% widthratio cat.total_ingresos total_global 100 %}%
+            {% else %}—{% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" style="text-align:center;color:#999;">Sin datos de ventas.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- TOP PRODUCTO POR CATEGORÍA -->
+<div class="card">
+  <div class="card-header"><h3>🏆 Producto más vendido por Categoría</h3></div>
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>Categoría</th>
+          <th>Producto</th>
+          <th>Unidades</th>
+          <th>Ingresos</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in top_por_cat %}
+        <tr>
+          <td><span class="badge badge-info">{{ item.variacion__producto__categoria__nombre }}</span></td>
+          <td>{{ item.variacion__producto__nombre_producto }}</td>
+          <td>{{ item.total_und }}</td>
+          <td>${{ item.total_ing|floatformat:0|intcomma }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" style="text-align:center;color:#999;">Sin datos.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

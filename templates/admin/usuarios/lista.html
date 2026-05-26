@@ -1,0 +1,143 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Usuarios - MOA{% endblock %}
+{% block menu_usuarios %}active{% endblock %}
+{% block navbar_title %}Gestión de Usuarios{% endblock %}
+ 
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">🪪 Usuarios</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            Usuarios
+        </div>
+    </div>
+    <a href="{% url 'crear_usuario' %}" class="btn btn-primary">➕ Nuevo Usuario</a>
+</div>
+ 
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+ 
+<!-- Buscador -->
+<div class="card" style="margin-bottom:20px;">
+    <div class="card-body" style="padding:16px 20px;">
+        <input
+            type="text"
+            id="searchInput"
+            class="form-control"
+            placeholder="🔍 Buscar por nombre, correo, documento o rol..."
+            onkeyup="filtrarTabla()"
+            style="max-width:480px;"
+        >
+    </div>
+</div>
+ 
+<div class="card">
+    <div class="card-body" style="padding:0;">
+ 
+        {% if usuarios %}
+        <div style="padding:16px 20px; border-bottom:1px solid #e0e6ed;">
+            <span style="color:#7f8c8d; font-size:14px;">
+                Total: <strong>{{ usuarios|length }} usuario(s)</strong>
+            </span>
+        </div>
+ 
+        <table class="table" id="tablaUsuarios">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Usuario</th>
+                    <th>Correo</th>
+                    <th>Documento</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Registro</th>
+                    <th style="text-align:center;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in usuarios %}
+                <tr>
+                    <td style="color:#7f8c8d; font-size:13px;">{{ forloop.counter }}</td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div style="width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,#144272,#2a628f); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:15px; flex-shrink:0;">
+                                {{ u.nombres_usuario|first|upper }}
+                            </div>
+                            <div>
+                                <div style="font-weight:600; color:#2c3e50;">{{ u.nombres_usuario }} {{ u.apellidos_usuario }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="font-size:13px;">
+                        <a href="mailto:{{ u.correo_usuario }}" style="color:#144272; text-decoration:none;">
+                            {{ u.correo_usuario }}
+                        </a>
+                    </td>
+                    <td style="font-size:13px; color:#7f8c8d;">
+                        {% if u.numero_documento %}
+                            <span style="font-size:11px; color:#95a5a6;">{{ u.tipo_documento|default:"" }}</span><br>
+                            {{ u.numero_documento }}
+                        {% else %}
+                            <span style="color:#bdc3c7;">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if u.rol %}
+                            {% if u.rol.nombre_rol == 'ADMINISTRADOR' %}
+                                <span style="background:#fdecea; color:#c0392b; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:600;">🔐 {{ u.rol.nombre_rol }}</span>
+                            {% else %}
+                                <span style="background:#eaf0fb; color:#144272; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:600;">🛡️ {{ u.rol.nombre_rol }}</span>
+                            {% endif %}
+                        {% else %}
+                            <span style="color:#bdc3c7; font-size:13px;">Sin rol</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if u.estado_usuario == 'ACTIVO' %}
+                            <span class="badge badge-success">✅ Activo</span>
+                        {% else %}
+                            <span class="badge badge-danger">❌ Inactivo</span>
+                        {% endif %}
+                    </td>
+                    <td style="font-size:13px; color:#7f8c8d;">
+                        {{ u.created_at|date:"d/m/Y"|default:"—" }}
+                    </td>
+                    <td style="text-align:center;">
+                        <div style="display:flex; gap:6px; justify-content:center;">
+                            <a href="{% url 'editar_usuario' u.id %}" class="btn btn-sm btn-warning" title="Editar">✏️</a>
+                            <a href="{% url 'eliminar_usuario' u.id %}" class="btn btn-sm btn-danger" title="Eliminar">🗑️</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+ 
+        {% else %}
+        <div style="text-align:center; padding:60px 20px; color:#7f8c8d;">
+            <div style="font-size:56px; margin-bottom:16px;">📋</div>
+            <h3 style="font-size:18px; margin-bottom:8px; color:#2c3e50;">No hay usuarios registrados</h3>
+            <p style="font-size:14px; margin-bottom:24px;">Crea el primer usuario del sistema.</p>
+            <a href="{% url 'crear_usuario' %}" class="btn btn-primary">➕ Crear primer usuario</a>
+        </div>
+        {% endif %}
+ 
+    </div>
+</div>
+ 
+<script>
+function filtrarTabla() {
+    const input = document.getElementById('searchInput').value.toLowerCase();
+    const filas = document.querySelectorAll('#tablaUsuarios tbody tr');
+    filas.forEach(fila => {
+        fila.style.display = fila.textContent.toLowerCase().includes(input) ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Editar Usuario — TiendaMoa07{% endblock %}
+{% block menu_usuarios %}active{% endblock %}
+{% block navbar_title %}Editar Usuario{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">✏️ Editar Usuario</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_usuarios' %}">Usuarios</a> ›
+            Editar
+        </div>
+    </div>
+</div>
+
+<div class="card" style="max-width:720px;">
+    <div class="card-header"><h3>👤 {{ usuario_edit.get_full_name }}</h3></div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-row">
+                <!-- ✅ name="nombres" — views.py: request.POST.get('nombres') -->
+                <!-- ✅ variable: usuario_edit.nombres_usuario -->
+                <div class="form-group">
+                    <label class="form-label">👤 Nombres <span class="required">*</span></label>
+                    <input type="text" name="nombres" class="form-control"
+                           value="{{ form.nombres|default:usuario_edit.nombres_usuario }}"
+                           required maxlength="150">
+                </div>
+
+                <!-- ✅ name="apellidos" — views.py: request.POST.get('apellidos') -->
+                <!-- ✅ variable: usuario_edit.apellidos_usuario -->
+                <div class="form-group">
+                    <label class="form-label">👤 Apellidos <span class="required">*</span></label>
+                    <input type="text" name="apellidos" class="form-control"
+                           value="{{ form.apellidos|default:usuario_edit.apellidos_usuario }}"
+                           maxlength="150">
+                </div>
+            </div>
+
+            <!-- ✅ name="email" — views.py: request.POST.get('email') -->
+            <!-- ✅ variable: usuario_edit.correo_usuario -->
+            <div class="form-group">
+                <label class="form-label">📧 Correo Electrónico <span class="required">*</span></label>
+                <input type="email" name="email" class="form-control"
+                       value="{{ form.email|default:usuario_edit.correo_usuario }}"
+                       required maxlength="150">
+            </div>
+
+            <!-- ✅ name="password" — views.py: request.POST.get('password') -->
+            <!-- Si viene vacío, el views NO cambia la contraseña -->
+            <div class="form-group">
+                <label class="form-label">
+                    🔒 Nueva Contraseña
+                    <span style="color:#7f8c8d;font-size:12px;font-weight:400;">
+                        (dejar en blanco para no cambiar)
+                    </span>
+                </label>
+                <input type="password" name="password" class="form-control"
+                       placeholder="Nueva contraseña (opcional)">
+            </div>
+
+            <div class="form-row">
+                <!-- ✅ name="tipo_documento" — views.py: request.POST.get('tipo_documento') -->
+                <!-- ✅ variable: usuario_edit.tipo_documento -->
+                <div class="form-group">
+                    <label class="form-label">🪪 Tipo de Documento</label>
+                    <select name="tipo_documento" class="form-control">
+                        <option value="">-- Seleccionar --</option>
+                        <option value="CC"  {% if usuario_edit.tipo_documento == 'CC' %}selected{% endif %}>Cédula de Ciudadanía</option>
+                        <option value="CE"  {% if usuario_edit.tipo_documento == 'CE' %}selected{% endif %}>Cédula de Extranjería</option>
+                        <option value="NIT" {% if usuario_edit.tipo_documento == 'NIT' %}selected{% endif %}>NIT</option>
+                        <option value="PA"  {% if usuario_edit.tipo_documento == 'PA' %}selected{% endif %}>Pasaporte</option>
+                    </select>
+                </div>
+
+                <!-- ✅ name="numero_documento" — views.py: request.POST.get('numero_documento') -->
+                <!-- ✅ variable: usuario_edit.numero_documento -->
+                <div class="form-group">
+                    <label class="form-label">🔢 Número de Documento</label>
+                    <input type="text" name="numero_documento" class="form-control"
+                           value="{{ form.numero_documento|default:usuario_edit.numero_documento|default:'' }}"
+                           maxlength="150">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <!-- ✅ name="rol" — views.py: request.POST.get('rol') -->
+                <!-- ✅ variable: usuario_edit.rol_id -->
+                <div class="form-group">
+                    <label class="form-label">🛡️ Rol <span class="required">*</span></label>
+                    <select name="rol" class="form-control" required>
+                        <option value="">-- Seleccionar rol --</option>
+                        {% for rol in roles %}
+                            <option value="{{ rol.id }}"
+                                {% if usuario_edit.rol_id == rol.id %}selected{% endif %}>
+                                {{ rol.nombre_rol }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- ✅ name="estado" — views.py: request.POST.get('estado', 'ACTIVO') -->
+                <!-- ✅ variable: usuario_edit.estado_usuario -->
+                <div class="form-group">
+                    <label class="form-label">🔘 Estado</label>
+                    <select name="estado" class="form-control">
+                        <option value="ACTIVO"   {% if usuario_edit.estado_usuario == 'ACTIVO' %}selected{% endif %}>✅ Activo</option>
+                        <option value="INACTIVO" {% if usuario_edit.estado_usuario == 'INACTIVO' %}selected{% endif %}>❌ Inactivo</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Auditoría -->
+            <div style="background:#f8f9fa;border-radius:8px;padding:12px 16px;margin-bottom:8px;font-size:13px;color:#7f8c8d;">
+                📅 Registrado el {{ usuario_edit.creado_en|date:"d/m/Y H:i" }}
+                &nbsp;·&nbsp;
+                🕐 Última edición: {{ usuario_edit.actualizado_en|date:"d/m/Y H:i" }}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-warning">💾 Guardar Cambios</button>
+                <a href="{% url 'admin_usuarios' %}" class="btn btn-secondary">❌ Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Eliminar Catálogo - MOA{% endblock %}
+{% block menu_catalogos %}active{% endblock %}
+{% block navbar_title %}Eliminar Catálogo{% endblock %}
+ 
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">🗑️ Eliminar Catálogo</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_catalogos' %}">Catálogos</a> ›
+            Eliminar
+        </div>
+    </div>
+</div>
+ 
+<div class="card" style="max-width:520px;">
+    <div class="card-body" style="text-align:center; padding:40px;">
+ 
+        <div style="font-size:64px; margin-bottom:20px;">⚠️</div>
+ 
+        <h3 style="color:#2c3e50; font-size:22px; margin-bottom:12px;">
+            ¿Eliminar este catálogo?
+        </h3>
+ 
+        <p style="color:#7f8c8d; margin-bottom:10px; font-size:15px;">
+            Estás a punto de eliminar permanentemente el catálogo:
+        </p>
+ 
+        <div style="background:#f8f9fa; border:2px solid #e0e6ed; border-radius:10px; padding:16px 24px; margin-bottom:20px; display:inline-block;">
+            <span style="font-size:18px; font-weight:700; color:#144272;">📚 {{ catalogo.nombre_catalogo }}</span>
+        </div>
+ 
+        {% if productos_count > 0 %}
+        <div class="alert alert-warning" style="text-align:left; margin-bottom:20px;">
+            ⚡ Este catálogo tiene <strong>{{ productos_count }} producto(s)</strong> asociado(s).
+            Al eliminarlo, esos productos quedarán sin catálogo asignado.
+        </div>
+        {% else %}
+        <div class="alert alert-success" style="text-align:left; margin-bottom:20px;">
+            ✅ Este catálogo no tiene productos asociados. Se puede eliminar sin problema.
+        </div>
+        {% endif %}
+ 
+        <p style="color:#e74c3c; font-size:13px; margin-bottom:30px;">
+            ⚠️ Esta acción <strong>no se puede deshacer</strong>.
+        </p>
+ 
+        <div style="display:flex; gap:12px; justify-content:center;">
+            <form action="{% url 'eliminar_catalogo' catalogo.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">🗑️ Sí, eliminar</button>
+            </form>
+            <a href="{% url 'admin_catalogos' %}" class="btn btn-secondary">❌ Cancelar</a>
+        </div>
+ 
+    </div>
+</div>
+{% endblock %}

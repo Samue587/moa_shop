@@ -1,0 +1,57 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Eliminar Rol — TiendaMoa07{% endblock %}
+{% block menu_roles %}active{% endblock %}
+{% block navbar_title %}Eliminar Rol{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">🗑️ Eliminar Rol</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_roles' %}">Roles</a> ›
+            Eliminar
+        </div>
+    </div>
+</div>
+
+<div class="card" style="max-width:520px;">
+    <div class="card-body" style="text-align:center;padding:40px;">
+
+        <div style="font-size:60px;margin-bottom:20px;">⚠️</div>
+
+        <h3 style="color:#2c3e50;font-size:22px;margin-bottom:12px;">¿Eliminar este rol?</h3>
+        <p style="color:#7f8c8d;margin-bottom:16px;font-size:15px;">
+            Estás a punto de eliminar permanentemente el rol:
+        </p>
+
+        <div style="background:#f8f9fa;border:2px solid #e0e6ed;border-radius:10px;padding:16px 24px;margin-bottom:20px;display:inline-block;">
+            <span style="font-size:18px;font-weight:700;color:#144272;">🛡️ {{ rol.nombre_rol }}</span>
+        </div>
+
+        {% if usuarios_count > 0 %}
+        <div class="alert alert-warning" style="text-align:left;">
+            ⚡ Este rol está asignado a <strong>{{ usuarios_count }} usuario(s)</strong>.
+            Al eliminarlo, esos usuarios quedarán sin rol asignado.
+        </div>
+        {% else %}
+        <div class="alert alert-success" style="text-align:left;">
+            ✅ Este rol no tiene usuarios asignados. Se puede eliminar sin problema.
+        </div>
+        {% endif %}
+
+        <p style="color:#e74c3c;font-size:13px;margin-bottom:28px;">
+            ⚠️ Esta acción <strong>no se puede deshacer</strong>.
+        </p>
+
+        <div style="display:flex;gap:12px;justify-content:center;">
+            <form action="{% url 'eliminar_rol' rol.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">🗑️ Sí, eliminar</button>
+            </form>
+            <a href="{% url 'admin_roles' %}" class="btn btn-secondary">❌ Cancelar</a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Roles — TiendaMoa07{% endblock %}
+{% block menu_roles %}active{% endblock %}
+{% block navbar_title %}Gestión de Roles{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">🛡️ Roles del Sistema</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> › Roles
+        </div>
+    </div>
+    <a href="{% url 'crear_rol' %}" class="btn btn-success">➕ Nuevo Rol</a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>🛡️ Roles registrados</h3>
+        <span style="color:#7f8c8d;font-size:13px;">{{ roles|length }} rol(es) en total</span>
+    </div>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre del Rol</th>
+                    <th>Permisos asignados</th>
+                    <th>Usuarios</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rol in roles %}
+                <tr>
+                    <td style="color:#7f8c8d;">{{ rol.id }}</td>
+                    <td>
+                        {% if rol.nombre_rol == 'ADMINISTRADOR' %}
+                            <span class="badge badge-success">🛡️ {{ rol.nombre_rol }}</span>
+                        {% elif rol.nombre_rol == 'CLIENTE' %}
+                            <span class="badge badge-info">🪪 {{ rol.nombre_rol }}</span>
+                        {% else %}
+                            <span class="badge badge-warning">{{ rol.nombre_rol }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% with permisos=rol.rol_permisos.all %}
+                            {% if permisos %}
+                                {% for rp in permisos %}
+                                    <span class="badge badge-info" style="margin:2px;">{{ rp.permiso.slug }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <span style="color:#bdc3c7;font-size:13px;">Sin permisos</span>
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td>
+                        <span style="font-weight:600;color:#2c3e50;">
+                            {{ rol.usuarios.count }}
+                        </span>
+                        <span style="color:#7f8c8d;font-size:12px;"> usuario(s)</span>
+                    </td>
+                    <td>
+                        <div style="display:flex;gap:8px;">
+                            <a href="{% url 'editar_rol' rol.id %}" class="btn btn-warning btn-sm">✏️ Editar</a>
+                            <a href="{% url 'eliminar_rol' rol.id %}" class="btn btn-danger btn-sm">🗑️ Eliminar</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">
+                        <div class="empty-state">
+                            <div class="empty-icon">🛡️</div>
+                            <p>No hay roles registrados. <a href="{% url 'crear_rol' %}">Crear el primero</a></p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
