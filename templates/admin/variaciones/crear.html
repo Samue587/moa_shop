@@ -1,0 +1,155 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Crear Variación — TiendaMoa07{% endblock %}
+{% block menu_productos %}active{% endblock %}
+{% block navbar_title %}Crear Variación{% endblock %}
+ 
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">➕ Nueva Variación</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_productos' %}">Productos</a> ›
+            <a href="{% url 'admin_variaciones' producto.id %}">{{ producto.nombre_producto }}</a> ›
+            Crear Variación
+        </div>
+    </div>
+</div>
+ 
+<div class="card" style="max-width:750px;">
+    <div class="card-header"><h3>🎨 Datos de la Variación — {{ producto.nombre_producto }}</h3></div>
+    <div class="card-body">
+        <form action="{% url 'crear_variacion' producto.id %}" method="post">
+            {% csrf_token %}
+ 
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Talla <span class="required">*</span></label>
+                    <input type="text" name="talla" class="form-control"
+                           placeholder="Ej: S, M, L, XL, 38, 40"
+                           value="{{ form.talla|default:'' }}" maxlength="5" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Color <span class="required">*</span></label>
+                    <input type="text" name="color" class="form-control"
+                           placeholder="Ej: Rojo, Azul Marino, Negro"
+                           value="{{ form.color|default:'' }}" required>
+                </div>
+            </div>
+ 
+            <div class="form-group">
+                <label class="form-label">SKU Único <span class="required">*</span></label>
+                <input type="text" name="sku_unico" id="sku" class="form-control"
+                       placeholder="Ej: CAM-POL-M-ROJ-001"
+                       value="{{ form.sku_unico|default:'' }}" required>
+                <span class="form-help">Código único de identificación de esta variación.</span>
+            </div>
+ 
+            <div class="form-row-3">
+                <div class="form-group">
+                    <label class="form-label">Precio de Compra <span class="required">*</span></label>
+                    <input type="number" name="precio_compra" class="form-control"
+                           placeholder="0.00" step="0.01" min="0"
+                           value="{{ form.precio_compra|default:'' }}" required>
+                    <span class="form-help">Lo que pagaste al proveedor.</span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Precio Base <span class="required">*</span></label>
+                    <input type="number"
+                        name="precio_base"
+                        id="precio_base"
+                        readonly>
+                    <span class="form-help">Precio antes de IVA.</span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">IVA (%)</label>
+                    <input type="number" name="iva_porcentaje" class="form-control"
+                           placeholder="19" step="0.1" min="0"
+                           value="{{ form.iva_porcentaje|default:'19' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Precio Final</label>
+
+                    <input type="number"
+                        name="precio_venta"
+                        id="precio_venta"
+                        class="form-control"
+                        readonly>
+
+                    <span class="form-help">
+                        Precio final con IVA incluido.
+                    </span>
+                </div>
+            </div>
+ 
+            <div class="form-row">
+        
+                <div class="form-group">
+                    <label class="form-label">Stock Mínimo</label>
+                    <input type="number" name="stock_minimo" class="form-control"
+                           placeholder="0" min="0"
+                           value="{{ form.stock_minimo|default:'0' }}">
+                    <span class="form-help">Alerta cuando el stock baje de este valor.</span>
+                </div>
+            </div>
+ 
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success">✅ Crear Variación</button>
+                <a href="{% url 'admin_variaciones' producto.id %}" class="btn btn-secondary">❌ Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+
+const precioCompra = document.querySelector(
+    '[name="precio_compra"]'
+)
+
+const precioBase = document.querySelector(
+    '#precio_base'
+)
+
+const precioVenta = document.querySelector(
+    '#precio_venta'
+)
+
+const iva = document.querySelector(
+    '[name="iva_porcentaje"]'
+)
+
+function calcularPrecios() {
+
+    let compra = parseFloat(
+        precioCompra.value
+    ) || 0
+
+    let ivaValor = parseFloat(
+        iva.value
+    ) || 0
+
+    // GANANCIA 50%
+    let base = compra * 1.50
+
+    // IVA
+    let final = base * (
+        1 + (ivaValor / 100)
+    )
+
+    precioBase.value = base.toFixed(2)
+
+    precioVenta.value = final.toFixed(2)
+}
+
+precioCompra.addEventListener(
+    'input',
+    calcularPrecios
+)
+
+iva.addEventListener(
+    'input',
+    calcularPrecios
+)
+
+</script>
+{% endblock %}

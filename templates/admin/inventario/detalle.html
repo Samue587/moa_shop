@@ -1,0 +1,111 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Detalle Entrada #{{ entrada.id }} — TiendaMoa07{% endblock %}
+{% block menu_inventario %}active{% endblock %}
+{% block navbar_title %}Detalle de Entrada{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">👁️ Entrada #{{ entrada.id }}</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_inventario' %}">Inventario</a> ›
+            Detalle
+        </div>
+    </div>
+    <a href="{% url 'admin_inventario' %}" class="btn btn-secondary">← Volver</a>
+</div>
+
+<!-- Resumen de la entrada -->
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
+    <div class="card" style="margin:0;">
+        <div class="card-body" style="padding:20px;">
+            <div style="font-size:12px;color:#7f8c8d;font-weight:600;text-transform:uppercase;margin-bottom:6px;">Proveedor</div>
+            <div style="font-size:16px;font-weight:700;color:#2c3e50;">🏭 {{ entrada.proveedor.nombre_proveedor }}</div>
+        </div>
+    </div>
+    <div class="card" style="margin:0;">
+        <div class="card-body" style="padding:20px;">
+            <div style="font-size:12px;color:#7f8c8d;font-weight:600;text-transform:uppercase;margin-bottom:6px;">Fecha de Entrada</div>
+            <div style="font-size:16px;font-weight:700;color:#2c3e50;">📅 {{ entrada.fecha_entrada|date:"d/m/Y H:i" }}</div>
+        </div>
+    </div>
+    <div class="card" style="margin:0;">
+        <div class="card-body" style="padding:20px;">
+            <div style="font-size:12px;color:#7f8c8d;font-weight:600;text-transform:uppercase;margin-bottom:6px;">Ítems recibidos</div>
+            <div style="font-size:16px;font-weight:700;color:#144272;">📦 {{ entrada.detalles.count }} producto(s)</div>
+        </div>
+    </div>
+    <div class="card" style="margin:0;">
+        <div class="card-body" style="padding:20px;">
+            <div style="font-size:12px;color:#7f8c8d;font-weight:600;text-transform:uppercase;margin-bottom:6px;">Total Unidades</div>
+            <div style="font-size:16px;font-weight:700;color:#1a7a4a;">✅ {{ entrada.total_entrada }} uds.</div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de detalles -->
+<div class="card">
+    <div class="card-header"><h3>🗂️ Productos Recibidos</h3></div>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>SKU</th>
+                    <th>Producto</th>
+                    <th>Talla</th>
+                    <th>Color</th>
+                    <th style="text-align:center;">Cantidad</th>
+                    <th style="text-align:center;">Precio Compra</th>
+                    <th style="text-align:center;">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detalle in entrada.detalles.all %}
+                <tr>
+                    <td style="color:#7f8c8d;font-size:13px;">{{ forloop.counter }}</td>
+                    <td>
+                        <span style="background:#f0f4ff;color:#144272;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:600;font-family:monospace;">
+                            {{ detalle.variacion.sku_unico }}
+                        </span>
+                    </td>
+                    <td style="font-weight:600;color:#2c3e50;">{{ detalle.variacion.producto.nombre_producto }}</td>
+                    <td>
+                        <span style="background:#f8f9fa;padding:3px 8px;border-radius:6px;font-size:13px;">
+                            {{ detalle.variacion.talla }}
+                        </span>
+                    </td>
+                    <td style="font-size:13px;color:#2c3e50;">{{ detalle.variacion.color }}</td>
+                    <td style="text-align:center;">
+                        <span style="background:#e8f8f0;color:#1a7a4a;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:600;">
+                            {{ detalle.cantidades }}
+                        </span>
+                    </td>
+                    <td style="text-align:center;font-size:13px;color:#7f8c8d;">
+                        ${{ detalle.precio_comprado|floatformat:0 }}
+                    </td>
+                    <td style="text-align:center;font-weight:600;color:#144272;">
+                        ${% widthratio detalle.precio_comprado 1 detalle.cantidades %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" style="text-align:center;padding:40px;color:#7f8c8d;">
+                        No hay detalles registrados.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr style="background:#f8f9fa;border-top:2px solid #e0e6ed;">
+                    <td colspan="7" style="padding:14px 16px;text-align:right;font-weight:700;color:#2c3e50;">TOTAL UNIDADES:</td>
+                    <td style="padding:14px 16px;text-align:center;font-weight:700;color:#144272;font-size:16px;">
+                        {{ entrada.total_entrada }} uds.
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+{% endblock %}

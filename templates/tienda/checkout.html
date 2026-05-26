@@ -1,0 +1,1131 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout — MOA Moda</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@700;800;900&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+   <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        :root{
+            --primary:#FF6B35;
+            --primary-dark:#E85A2B;
+            --navy:#1C2942;
+            --dark:#161625;
+            --light:#F7F6F3;
+            --white:#FFFFFF;
+            --border:#ECE7E1;
+            --muted:#8C8C96;
+            --success:#22c55e;
+
+            --shadow:
+                0 10px 35px rgba(0,0,0,.06);
+
+            --radius:20px;
+        }
+
+        body{
+            font-family:'Instrument Sans',sans-serif;
+            background:
+                radial-gradient(circle at top right,
+                rgba(255,107,53,.08),
+                transparent 25%),
+                var(--light);
+
+            color:var(--dark);
+            min-height:100vh;
+        }
+
+        /* NAVBAR */
+
+        .navbar{
+            position:sticky;
+            top:0;
+            z-index:100;
+
+            backdrop-filter:blur(14px);
+
+            background:rgba(255,255,255,.88);
+
+            border-bottom:1px solid rgba(0,0,0,.04);
+        }
+
+        .navbar-inner{
+            max-width:1180px;
+            margin:auto;
+            height:78px;
+            padding:0 28px;
+
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+        }
+
+        .logo{
+            display:flex;
+            align-items:center;
+            gap:12px;
+            text-decoration:none;
+        }
+
+        .logo-sq{
+            width:48px;
+            height:42px;
+            border-radius:12px;
+
+            background:linear-gradient(
+                135deg,
+                var(--primary),
+                #ff8a5f
+            );
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+
+            box-shadow:
+                0 10px 20px rgba(255,107,53,.25);
+        }
+
+        .logo-sq span{
+            font-family:'Darker Grotesque',sans-serif;
+            font-size:34px;
+            font-weight:900;
+            color:white;
+        }
+
+        .logo-text{
+            display:flex;
+            flex-direction:column;
+            line-height:1;
+        }
+
+        .logo-oa{
+            font-family:'Darker Grotesque',sans-serif;
+            font-size:24px;
+            font-weight:900;
+            color:var(--dark);
+        }
+
+        .logo-shop{
+            font-size:11px;
+            font-weight:700;
+            color:var(--primary);
+            letter-spacing:4px;
+            text-transform:uppercase;
+        }
+
+        .nav-back{
+            text-decoration:none;
+            color:var(--muted);
+
+            font-size:14px;
+            font-weight:700;
+
+            transition:.2s;
+        }
+
+        .nav-back:hover{
+            color:var(--primary);
+        }
+
+        /* LAYOUT */
+
+        .page{
+            max-width:1180px;
+            margin:40px auto;
+            padding:0 24px 80px;
+
+            display:grid;
+            grid-template-columns:1fr 390px;
+            gap:30px;
+        }
+
+        @media(max-width:980px){
+
+            .page{
+                grid-template-columns:1fr;
+            }
+
+            .resumen-sticky{
+                position:static !important;
+            }
+        }
+
+        /* CARDS */
+
+        .card{
+            background:rgba(255,255,255,.95);
+
+            border:1px solid rgba(255,255,255,.7);
+
+            border-radius:var(--radius);
+
+            box-shadow:var(--shadow);
+
+            overflow:hidden;
+
+            margin-bottom:24px;
+        }
+
+        .card-title{
+            padding:22px 28px;
+
+            border-bottom:1px solid var(--border);
+
+            font-family:'Darker Grotesque',sans-serif;
+            font-size:26px;
+            font-weight:900;
+
+            color:var(--dark);
+
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+
+        .card-body{
+            padding:28px;
+        }
+
+        /* FORM */
+
+        .form-row{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:18px;
+        }
+
+        @media(max-width:650px){
+
+            .form-row{
+                grid-template-columns:1fr;
+            }
+        }
+
+        .form-group{
+            margin-bottom:18px;
+        }
+
+        label{
+            display:block;
+
+            margin-bottom:8px;
+
+            font-size:13px;
+            font-weight:700;
+
+            color:var(--dark);
+        }
+
+        .req{
+            color:var(--primary);
+        }
+
+        .opc{
+            color:var(--muted);
+            font-weight:500;
+        }
+
+        input,
+        select{
+            width:100%;
+
+            height:52px;
+
+            border:1.5px solid var(--border);
+
+            border-radius:14px;
+
+            padding:0 16px;
+
+            background:#FAFAFA;
+
+            font-family:inherit;
+            font-size:14px;
+
+            transition:.25s;
+        }
+
+        input:hover,
+        select:hover{
+            border-color:#d6d0c9;
+        }
+
+        input:focus,
+        select:focus{
+            outline:none;
+
+            background:white;
+
+            border-color:var(--primary);
+
+            box-shadow:
+                0 0 0 4px rgba(255,107,53,.12);
+        }
+
+        input[readonly]{
+            background:#f3f4f6;
+            font-weight:700;
+            color:var(--navy);
+        }
+
+        /* DIRECCIÓN */
+
+        .direccion-box{
+            display:flex;
+            flex-direction:column;
+            gap:14px;
+        }
+
+        .direccion-grid{
+            display:grid;
+
+            grid-template-columns:
+                1.4fr
+                1fr
+                .7fr
+                .9fr
+                .9fr
+                auto
+                1fr
+                .7fr
+                auto
+                1fr;
+
+            gap:10px;
+            align-items:center;
+        }
+
+        .direccion-grid span{
+            color:var(--muted);
+            font-weight:900;
+            font-size:18px;
+        }
+
+        #direccion_preview{
+            border:2px dashed #ddd5cb;
+            background:#fafafa;
+        }
+
+        @media(max-width:950px){
+
+            .direccion-grid{
+                grid-template-columns:1fr 1fr;
+            }
+
+            .direccion-grid span{
+                display:none;
+            }
+        }
+
+        @media(max-width:500px){
+
+            .direccion-grid{
+                grid-template-columns:1fr;
+            }
+        }
+
+        /* ALERT */
+
+        .alert{
+            padding:16px 18px;
+
+            border-radius:16px;
+
+            margin-bottom:20px;
+
+            font-size:14px;
+            font-weight:600;
+        }
+
+        .alert-error{
+            background:#fff1f1;
+            color:#b91c1c;
+            border:1px solid #fecaca;
+        }
+
+        /* RESUMEN */
+
+        .resumen-sticky{
+            position:sticky;
+            top:100px;
+        }
+
+        .resumen-item{
+            display:flex;
+            align-items:center;
+            gap:14px;
+
+            padding:18px 0;
+
+            border-bottom:1px solid var(--border);
+        }
+
+        .item-foto{
+            width:62px;
+            height:62px;
+
+            border-radius:16px;
+
+            overflow:hidden;
+
+            background:#f5f5f5;
+
+            flex-shrink:0;
+        }
+
+        .item-foto img{
+            width:100%;
+            height:100%;
+            object-fit:cover;
+        }
+
+        .item-info{
+            flex:1;
+        }
+
+        .item-nombre{
+            font-size:15px;
+            font-weight:700;
+            color:var(--dark);
+        }
+
+        .item-qty{
+            margin-top:4px;
+
+            font-size:13px;
+            color:var(--muted);
+        }
+
+        .item-precio{
+            font-family:'Darker Grotesque',sans-serif;
+            font-size:24px;
+            font-weight:900;
+            color:var(--navy);
+        }
+
+        /* RESUMEN TOTALS */
+
+        .resume-line{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+
+            padding:14px 0;
+
+            font-size:15px;
+        }
+
+        .resume-line strong{
+            font-size:18px;
+        }
+
+        .shipping-price{
+            color:var(--success);
+            font-weight:800;
+        }
+
+        /* TOTAL */
+
+        .total-blk{
+            margin-top:20px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #1d2d4a,
+                    #142136
+                );
+
+            border-radius:20px;
+
+            padding:24px;
+
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+
+            box-shadow:
+                0 15px 35px rgba(28,41,66,.22);
+        }
+
+        .total-label{
+            font-size:11px;
+            letter-spacing:2px;
+            text-transform:uppercase;
+
+            color:rgba(255,255,255,.55);
+
+            font-weight:800;
+        }
+
+        .total-refs{
+            margin-top:6px;
+
+            font-size:13px;
+
+            color:rgba(255,255,255,.35);
+        }
+
+        .total-monto{
+            font-family:'Darker Grotesque',sans-serif;
+
+            font-size:52px;
+            font-weight:900;
+
+            color:var(--primary);
+
+            line-height:1;
+        }
+
+        .total-cop{
+            text-align:right;
+
+            margin-top:4px;
+
+            font-size:11px;
+
+            color:rgba(255,255,255,.35);
+        }
+
+        /* BOTÓN */
+
+        .btn-comprar{
+            width:100%;
+
+            height:60px;
+
+            border:none;
+            border-radius:16px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary),
+                    #ff8459
+                );
+
+            color:white;
+
+            font-size:17px;
+            font-weight:800;
+
+            cursor:pointer;
+
+            transition:.25s;
+
+            box-shadow:
+                0 14px 30px rgba(255,107,53,.25);
+        }
+
+        .btn-comprar:hover{
+            transform:translateY(-2px);
+
+            box-shadow:
+                0 18px 40px rgba(255,107,53,.35);
+        }
+
+        /* MOBILE */
+
+        @media(max-width:600px){
+
+            .page{
+                padding:0 14px 60px;
+                margin:24px auto;
+            }
+
+            .card-body{
+                padding:22px;
+            }
+
+            .card-title{
+                font-size:22px;
+            }
+
+            .total-monto{
+                font-size:40px;
+            }
+
+            .total-blk{
+                padding:20px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+
+    <div class="navbar-inner">
+
+        <a href="{% url 'tienda' %}" class="logo">
+
+            <div class="logo-sq">
+                <span>M</span>
+            </div>
+
+            <div class="logo-text">
+                <span class="logo-oa">OA</span>
+                <span class="logo-shop">Shop</span>
+            </div>
+
+        </a>
+
+        <a href="{% url 'carrito_ver' %}" class="nav-back">
+            ← Volver al carrito
+        </a>
+
+    </div>
+
+</nav>
+
+<div class="page">
+
+    <!-- FORMULARIO -->
+
+    <div>
+
+        {% if errores %}
+            {% for e in errores %}
+                <div class="alert alert-error">
+                    ⚠️ {{ e }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" action="{% url 'checkout_procesar' %}">
+
+            {% csrf_token %}
+
+            <!-- ENVÍO -->
+
+            <div class="card">
+
+                <div class="card-title">
+                    📦 Datos de envío
+                </div>
+
+                <div class="card-body">
+
+                    <div class="direccion-box">
+
+                        <label>
+                            Dirección <span class="req">*</span>
+                        </label>
+
+                        <div class="direccion-grid">
+
+                            <select id="tipo_via">
+                                <option value="Calle">Sin Seleccionar</option>
+                                <option value="Calle">Calle</option>
+                                <option value="Carrera">Carrera</option>
+                                <option value="Diagonal">Diagonal</option>
+                                <option value="Transversal">Transversal</option>
+                                <option value="Avenida">Avenida</option>
+                            </select>
+
+                            <input type="text" id="numero1" placeholder="123">
+
+                            <input type="text" id="letra1" placeholder="A">
+
+                            <select id="bis">
+                                <option value=""></option>
+                                <option value="Bis">Bis</option>
+                            </select>
+
+                            <select id="cardinal1">
+                                <option value=""></option>
+                                <option value="Norte">Norte</option>
+                                <option value="Sur">Sur</option>
+                                <option value="Este">Este</option>
+                                <option value="Oeste">Oeste</option>
+                            </select>
+
+                            <span>#</span>
+
+                            <input type="text" id="numero2" placeholder="45">
+
+                            <input type="text" id="letra2" placeholder="B">
+
+                            <span>-</span>
+
+                            <input type="text" id="numero3" placeholder="67">
+
+                        </div>
+
+                        <input
+                            type="text"
+                            id="complemento"
+                            placeholder="Apartamento, torre, interior..."
+                        >
+
+                        <input
+                            type="text"
+                            id="direccion_preview"
+                            name="direccion"
+                            placeholder="Tu dirección aparecerá aquí..."
+                            readonly
+                            required
+                        >
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>
+                            Barrio 
+                        </label>
+
+                        <input
+                            type="text"
+                            name="barrio"
+                            value="{{ form.barrio|default:'' }}"
+                        required>
+
+                    </div>
+
+                    <div class="form-row">
+
+                        <div class="form-group">
+
+                            <label>
+                                Departamento <span class="req">*</span>
+                            </label>
+
+                            <select name="departamento"
+                                    id="sel-departamento"
+                                    required>
+
+                                <option value="">
+                                    Selecciona departamento
+                                </option>
+
+                                {% for depto in departamentos %}
+
+                                    <option value="{{ depto }}"
+                                    {% if form.departamento == depto %}
+                                        selected
+                                    {% endif %}>
+
+                                        {{ depto }}
+
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label>
+                                Ciudad <span class="req">*</span>
+                            </label>
+
+                            <select name="ciudad"
+                                    id="sel-ciudad"
+                                    required
+                                    disabled>
+
+                                <option value="">
+                                    Primero elige departamento
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>
+                            Teléfono <span class="req">*</span>
+                        </label>
+
+                        <input
+                            type="tel"
+                            name="telefono"
+                            required
+                            value="{{ form.telefono|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- RECEPTOR -->
+
+            <div class="card">
+
+                <div class="card-title">
+                    🪪 Datos del receptor
+                </div>
+
+                <div class="card-body">
+
+                    <div class="form-group">
+
+                        <label>
+                            Número de documento
+                            <span class="req">*</span>
+                        </label>
+
+                        <input
+                            type="number"
+                            name="num_documento"
+                            required
+                            value="{{ form.num_documento|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn-comprar">
+                💳 Confirmar compra
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- RESUMEN -->
+
+    <div>
+
+        <div class="card resumen-sticky">
+
+            <div class="card-title">
+                🛒 Resumen del pedido
+            </div>
+
+            <div class="card-body">
+
+                {% for item in items %}
+
+                <div class="resumen-item">
+
+                    <div class="item-foto">
+
+                        {% if item.foto %}
+                            <img src="/imagenes/{{ item.foto }}">
+                        {% else %}
+                            📦
+                        {% endif %}
+
+                    </div>
+
+                    <div class="item-info">
+
+                        <div class="item-nombre">
+                            {{ item.nombre }}
+                        </div>
+
+                        <div class="item-qty">
+                            Cantidad: {{ item.cantidad }}
+                        </div>
+
+                    </div>
+
+                    <div class="item-precio">
+                        ${{ item.subtotal|floatformat:0|intcomma }}
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+                <!-- SUBTOTAL -->
+
+                <div class="resume-line">
+
+                    <span>Subtotal</span>
+
+                    <strong>
+                        ${{ total|floatformat:0|intcomma }}
+                    </strong>
+
+                </div>
+
+                <!-- ENVÍO -->
+
+                <div class="resume-line">
+
+                    <span>Envío</span>
+
+                    <strong id="valor-envio" class="shipping-price">
+                        $0
+                    </strong>
+
+                </div>
+
+                <!-- TOTAL -->
+
+                <div class="total-blk">
+
+                    <div>
+
+                        <div class="total-label">
+                            Total final
+                        </div>
+
+                        <div class="total-refs">
+                            {{ items|length }} producto{% if items|length != 1 %}s{% endif %}
+                        </div>
+
+                    </div>
+
+                    <div style="text-align:right;">
+
+                        <div class="total-monto" id="total-final">
+
+                            ${{ total|floatformat:0|intcomma }}
+
+                        </div>
+
+                        <div class="total-cop">
+                            Pesos colombianos
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const ciudadesPorDepto = {{ ciudades_por_departamento|safe }};
+
+const costosEnvio = {
+
+    'Antioquia':18000,
+    'Atlántico':22000,
+    'Bogotá D.C.':8000,
+    'Bolívar':23000,
+    'Boyacá':16000,
+    'Caldas':17000,
+    'Cauca':22000,
+    'Cesar':24000,
+    'Córdoba':23000,
+    'Cundinamarca':12000,
+    'Huila':18000,
+    'La Guajira':26000,
+    'Magdalena':23000,
+    'Meta':17000,
+    'Nariño':25000,
+    'Norte de Santander':24000,
+    'Quindío':17000,
+    'Risaralda':17000,
+    'Santander':20000,
+    'Sucre':23000,
+    'Tolima':17000,
+    'Valle del Cauca':20000,
+    'Putumayo':28000,
+    'Caquetá': 25000
+
+};
+
+const subtotal = parseInt("{{ total|floatformat:'0'|cut:'.'|cut:',' }}");
+
+const selDepto = document.getElementById('sel-departamento');
+const selCiudad = document.getElementById('sel-ciudad');
+
+const ciudadPrevia = "{{ form.ciudad|default:'' }}";
+
+/* CIUDADES */
+
+function cargarCiudades(depto){
+
+    selCiudad.innerHTML = '';
+
+    if(!depto){
+
+        selCiudad.disabled = true;
+
+        selCiudad.innerHTML =
+            '<option value="">Primero elige departamento</option>';
+
+        return;
+    }
+
+    const ciudades = ciudadesPorDepto[depto] || [];
+
+    selCiudad.disabled = false;
+
+    const placeholder = document.createElement('option');
+
+    placeholder.value = '';
+    placeholder.textContent = 'Selecciona ciudad';
+
+    selCiudad.appendChild(placeholder);
+
+    ciudades.forEach(function(c){
+
+        const opt = document.createElement('option');
+
+        opt.value = c;
+        opt.textContent = c;
+
+        if(c === ciudadPrevia){
+            opt.selected = true;
+        }
+
+        selCiudad.appendChild(opt);
+
+    });
+}
+
+/* ENVÍO */
+
+function actualizarEnvio(departamento){
+
+    const envio = costosEnvio[departamento] || 20000;
+
+    document.getElementById('valor-envio').textContent =
+        '$' + envio.toLocaleString('es-CO');
+
+    const totalFinal = subtotal + envio;
+
+    document.getElementById('total-final').textContent =
+        '$' + totalFinal.toLocaleString('es-CO');
+}
+
+/* DIRECCIÓN */
+
+const campos = [
+    'tipo_via',
+    'numero1',
+    'letra1',
+    'bis',
+    'cardinal1',
+    'numero2',
+    'letra2',
+    'numero3',
+    'complemento'
+];
+
+campos.forEach(id => {
+
+    document.getElementById(id)
+        .addEventListener('input', actualizarDireccion);
+
+    document.getElementById(id)
+        .addEventListener('change', actualizarDireccion);
+
+});
+
+function actualizarDireccion(){
+
+    const tipoVia   = document.getElementById('tipo_via').value;
+    const numero1   = document.getElementById('numero1').value.trim();
+    const letra1    = document.getElementById('letra1').value.trim();
+    const bis       = document.getElementById('bis').value.trim();
+    const cardinal1 = document.getElementById('cardinal1').value.trim();
+    const numero2   = document.getElementById('numero2').value.trim();
+    const letra2    = document.getElementById('letra2').value.trim();
+    const numero3   = document.getElementById('numero3').value.trim();
+    const complemento = document.getElementById('complemento').value.trim();
+
+    const preview = document.getElementById('direccion_preview');
+
+    /* SI TODO ESTÁ VACÍO */
+
+    if(
+        !numero1 &&
+        !letra1 &&
+        !bis &&
+        !cardinal1 &&
+        !numero2 &&
+        !letra2 &&
+        !numero3 &&
+        !complemento
+    ){
+        preview.value = '';
+        return;
+    }
+
+    let direccion = `${tipoVia}`;
+
+    if(numero1){
+        direccion += ` ${numero1}`;
+    }
+
+    if(letra1){
+        direccion += `${letra1.toUpperCase()}`;
+    }
+
+    if(bis){
+        direccion += ` ${bis}`;
+    }
+
+    if(cardinal1){
+        direccion += ` ${cardinal1}`;
+    }
+
+    if(numero2){
+        direccion += ` # ${numero2}`;
+    }
+
+    if(letra2){
+        direccion += `${letra2.toUpperCase()}`;
+    }
+
+    if(numero3){
+        direccion += ` - ${numero3}`;
+    }
+
+    if(complemento){
+        direccion += ` ${complemento}`;
+    }
+
+    preview.value = direccion;
+}
+/* EVENTOS */
+
+selDepto.addEventListener('change', function(){
+
+    cargarCiudades(this.value);
+
+    actualizarEnvio(this.value);
+
+});
+
+/* INIT */
+
+if(selDepto.value){
+
+    cargarCiudades(selDepto.value);
+
+    actualizarEnvio(selDepto.value);
+}
+
+actualizarDireccion();
+
+</script>
+
+</body>
+</html>
