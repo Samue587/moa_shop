@@ -59,6 +59,7 @@
                         <tr style="background:#f8f9fa;border-bottom:2px solid #e0e6ed;">
                             <th style="padding:12px 16px;text-align:left;font-size:13px;color:#7f8c8d;font-weight:600;">VARIACIÓN (SKU)</th>
                             <th style="padding:12px 16px;text-align:center;font-size:13px;color:#7f8c8d;font-weight:600;">CANTIDAD</th>
+<<<<<<< HEAD
                             <th style="padding:12px 16px;text-align:center;font-size:13px;color:#7f8c8d;font-weight:600;">
                                 PRECIO COMPRA
                             </th>
@@ -66,6 +67,9 @@
                             <td>
                                 $ {{ variacion_producto.precio_compra }}
                             </td>
+=======
+                            <th style="padding:12px 16px;text-align:center;font-size:13px;color:#7f8c8d;font-weight:600;">PRECIO COMPRA</th>
+>>>>>>> 80652bf46c1dc99bae8fb73815ca7fa19f7c918d
                             <th style="padding:12px 16px;text-align:center;font-size:13px;color:#7f8c8d;font-weight:600;">SUBTOTAL</th>
                             <th style="padding:12px 16px;text-align:center;font-size:13px;color:#7f8c8d;font-weight:600;">ACCIÓN</th>
                         </tr>
@@ -139,6 +143,7 @@ function agregarFila() {
                    min="1" value="1" oninput="calcularSubtotal(${idx})" required>
         </td>
         <td style="padding:10px 16px;text-align:center;">
+<<<<<<< HEAD
             <input type="number"
                 name="precio_${idx}"
                 class="form-control"
@@ -146,6 +151,10 @@ function agregarFila() {
                 min="0"
                 value="0"
                 readonly>
+=======
+            <input type="number" name="precio_${idx}" class="form-control" style="width:120px;margin:auto;text-align:center;"
+                   min="0" value="0" oninput="calcularSubtotal(${idx})" required>
+>>>>>>> 80652bf46c1dc99bae8fb73815ca7fa19f7c918d
         </td>
         <td style="padding:10px 16px;text-align:center;font-weight:600;color:#144272;" id="sub_${idx}">$0</td>
         <td style="padding:10px 16px;text-align:center;">

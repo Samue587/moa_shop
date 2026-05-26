@@ -2,6 +2,11 @@ from django.db import models
 from django.contrib.auth.hashers import make_password
 from django.core.validators import MinValueValidator
 from decimal import Decimal
+<<<<<<< HEAD
+=======
+import uuid
+
+>>>>>>> 80652bf46c1dc99bae8fb73815ca7fa19f7c918d
 
 
 # ╔══════════════════════════════════════════════════════════════════════╗
@@ -638,3 +643,30 @@ class Envio(models.Model):
             partes.append(f"Barrio {self.barrio_envio}")
         partes += [self.ciudad_envio, self.departamento_envio]
         return ', '.join(partes)
+<<<<<<< HEAD
+=======
+
+
+
+
+# ══════════════════════════════════════════════════════
+# TOKEN RESET — Restablecimiento de contraseña
+# ══════════════════════════════════════════════════════
+class TokenReset(models.Model):
+    usuario   = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='tokens_reset')
+    token     = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    creado_en = models.DateTimeField(auto_now_add=True)
+    usado     = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'tokens_reset'
+
+    def esta_vigente(self):
+        from datetime import timedelta
+        import datetime
+        ahora = datetime.datetime.now()
+        return not self.usado and ahora < self.creado_en + timedelta(hours=24)
+
+    def __str__(self):
+        return f"Token de {self.usuario.correo_usuario}"
+>>>>>>> 80652bf46c1dc99bae8fb73815ca7fa19f7c918d

@@ -1,5 +1,7 @@
 import os
 import uuid
+import resend
+
 from decimal import Decimal
 from datetime import date, timedelta
 
@@ -61,6 +63,9 @@ CIUDADES_POR_DEPARTAMENTO = {
     'Huila':              ['Neiva', 'Pitalito', 'Garzón', 'La Plata', 'Palermo'],
     'La Guajira':         ['Riohacha', 'Maicao'],
     'Magdalena':          ['Santa Marta', 'Ciénaga', 'El Banco'],
+    'Huila':              ['Neiva', 'Pitalito', 'Garzón'],
+    'La Guajira':         ['Riohacha', 'Maicao'],
+    'Magdalena':          ['Santa Marta', 'Ciénaga'],
     'Meta':               ['Villavicencio', 'Acacías'],
     'Nariño':             ['Pasto', 'Tumaco', 'Ipiales'],
     'Norte de Santander': ['Cúcuta', 'Ocaña', 'Pamplona'],
@@ -77,7 +82,6 @@ CIUDADES_POR_DEPARTAMENTO = {
 COSTOS_ENVIO = {
     'Bogotá D.C.': 8000,
     'Cundinamarca': 10000,
-
     'Antioquia': 16000,
     'Atlántico': 22000,
     'Bolívar': 22000,
@@ -99,7 +103,8 @@ COSTOS_ENVIO = {
     'Tolima': 13000,
     'Valle del Cauca': 18000,
     'Putumayo': 26000,
-    'Caquetá': 25000
+    'Caquetá': 25000,
+    'Putumayo': 28000,
 }
 
 
@@ -461,13 +466,21 @@ def checkout_procesar(request):
     usuario = get_usuario_sesion(request)
     carrito = _get_carrito(request)
 
+
     list(messages.get_messages(request))
     storage = messages.get_messages(request)
     storage.used = True
 
+    list(messages.get_messages(request))
+    storage = messages.get_messages(request)
+    storage.used = True
+    
+
+
     if not carrito['items']:
         messages.error(request, 'El carrito está vacío.')
         return redirect('carrito_ver')
+
 
     # TOTAL BASE DEL CARRITO
     total_carrito = float(_calcular_total(carrito))
@@ -476,6 +489,13 @@ def checkout_procesar(request):
         'usuario':                   usuario,
         'items':                     carrito['items'],
         'total':                     total_carrito,
+    }
+
+    ctx_base = {
+        'usuario':                   usuario,
+        'items':                     carrito['items'],
+        'total':                     _calcular_total(carrito),
+
         'cantidad_carrito':          _cantidad_carrito(request),
         'departamentos':             sorted(CIUDADES_POR_DEPARTAMENTO.keys()),
         'ciudades_por_departamento': CIUDADES_POR_DEPARTAMENTO,
@@ -522,6 +542,22 @@ def checkout_procesar(request):
 
     if not telefono:
         errores.append('El teléfono es obligatorio.')
+        return render(request, 'tienda/checkout.html', {**ctx_base, 'form': {}, 'errores': []})
+
+    direccion    = request.POST.get('direccion', '').strip()
+    barrio       = request.POST.get('barrio', '').strip()
+    ciudad       = request.POST.get('ciudad', '').strip()
+    departamento = request.POST.get('departamento', '').strip()
+    tipo_vivienda = request.POST.get('tipo_vivienda', 'CASA').strip()
+    especificaciones = request.POST.get('especificaciones', '').strip()
+    telefono     = request.POST.get('telefono', '').strip()
+    empresa      = request.POST.get('empresa', 'Interrapidísimo').strip()
+
+    errores = []
+    if not direccion:    errores.append('La dirección es obligatoria.')
+    if not ciudad:       errores.append('La ciudad es obligatoria.')
+    if not departamento: errores.append('El departamento es obligatorio.')
+    if not telefono:     errores.append('El teléfono es obligatorio.')
 
     if errores:
         return render(request, 'tienda/checkout.html', {
@@ -564,6 +600,14 @@ def checkout_procesar(request):
                         f"({variacion.talla} - {variacion.color})."
                     )
 
+                monto_final=total,
+
+            for item in carrito['items']:
+                variacion = VariacionProducto.objects.select_for_update().get(pk=item['variacion_id'])
+                if variacion.stock_actual < item['cantidad']:
+                    raise Exception(f"Stock insuficiente para '{variacion.producto.nombre_producto}' ({variacion.talla} - {variacion.color}).")
+
+
                 DetalleVenta.objects.create(
                     venta=venta,
                     variacion=variacion,
@@ -572,6 +616,7 @@ def checkout_procesar(request):
                 )
 
                 variacion.stock_actual -= item['cantidad']
+
 
                 variacion.save(
                     update_fields=['stock_actual', 'actualizado_en']
@@ -628,6 +673,7 @@ def checkout_procesar(request):
             'costo_envio': costo_envio,
             'total_final': total_final,
         })
+
 
 def checkout_comprobante(request, venta_id):
     usuario = get_usuario_sesion(request)
@@ -2591,4 +2637,78 @@ def reportes_hub(request):
 
     
 
+
+# ══════════════════════════════════════════════════════
+# RESTABLECIMIENTO DE CONTRASEÑA
+# ══════════════════════════════════════════════════════
+def solicitar_reset(request):
+    if request.method == 'POST':
+        correo = request.POST.get('correo', '').strip()
+        try:
+            usuario = Usuario.objects.get(correo_usuario=correo)
+            TokenReset.objects.filter(usuario=usuario, usado=False).update(usado=True)
+            token = TokenReset.objects.create(usuario=usuario)
+            enlace = request.build_absolute_uri(f'/reset-password/{token.token}/')
+            resend.Emails.send({
+                "from": "TiendaMoa <onboarding@resend.dev>",
+                "to": usuario.correo_usuario,
+                "subject": "Restablecer contraseña - TiendaMoa",
+                "html": f"""
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #144272;">🏷️ TiendaMoa</h2>
+                    <p>Hola <strong>{usuario.nombres_usuario}</strong>,</p>
+                    <p>Recibimos una solicitud para restablecer tu contraseña.</p>
+                    <a href="{enlace}" style="
+                        display: inline-block;
+                        padding: 14px 28px;
+                        background: linear-gradient(135deg, #667eea, #764ba2);
+                        color: white;
+                        text-decoration: none;
+                        border-radius: 10px;
+                        font-weight: bold;
+                        margin: 20px 0;
+                    ">Restablecer contraseña</a>
+                    <p style="color: #888; font-size: 13px;">Este enlace expira en 24 horas. Si no solicitaste esto, ignora este correo.</p>
+                </div>
+                """,
+            })
+        except Usuario.DoesNotExist:
+            pass
+        return redirect('reset_enviado')
+    return render(request, 'registration/password_reset_form.html')
+
+
+def reset_enviado(request):
+    return render(request, 'registration/password_reset_done.html')
+
+
+def confirmar_reset(request, token):
+    try:
+        token_obj = TokenReset.objects.get(token=token)
+    except TokenReset.DoesNotExist:
+        return render(request, 'registration/password_reset_confirm.html', {'validlink': False})
+
+    if not token_obj.esta_vigente():
+        return render(request, 'registration/password_reset_confirm.html', {'validlink': False})
+
+    error = None
+    if request.method == 'POST':
+        nueva = request.POST.get('new_password1', '')
+        confirmar = request.POST.get('new_password2', '')
+        if nueva != confirmar:
+            error = 'Las contraseñas no coinciden.'
+        elif len(nueva) < 6:
+            error = 'La contraseña debe tener al menos 6 caracteres.'
+        else:
+            token_obj.usuario.set_password(nueva)
+            token_obj.usuario.save()
+            token_obj.usado = True
+            token_obj.save()
+            return redirect('reset_completo')
+
+    return render(request, 'registration/password_reset_confirm.html', {'validlink': True, 'error': error})
+
+
+def reset_completo(request):
+    return render(request, 'registration/password_reset_complete.html')
 
