@@ -14,7 +14,8 @@ MODULOS = [
     'envios',
     'catalogos',
     'categorias',
-    'variaciones'
+    'variaciones',
+    'entradas'
 ]
 
 
