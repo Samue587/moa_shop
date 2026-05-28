@@ -8,7 +8,7 @@ class AppmoaConfig(AppConfig):
     def ready(self):
 
         try:
-            from .Seeds import crear_roles, crear_permisos, asignar_permisos
+            from .seeds import crear_roles, crear_permisos, asignar_permisos
 
             crear_roles()
             crear_permisos()
