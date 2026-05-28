@@ -6,15 +6,4 @@ class AppmoaConfig(AppConfig):
     name = 'AppMoa'
 
     def ready(self):
-
-        try:
-            from .seeds import crear_roles, crear_permisos, asignar_permisos
-
-            crear_roles()
-            crear_permisos()
-            asignar_permisos()
-
-            print("SEEDS EJECUTADOS")
-
-        except Exception as e:
-            print(e)
+        pass
