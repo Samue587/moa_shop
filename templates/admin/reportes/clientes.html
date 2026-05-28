@@ -1,0 +1,131 @@
+{% extends "admin/base_admin.html" %}
+{% load humanize %}
+{% block title %}Reporte Clientes — MOA{% endblock %}
+{% block navbar_title %}👥 Reporte de Clientes{% endblock %}
+
+{% block content %}
+
+<!-- STATS -->
+<div class="stats-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr));margin-bottom:20px;">
+  <div class="stat-card" style="border-left-color:#144272;">
+    
+    <div class="stat-info">
+      <div class="stat-number">{{ total_clientes }}</div>
+      <div class="stat-label">Total clientes</div>
+    </div>
+  </div>
+  <div class="stat-card" style="border-left-color:#27ae60;">
+    
+    <div class="stat-info">
+      <div class="stat-number">{{ clientes_activos }}</div>
+      <div class="stat-label">Clientes activos</div>
+    </div>
+  </div>
+  <div class="stat-card" style="border-left-color:#e74c3c;">
+    
+    <div class="stat-info">
+      <div class="stat-number">{{ clientes_inactivos }}</div>
+      <div class="stat-label">Sin compras</div>
+    </div>
+  </div>
+</div>
+
+<!-- TOP 5 CLIENTES -->
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-header"><h3>🏆 Top 5 Clientes por Gasto</h3></div>
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Cliente</th><th>Email</th><th>Compras</th><th>Total Gastado</th></tr>
+      </thead>
+      <tbody>
+        {% for c in top_clientes %}
+        <tr>
+          <td><strong>{{ forloop.counter }}</strong></td>
+          <td>{{ c.get_full_name }}</td>
+          <td style="font-size:12px;color:#7f8c8d;">{{ c.correo_usuario }}</td>
+          <td><span class="badge badge-info">{{ c.num_ventas }}</span></td>
+          <td><strong style="color:#144272;">${{ c.total_gastado|floatformat:0|intcomma }}</strong></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" style="text-align:center;color:#999;">Sin datos</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- FILTROS -->
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-body" style="padding:20px 25px;">
+    <form method="get" action="{% url 'reporte_clientes' %}"
+          style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;">
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">BUSCAR CLIENTE</label>
+        <input type="text" name="q" class="form-control"
+               placeholder="Nombre o email..." value="{{ busqueda }}">
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">ORDENAR POR</label>
+        <select name="orden" class="form-control">
+          <option value="ventas"  {% if filtro_orden == 'ventas'  %}selected{% endif %}>N° de Compras</option>
+          <option value="gastado" {% if filtro_orden == 'gastado' %}selected{% endif %}>Total Gastado</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">🔍 Buscar Cliente</button>
+    </form>
+  </div>
+</div>
+
+<!-- TABLA CLIENTES -->
+<div class="card">
+  <div class="card-header">
+    <h3>📋 Listado de Clientes</h3>
+    <span style="font-size:13px;color:#7f8c8d;">{{ clientes|length }} resultado(s)</span>
+  </div>
+  {% if clientes %}
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>Cliente</th><th>Email</th><th>Estado</th>
+          <th>N° Compras</th><th>Total Gastado</th><th>Miembro desde</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in clientes %}
+        <tr>
+          <td><strong>{{ c.get_full_name }}</strong></td>
+          <td style="font-size:12px;color:#7f8c8d;">{{ c.correo_usuario }}</td>
+          <td>
+            {% if c.activo %}
+              <span class="badge badge-success">Activo</span>
+            {% else %}
+              <span class="badge badge-danger">Inactivo</span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="badge badge-info">{{ c.num_ventas|default:"0" }}</span>
+          </td>
+          <td>
+            <strong style="color:#144272;">
+              ${{ c.total_gastado|default:0|floatformat:0|intcomma }}
+            </strong>
+          </td>
+          <td style="font-size:12px;color:#7f8c8d;">{{ c.creado_en|date:"d/m/Y" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📭</div>
+    <p>No hay clientes con ese criterio.</p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
+
+

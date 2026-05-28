@@ -1,0 +1,168 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Nuevo Proveedor — TiendaMoa07{% endblock %}
+{% block menu_proveedores %}active{% endblock %}
+{% block navbar_title %}Nuevo Proveedor{% endblock %}
+ 
+
+
+{% if 'crear_proovedores' in permisos_usuario %}
+    {% block content %}
+        <div class="page-header">
+            <div>
+                <div class="page-title">➕ Nuevo Proveedor</div>
+                <div class="breadcrumb">
+                    <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+                    <a href="{% url 'admin_proveedores' %}">Proveedores</a> ›
+                    Nuevo
+                </div>
+            </div>
+        </div>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        
+        <div class="card" style="max-width:720px;">
+            <div class="card-header"><h3>🏭 Datos del Proveedor</h3></div>
+            <div class="card-body">
+                <form method="post" id="formProveedor" novalidate>
+                    {% csrf_token %}
+        
+                    <div class="form-group">
+                        <label class="form-label">🏭 Nombre del Proveedor <span class="required">*</span></label>
+                        <input type="text" name="nombre_proveedor" id="nombre_proveedor" class="form-control"
+                            placeholder="Ej: Distribuidora Textil S.A.S"
+                            value="{{ form_data.nombre_proveedor|default:'' }}"
+                            maxlength="150" required>
+                        <span class="form-help error-msg" id="err_nombre" style="color:#e74c3c;display:none;">⚠️ Solo se permiten letras y espacios.</span>
+                    </div>
+        
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">🪪 NIT / Documento <span class="required">*</span></label>
+                            <input type="text" name="nit_proveedor" id="nit_proveedor" class="form-control"
+                                placeholder="Ej: 9001234561"
+                                value="{{ form_data.nit_proveedor|default:'' }}"
+                                minlength="5" maxlength="20" required>
+                            <span class="form-help error-msg" id="err_nit" style="color:#e74c3c;display:none;">⚠️ Mínimo 5 dígitos, solo números.</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">👤 Persona de Contacto</label>
+                            <input type="text" name="contacto_proveedor" id="contacto_proveedor" class="form-control"
+                                placeholder="Ej: Juan Pérez"
+                                value="{{ form_data.contacto_proveedor|default:'' }}"
+                                maxlength="100">
+                            <span class="form-help error-msg" id="err_contacto" style="color:#e74c3c;display:none;">⚠️ Solo se permiten letras y espacios.</span>
+                        </div>
+                    </div>
+        
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">📞 Teléfono <span class="required">*</span></label>
+                            <input type="text" name="telefono_proveedor" id="telefono_proveedor" class="form-control"
+                                placeholder="Ej: 3001234567"
+                                value="{{ form_data.telefono_proveedor|default:'' }}"
+                                minlength="7" maxlength="15" required>
+                            <span class="form-help error-msg" id="err_telefono" style="color:#e74c3c;display:none;">⚠️ Solo números, mínimo 7 dígitos.</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">📧 Correo Electrónico <span class="required">*</span></label>
+                            <input type="email" name="correo_proveedor" id="correo_proveedor" class="form-control"
+                                placeholder="Ej: contacto@empresa.com"
+                                value="{{ form_data.correo_proveedor|default:'' }}"
+                                maxlength="150" required>
+                            <span class="form-help error-msg" id="err_correo" style="color:#e74c3c;display:none;">⚠️ Ingresa un correo válido (ej: nombre@dominio.com).</span>
+                        </div>
+                    </div>
+        
+                    <div class="form-group">
+                        <label class="form-label">📍 Dirección</label>
+                        <input type="text" name="direccion_proveedor" id="direccion_proveedor" class="form-control"
+                            placeholder="Ej: Calle 123 #45-67, Bodega 3"
+                            value="{{ form_data.direccion_proveedor|default:'' }}"
+                            maxlength="200">
+                    </div>
+        
+                    <div class="form-group">
+                        <label class="form-label">📝 Observaciones</label>
+                        <textarea name="observaciones_proveedor" id="observaciones_proveedor" class="form-control"
+                                placeholder="Notas adicionales sobre el proveedor..."
+                                rows="3" maxlength="500">{{ form_data.observaciones_proveedor|default:'' }}</textarea>
+                        <span class="form-help"><span id="obs_count">0</span>/500 caracteres</span>
+                    </div>
+        
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success">💾 Guardar Proveedor</button>
+                        <a href="{% url 'admin_proveedores' %}" class="btn btn-secondary">❌ Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <script>
+        const soloTexto   = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s.'-]+$/;
+        const soloNumeros = /^\d+$/;
+        const regexEmail  = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+        
+        function validar(id, condicion, errId) {
+            const campo = document.getElementById(id);
+            const err   = errId ? document.getElementById(errId) : null;
+            if (!campo) return;
+            campo.addEventListener('input', () => {
+                if (!condicion(campo.value)) {
+                    campo.style.borderColor = '#e74c3c';
+                    if (err) err.style.display = 'block';
+                } else {
+                    campo.style.borderColor = '#27ae60';
+                    if (err) err.style.display = 'none';
+                }
+            });
+        }
+        
+        validar('nombre_proveedor',   v => soloTexto.test(v) && v.trim().length >= 3,  'err_nombre');
+        validar('nit_proveedor',      v => soloNumeros.test(v) && v.length >= 5,        'err_nit');
+        validar('contacto_proveedor', v => !v || (soloTexto.test(v) && v.trim().length >= 3), 'err_contacto');
+        validar('telefono_proveedor', v => soloNumeros.test(v) && v.length >= 7,        'err_telefono');
+        validar('correo_proveedor',   v => regexEmail.test(v),                          'err_correo');
+        
+        ['nit_proveedor','telefono_proveedor'].forEach(id => {
+            document.getElementById(id).addEventListener('keypress', e => {
+                if (!/[0-9]/.test(e.key)) e.preventDefault();
+            });
+        });
+        
+        ['nombre_proveedor','contacto_proveedor'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('keypress', e => {
+                if (/[0-9]/.test(e.key)) e.preventDefault();
+            });
+        });
+        
+        const obs = document.getElementById('observaciones_proveedor');
+        const cnt = document.getElementById('obs_count');
+        obs.addEventListener('input', () => cnt.textContent = obs.value.length);
+        
+        document.getElementById('formProveedor').addEventListener('submit', function(e) {
+            let ok = true;
+            if (!soloTexto.test(document.getElementById('nombre_proveedor').value.trim())) {
+                document.getElementById('err_nombre').style.display = 'block'; ok = false;
+            }
+            const nit = document.getElementById('nit_proveedor').value;
+            if (!soloNumeros.test(nit) || nit.length < 5) {
+                document.getElementById('err_nit').style.display = 'block'; ok = false;
+            }
+            const tel = document.getElementById('telefono_proveedor').value;
+            if (!soloNumeros.test(tel) || tel.length < 7) {
+                document.getElementById('err_telefono').style.display = 'block'; ok = false;
+            }
+            if (!regexEmail.test(document.getElementById('correo_proveedor').value)) {
+                document.getElementById('err_correo').style.display = 'block'; ok = false;
+            }
+            if (!ok) e.preventDefault();
+        });
+        </script>
+    {% endblock %}
+
+{% endif %}

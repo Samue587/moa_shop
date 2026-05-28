@@ -1,0 +1,65 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Nuevo Catálogo - MOA{% endblock %}
+{% block menu_catalogos %}active{% endblock %}
+{% block navbar_title %}Nuevo Catálogo{% endblock %}
+ 
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">➕ Nuevo Catálogo</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_catalogos' %}">Catálogos</a> ›
+            Nuevo
+        </div>
+    </div>
+</div>
+ 
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+ 
+<div class="card" style="max-width:620px;">
+    <div class="card-body">
+ 
+        <form method="post">
+            {% csrf_token %}
+ 
+            <div class="form-group">
+                <label class="form-label">📝 Nombre del Catálogo *</label>
+                <input
+                    type="text"
+                    name="nombre_catalogo"
+                    class="form-control"
+                    placeholder="Ej: Temporada Verano 2025"
+                    value="{{ form_data.nombre_catalogo|default:'' }}"
+                    required
+                    maxlength="150"
+                >
+            </div>
+ 
+            <div class="form-group">
+                <label class="form-label">📄 Descripción</label>
+                <textarea
+                    name="descripcion_catalogo"
+                    class="form-control"
+                    placeholder="Describe brevemente este catálogo..."
+                    rows="4"
+                    style="resize:vertical;"
+                >{{ form_data.descripcion_catalogo|default:'' }}</textarea>
+            </div>
+ 
+ 
+            <div style="display:flex; gap:12px; margin-top:24px;">
+                <button type="submit" class="btn btn-primary">💾 Guardar Catálogo</button>
+                <a href="{% url 'admin_catalogos' %}" class="btn btn-secondary">❌ Cancelar</a>
+            </div>
+        </form>
+ 
+    </div>
+</div>
+{% endblock %}

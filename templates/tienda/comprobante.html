@@ -1,0 +1,555 @@
+{% load static humanize %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pedido confirmado — MOA Moda</title>
+  <link href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@600;700;800;900&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink:    #1A1A2E;
+      --orange: #FF6B35;
+      --cream:  #F5F4F0;
+      --muted:  #7a8fa6;
+      --border: #e0ddd8;
+      --white:  #ffffff;
+      --green:  #22c55e;
+      --navy:   #1e2d4a;
+    }
+    body {
+      font-family: 'Instrument Sans', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      background: var(--ink);
+      padding: 0 2rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .navbar-brand {
+      font-family: 'Darker Grotesque', sans-serif;
+      font-weight: 900;
+      font-size: 1.6rem;
+      color: var(--white);
+      text-decoration: none;
+    }
+    .navbar-brand span { color: var(--orange); }
+
+    /* HERO */
+    .confirm-hero {
+      background: linear-gradient(135deg, var(--navy) 0%, #0f1a2e 100%);
+      padding: 3.5rem 2rem 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .confirm-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 70% 50%, rgba(255,107,53,.18) 0%, transparent 60%);
+    }
+    .confirm-hero .checkmark {
+      width: 72px; height: 72px;
+      background: var(--green);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.2rem;
+      font-size: 2rem;
+      color: var(--white);
+      box-shadow: 0 0 0 10px rgba(34,197,94,.15);
+      animation: pop .4s cubic-bezier(.175,.885,.32,1.275) both;
+    }
+    @keyframes pop {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    .confirm-hero h1 {
+      font-family: 'Darker Grotesque', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--white);
+      position: relative;
+    }
+    .confirm-hero p {
+      color: #aab4c4;
+      margin-top: .5rem;
+      font-size: .95rem;
+      position: relative;
+    }
+    .confirm-hero .orden-badge {
+      display: inline-block;
+      background: rgba(255,107,53,.2);
+      border: 1px solid var(--orange);
+      color: var(--orange);
+      border-radius: 20px;
+      padding: .25rem .9rem;
+      font-size: .85rem;
+      font-weight: 700;
+      margin-top: .8rem;
+      position: relative;
+    }
+
+    /* WRAPPER */
+    .factura-wrapper {
+      max-width: 580px;
+      margin: 2.5rem auto 3rem;
+      padding: 0 1.2rem;
+    }
+
+    /* FACTURA CARD */
+    .factura {
+      background: var(--white);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 32px rgba(26,26,46,.13);
+    }
+
+    /* HEADER NARANJA */
+    .factura-header {
+      background: var(--orange);
+      padding: 1.4rem 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .fh-logo { display: flex; align-items: center; gap: .7rem; }
+    .fh-logo-sq {
+      width: 40px; height: 40px;
+      background: rgba(255,255,255,.25);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .fh-logo-sq span {
+      font-family: 'Darker Grotesque', sans-serif;
+      font-size: 26px; font-weight: 900;
+      color: var(--white); line-height: 1;
+    }
+    .fh-brand { display: flex; flex-direction: column; line-height: 1; }
+    .fh-brand-name {
+      font-family: 'Darker Grotesque', sans-serif;
+      font-size: 1.4rem; font-weight: 900;
+      color: var(--white);
+    }
+    .fh-brand-sub {
+      font-size: .65rem; font-weight: 700;
+      color: rgba(255,255,255,.7);
+      letter-spacing: 3px; text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .fh-right { text-align: right; }
+    .fh-label {
+      font-size: .62rem; font-weight: 800;
+      color: rgba(255,255,255,.7);
+      letter-spacing: 3px; text-transform: uppercase;
+    }
+    .fh-num {
+      font-family: 'Darker Grotesque', sans-serif;
+      font-size: 2.8rem; font-weight: 900;
+      color: var(--white); line-height: 1;
+    }
+    .fh-date {
+      font-size: .72rem;
+      color: rgba(255,255,255,.75);
+      margin-top: .2rem;
+    }
+
+    /* BODY */
+    .factura-body { padding: 1.6rem 1.8rem; }
+
+    /* CLIENTE + ESTADO */
+    .sec-top {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      padding-bottom: 1.4rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .sec-label {
+      font-size: .62rem; font-weight: 800;
+      color: var(--muted); letter-spacing: 2px;
+      text-transform: uppercase; margin-bottom: .35rem;
+    }
+    .cliente-nombre { font-size: 1rem; font-weight: 700; color: var(--ink); }
+    .cliente-email  { font-size: .75rem; color: var(--muted); margin-top: .15rem; }
+    .estado-val     { font-size: 1rem; font-weight: 700; color: var(--ink); }
+    .estado-badge {
+      display: inline-flex; align-items: center; gap: .3rem;
+      margin-top: .3rem;
+      font-size: .75rem; font-weight: 700;
+      color: var(--green);
+    }
+
+    /* ENVIO */
+    .sec-envio {
+      padding: 1.3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .sec-envio-title {
+      display: flex; align-items: center; gap: .4rem;
+      font-size: .62rem; font-weight: 800;
+      color: var(--orange); letter-spacing: 2px;
+      text-transform: uppercase; margin-bottom: 1rem;
+    }
+    .envio-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .8rem 1.2rem;
+    }
+    .envio-item-label {
+      font-size: .62rem; font-weight: 800;
+      color: var(--muted); letter-spacing: 1.5px;
+      text-transform: uppercase; margin-bottom: .25rem;
+    }
+    .envio-item-val  { font-size: .88rem; font-weight: 700; color: var(--ink); }
+    .envio-item-sub  { font-size: .72rem; color: var(--muted); margin-top: .1rem; }
+    .fecha-llegada-val { color: var(--green); }
+
+    .badge-pendiente {
+      display: inline-block;
+      background: rgba(255,193,7,.12);
+      color: #b45309;
+      border: 1px solid rgba(255,193,7,.4);
+      border-radius: 20px;
+      padding: .15rem .6rem;
+      font-size: .65rem; font-weight: 800;
+      letter-spacing: 1px; text-transform: uppercase;
+      margin-top: .3rem;
+    }
+    .badge-encamino {
+      display: inline-block;
+      background: rgba(34,197,94,.12);
+      color: var(--green);
+      border: 1px solid rgba(34,197,94,.35);
+      border-radius: 20px;
+      padding: .15rem .6rem;
+      font-size: .65rem; font-weight: 800;
+      letter-spacing: 1px; text-transform: uppercase;
+      margin-top: .3rem;
+    }
+    .badge-entregado {
+      display: inline-block;
+      background: rgba(34,197,94,.15);
+      color: var(--green);
+      border: 1px solid rgba(34,197,94,.4);
+      border-radius: 20px;
+      padding: .15rem .6rem;
+      font-size: .65rem; font-weight: 800;
+      letter-spacing: 1px; text-transform: uppercase;
+      margin-top: .3rem;
+    }
+
+    /* TABLA PRODUCTOS */
+    .sec-productos { padding: 1.3rem 0; border-bottom: 1px solid var(--border); }
+    .tabla-header {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto;
+      gap: .5rem;
+      padding-bottom: .6rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: .3rem;
+    }
+    .th {
+      font-size: .62rem; font-weight: 800;
+      color: var(--orange); letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .th:not(:first-child) { text-align: right; }
+
+    .prod-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto;
+      gap: .5rem;
+      align-items: center;
+      padding: .85rem 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .prod-row:last-child { border-bottom: none; }
+    .prod-nombre    { font-size: .9rem; font-weight: 700; color: var(--ink); }
+    .prod-variacion { font-size: .72rem; color: var(--muted); margin-top: .1rem; }
+    .prod-precio, .prod-cant, .prod-subtotal {
+      text-align: right;
+      font-size: .88rem; font-weight: 600; color: var(--ink);
+    }
+    .prod-cant     { color: var(--orange); font-weight: 800; }
+    .prod-subtotal { font-weight: 800; }
+
+    /* DESGLOSE */
+    .desglose {
+      padding: 1rem 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+    }
+    .desglose-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: .82rem;
+      color: var(--muted);
+    }
+    .desglose-row.total-row {
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--ink);
+      border-top: 1px solid var(--border);
+      padding-top: .5rem;
+      margin-top: .3rem;
+    }
+
+    /* TOTAL */
+    .total-blk {
+      background: var(--navy);
+      border-radius: 12px;
+      padding: 1.2rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.3rem;
+    }
+    .total-label-txt {
+      font-size: .62rem; font-weight: 800;
+      color: rgba(255,255,255,.5);
+      letter-spacing: 2px; text-transform: uppercase;
+    }
+    .total-qty { font-size: .75rem; color: rgba(255,255,255,.3); margin-top: .2rem; }
+    .total-monto {
+      font-family: 'Darker Grotesque', sans-serif;
+      font-size: 2.4rem; font-weight: 900;
+      color: var(--orange); line-height: 1;
+    }
+    .total-cop { font-size: .65rem; color: rgba(255,255,255,.3); text-align: right; margin-top: .2rem; }
+
+    /* FOOTER */
+    .factura-footer {
+      background: #fafaf8;
+      border-top: 1px solid var(--border);
+      padding: 1rem 1.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    .footer-frase   { font-size: .75rem; color: var(--muted); font-style: italic; }
+    .footer-loc     { font-size: .7rem; font-weight: 800; color: var(--ink); letter-spacing: 1px; text-align: right; white-space: nowrap; }
+    .footer-copy    { font-size: .62rem; color: var(--muted); margin-top: .15rem; text-align: right; }
+
+    /* ACCIONES */
+    .actions-row { display: flex; gap: 1rem; margin-top: 1.5rem; }
+    .btn-primary {
+      flex: 1;
+      background: var(--orange); color: var(--white);
+      border: none; border-radius: 10px; padding: .85rem;
+      font-family: 'Darker Grotesque', sans-serif;
+      font-size: 1rem; font-weight: 800;
+      cursor: pointer; text-decoration: none; text-align: center;
+      transition: background .2s;
+    }
+    .btn-primary:hover { background: #e85a25; }
+    .btn-secondary {
+      flex: 1;
+      background: transparent; color: var(--ink);
+      border: 2px solid var(--border); border-radius: 10px; padding: .85rem;
+      font-family: 'Darker Grotesque', sans-serif;
+      font-size: 1rem; font-weight: 800;
+      cursor: pointer; text-decoration: none; text-align: center;
+      transition: border-color .2s;
+    }
+    .btn-secondary:hover { border-color: var(--ink); }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="{% url 'tienda' %}" class="navbar-brand">MOA<span>.</span></a>
+</nav>
+
+<!-- HERO -->
+<div class="confirm-hero">
+  <div class="checkmark">✓</div>
+  <h1>¡Pedido confirmado!</h1>
+  <p>Gracias {{ venta.usuario.nombres_usuario }}, hemos recibido tu orden.</p>
+  <div class="orden-badge">Orden #{{ venta.id }}</div>
+</div>
+
+<!-- FACTURA -->
+<div class="factura-wrapper">
+  <div class="factura">
+
+    <!-- HEADER -->
+    <div class="factura-header">
+      <div class="fh-logo">
+        <div class="fh-logo-sq"><span>M</span></div>
+        <div class="fh-brand">
+          <span class="fh-brand-name">OA</span>
+          <span class="fh-brand-sub">A la moda</span>
+        </div>
+      </div>
+      <div class="fh-right">
+        <div class="fh-label">Comprobante</div>
+        <div class="fh-num">#{{ venta.id }}</div>
+        <div class="fh-date">{{ venta.fecha|date:"d \d\e F \d\e Y" }} — {{ venta.fecha|date:"H:i" }}</div>
+      </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="factura-body">
+
+      <!-- CLIENTE + ESTADO -->
+      <div class="sec-top">
+        <div>
+          <div class="sec-label">Cliente</div>
+          <div class="cliente-nombre">{{ venta.usuario.nombres_usuario }} {{ venta.usuario.apellidos_usuario }}</div>
+          <div class="cliente-email">{{ venta.usuario.correo_usuario }}</div>
+        </div>
+        <div>
+          <div class="sec-label">Estado</div>
+          <div class="estado-val">Completado</div>
+          <div class="estado-badge">✓ Pago confirmado</div>
+        </div>
+      </div>
+
+      <!-- ENVIO -->
+      {% if envio %}
+      <div class="sec-envio">
+        <div class="sec-envio-title">📦 Datos de envío</div>
+        <div class="envio-grid">
+
+          <div class="envio-item">
+            <div class="envio-item-label">Dirección</div>
+            <div class="envio-item-val">{{ envio.direccion_envio }}</div>
+            {% if envio.barrio_envio %}
+              <div class="envio-item-sub">{{ envio.barrio_envio }}, {{ envio.ciudad_envio }}, {{ envio.departamento_envio }}</div>
+            {% else %}
+              <div class="envio-item-sub">{{ envio.ciudad_envio }}, {{ envio.departamento_envio }}</div>
+            {% endif %}
+          </div>
+
+          <div class="envio-item">
+            <div class="envio-item-label">Empresa transportadora</div>
+            <div class="envio-item-val">{{ envio.empresa_transportadora }}</div>
+            {% if envio.numero_guia %}
+              <div class="envio-item-sub">N° guía: {{ envio.numero_guia }}</div>
+            {% endif %}
+          </div>
+
+          <div class="envio-item">
+            <div class="envio-item-label">Fecha de envío</div>
+            <div class="envio-item-val">{{ envio.fecha_envio|date:"d/m/Y" }}</div>
+          </div>
+
+          <div class="envio-item">
+            <div class="envio-item-label">Llegada estimada</div>
+            <div class="envio-item-val fecha-llegada-val">
+              {% if envio.fecha_estipulada_llegada %}{{ envio.fecha_estipulada_llegada|date:"d/m/Y" }}{% else %}—{% endif %}
+            </div>
+            {% if envio.estado_envio == 'EN_TRANSITO' %}
+              <div class="badge-encamino">🚚 En camino</div>
+            {% elif envio.estado_envio == 'ENTREGADO' %}
+              <div class="badge-entregado">✓ Entregado</div>
+            {% else %}
+              <div class="badge-pendiente">⏳ Preparando</div>
+            {% endif %}
+          </div>
+
+          <div class="envio-item" style="grid-column:1/-1;">
+            <div class="envio-item-label">Teléfono de contacto</div>
+            <div class="envio-item-val">{{ envio.telefono_llegada }}</div>
+          </div>
+
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- PRODUCTOS -->
+      <div class="sec-productos">
+        <div class="tabla-header">
+          <span class="th">Producto</span>
+          <span class="th">Precio</span>
+          <span class="th">Cant.</span>
+          <span class="th">Subtotal</span>
+        </div>
+
+        {% for d in detalles %}
+        <div class="prod-row">
+          <div>
+            <div class="prod-nombre">{{ d.variacion.producto.nombre_producto }}</div>
+            <div class="prod-variacion">
+              {% if d.variacion.talla %}Talla: {{ d.variacion.talla }}{% endif %}
+              {% if d.variacion.talla and d.variacion.color %} · {% endif %}
+              {% if d.variacion.color %}Color: {{ d.variacion.color }}{% endif %}
+            </div>
+          </div>
+          <div class="prod-precio">${{ d.precio_unitario|floatformat:0|intcomma }}</div>
+          <div class="prod-cant">×{{ d.cantidad }}</div>
+          <div class="prod-subtotal">${{ d.subtotal|floatformat:0|intcomma }}</div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- DESGLOSE -->
+      <div class="desglose">
+        <div class="desglose-row">
+          <span>Subtotal</span>
+          <span>${{ venta.subtotal|floatformat:0|intcomma }}</span>
+        </div>
+        <div class="desglose-row">
+          <span>IVA (19%)</span>
+          <span>${{ venta.monto_iva|floatformat:0|intcomma }}</span>
+        </div>
+        <div class="desglose-row">
+          <span>Envío</span>
+<<<<<<< HEAD
+
+          <span style="font-weight:700;color:var(--orange);">
+            ${{ envio.costo_envio|floatformat:0|intcomma }}
+          </span>
+=======
+          <span style="color:var(--green); font-weight:700;">Gratis</span>
+>>>>>>> 80652bf46c1dc99bae8fb73815ca7fa19f7c918d
+        </div>
+      </div>
+
+      <!-- TOTAL -->
+      <div class="total-blk">
+        <div>
+          <div class="total-label-txt">Total pagado</div>
+          <div class="total-qty">{{ detalles|length }} producto{% if detalles|length != 1 %}s{% endif %}</div>
+        </div>
+        <div>
+          <div class="total-monto">${{ venta.monto_final|floatformat:0|intcomma }}</div>
+          <div class="total-cop">Pesos colombianos</div>
+        </div>
+      </div>
+
+    </div><!-- factura-body -->
+
+    <!-- FOOTER -->
+    <div class="factura-footer">
+      <div class="footer-frase">"Tu estilo, nuestra pasión. Gracias por elegirnos."</div>
+      <div>
+        <div class="footer-loc">COLOMBIA — BOGOTÁ, D.C.</div>
+        <div class="footer-copy">© {% now "Y" %} MOA Moda — Todos los derechos reservados</div>
+      </div>
+    </div>
+
+  </div><!-- factura -->
+
+  <!-- ACCIONES -->
+  <div class="actions-row">
+    <a href="{% url 'tienda' %}" class="btn-primary">🛍️ Seguir comprando</a>
+    <a href="{% url 'perfil_usuario' %}" class="btn-secondary">📦 Ver mis pedidos</a>
+  </div>
+
+</div><!-- factura-wrapper -->
+
+</body>
+</html>

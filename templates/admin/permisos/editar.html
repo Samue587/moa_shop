@@ -1,0 +1,52 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Editar Permiso — TiendaMoa07{% endblock %}
+{% block menu_permisos %}active{% endblock %}
+{% block navbar_title %}Editar Permiso{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">✏️ Editar Permiso</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_permisos' %}">Permisos</a> ›
+            Editar
+        </div>
+    </div>
+</div>
+
+<div class="card" style="max-width:600px;">
+    <div class="card-header">
+        <h3>🔑 {{ permiso.slug }}</h3>
+    </div>
+    <div class="card-body">
+
+        <div class="alert alert-warning">
+            ⚡ Si cambias el slug, asegúrate de actualizar cualquier referencia en el código.
+        </div>
+
+        <form action="{% url 'editar_permiso' permiso.id %}" method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label">Descripción <span class="required">*</span></label>
+                <input type="text" name="descripcion" class="form-control"
+                       value="{{ form.descripcion|default:permiso.descripcion }}" required>
+                <span class="form-help">Describe para qué sirve este permiso.</span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Slug <span class="required">*</span></label>
+                <input type="text" name="slug" class="form-control"
+                       value="{{ form.slug|default:permiso.slug }}" required>
+                <span class="form-help">Solo letras minúsculas, números y guiones bajos. Debe ser único.</span>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-warning">💾 Guardar Cambios</button>
+                <a href="{% url 'admin_permisos' %}" class="btn btn-secondary">❌ Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
