@@ -2,11 +2,9 @@ from django.db import models
 from django.contrib.auth.hashers import make_password
 from django.core.validators import MinValueValidator
 from decimal import Decimal
-<<<<<<< HEAD
-=======
 import uuid
 
->>>>>>> 80652bf46c1dc99bae8fb73815ca7fa19f7c918d
+
 
 
 # ╔══════════════════════════════════════════════════════════════════════╗
@@ -643,8 +641,6 @@ class Envio(models.Model):
             partes.append(f"Barrio {self.barrio_envio}")
         partes += [self.ciudad_envio, self.departamento_envio]
         return ', '.join(partes)
-<<<<<<< HEAD
-=======
 
 
 
@@ -669,4 +665,4 @@ class TokenReset(models.Model):
 
     def __str__(self):
         return f"Token de {self.usuario.correo_usuario}"
->>>>>>> 80652bf46c1dc99bae8fb73815ca7fa19f7c918d
+
