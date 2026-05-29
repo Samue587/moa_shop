@@ -36,7 +36,7 @@ INSTALLED_APPS = [
 # ══════════════════════════════════════════════════════
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # ← añadido
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -98,9 +98,6 @@ else:
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'tiendamoa07',
             'USER': 'root',
-            'PASSWORD': '',
-            'HOST': '127.0.0.1',
-            'PORT': '3307',
             'PASSWORD': 'Level_one19',
             'HOST': '127.0.0.1',
             'PORT': '3306',
@@ -138,13 +135,14 @@ CSRF_TRUSTED_ORIGINS = [
 CSRF_COOKIE_SECURE = False
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_SAMESITE = 'Lax'
+
 # ══════════════════════════════════════════════════════
 # ARCHIVOS ESTÁTICOS
 # ══════════════════════════════════════════════════════
 STATIC_URL = '/static/'
 STATICFILES_DIRS = []
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # ← añadido
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # ← añadido
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ══════════════════════════════════════════════════════
 # MEDIA — imágenes de productos
@@ -171,9 +169,8 @@ USE_THOUSAND_SEPARATOR = True
 # ══════════════════════════════════════════════════════
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 # ══════════════════════════════════════════════════════
-# EMAIL — Restablecimiento de contraseña
+# EMAIL — Gmail
 # ══════════════════════════════════════════════════════
 EMAIL_BACKEND       = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST          = 'smtp.gmail.com'
@@ -183,13 +180,7 @@ EMAIL_HOST_USER     = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL  = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 
-# ══════════════════════════════════════════════════════
-# EMAIL — Resend
-# ══════════════════════════════════════════════════════
-import resend
-resend.api_key = os.getenv('RESEND_API_KEY', '')
-
-# URLs de redirección tras login/logout
+# URLs de redirección
 LOGIN_URL           = '/login/'
 LOGIN_REDIRECT_URL  = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/login/'

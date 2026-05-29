@@ -1,6 +1,5 @@
 import os
 import uuid
-import resend
 
 from decimal import Decimal
 from datetime import date, timedelta
@@ -18,7 +17,8 @@ from django.db.models import Sum, Count, F, ExpressionWrapper, FloatField
 from django.db.models.functions import TruncDay
 from AppMoa.decorators import permiso_requerido
 
-
+from django.core.mail import send_mail
+from .models import TokenReset
 
 
 
@@ -2636,8 +2636,6 @@ def reportes_hub(request):
     return render(request, 'admin/reportes/reportes_hub.html')
 
     
-
-
 # ══════════════════════════════════════════════════════
 # RESTABLECIMIENTO DE CONTRASEÑA
 # ══════════════════════════════════════════════════════
@@ -2649,31 +2647,18 @@ def solicitar_reset(request):
             TokenReset.objects.filter(usuario=usuario, usado=False).update(usado=True)
             token = TokenReset.objects.create(usuario=usuario)
             enlace = request.build_absolute_uri(f'/reset-password/{token.token}/')
-            resend.Emails.send({
-                "from": "TiendaMoa <onboarding@resend.dev>",
-                "to": usuario.correo_usuario,
-                "subject": "Restablecer contraseña - TiendaMoa",
-                "html": f"""
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h2 style="color: #144272;">🏷️ TiendaMoa</h2>
-                    <p>Hola <strong>{usuario.nombres_usuario}</strong>,</p>
-                    <p>Recibimos una solicitud para restablecer tu contraseña.</p>
-                    <a href="{enlace}" style="
-                        display: inline-block;
-                        padding: 14px 28px;
-                        background: linear-gradient(135deg, #667eea, #764ba2);
-                        color: white;
-                        text-decoration: none;
-                        border-radius: 10px;
-                        font-weight: bold;
-                        margin: 20px 0;
-                    ">Restablecer contraseña</a>
-                    <p style="color: #888; font-size: 13px;">Este enlace expira en 24 horas. Si no solicitaste esto, ignora este correo.</p>
-                </div>
-                """,
-            })
+            send_mail(
+                subject='Restablecer contraseña - TiendaMoa',
+                message=f'Hola {usuario.nombres_usuario},\n\nHaz clic en el siguiente enlace para restablecer tu contraseña:\n\n{enlace}\n\nEste enlace expira en 24 horas.\n\nSi no solicitaste esto, ignora este correo.',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[usuario.correo_usuario],
+                fail_silently=False,
+            )
         except Usuario.DoesNotExist:
             pass
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f"ERROR EMAIL: {e}")
         return redirect('reset_enviado')
     return render(request, 'registration/password_reset_form.html')
 
@@ -2711,4 +2696,3 @@ def confirmar_reset(request, token):
 
 def reset_completo(request):
     return render(request, 'registration/password_reset_complete.html')
-

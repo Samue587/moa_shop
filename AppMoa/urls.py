@@ -11,6 +11,15 @@ urlpatterns = [
     path('logout/',   views.logout_view,   name='logout'),
     path('registro/', views.registro_view, name='registro'),
 
+
+# ══════════════════════════════════════════════════════
+    # RESTABLECIMIENTO DE CONTRASEÑA
+    # ══════════════════════════════════════════════════════
+    path('password-reset/', views.solicitar_reset, name='password_reset'),
+    path('password-reset/done/', views.reset_enviado, name='reset_enviado'),
+    path('reset-password/<uuid:token>/', views.confirmar_reset, name='confirmar_reset'),
+    path('reset-password/complete/', views.reset_completo, name='reset_completo'),
+    
     # ══════════════════════════════════════════════════════
     # TIENDA PÚBLICA
     # ══════════════════════════════════════════════════════
