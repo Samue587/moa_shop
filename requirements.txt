@@ -6,7 +6,5 @@ reportlab==4.4.10
 openpyxl==3.1.5
 gunicorn
 whitenoise
-cryptography    
-cryptography    
+cryptography      
 python-dotenv==1.2.2
-ex
