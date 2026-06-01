@@ -8,4 +8,5 @@ gunicorn
 whitenoise
 cryptography    
 cryptography    
-resend
+python-dotenv==1.2.2
+ex

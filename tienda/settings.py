@@ -1,7 +1,9 @@
 import os
 import logging
 from pathlib import Path
+from dotenv import load_dotenv
 
+load_dotenv()
 # ══════════════════════════════════════════════════════
 # RUTAS BASE
 # ══════════════════════════════════════════════════════
