@@ -2656,6 +2656,8 @@ def solicitar_reset(request):
             enlace = request.build_absolute_uri(
                 f'/reset-password/{token.token}/'
             )
+            
+            print(f"BREVO_API_KEY valor: {settings.BREVO_API_KEY[:10]}...")
 
             # ── Envío por API HTTP de Brevo ──
             configuration = sib_api_v3_sdk.Configuration()
