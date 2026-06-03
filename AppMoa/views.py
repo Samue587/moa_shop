@@ -2644,71 +2644,132 @@ def reportes_hub(request):
 def solicitar_reset(request):
     if request.method == 'POST':
         correo = request.POST.get('correo', '').strip()
- 
+
         try:
             print("\n========== RESET PASSWORD ==========")
             print(f"Correo ingresado: {correo}")
- 
+
             usuario = Usuario.objects.get(correo_usuario=correo)
- 
+
             print(f"Usuario encontrado: {usuario.nombres_usuario}")
             print(f"Correo usuario: {usuario.correo_usuario}")
- 
+
             TokenReset.objects.filter(
                 usuario=usuario,
                 usado=False
             ).update(usado=True)
- 
+
             token = TokenReset.objects.create(usuario=usuario)
- 
+
             print(f"Token generado: {token.token}")
- 
+
             enlace = request.build_absolute_uri(
                 f'/reset-password/{token.token}/'
             )
- 
+
             print(f"Enlace generado: {enlace}")
             print(f"Enviando correo a: {usuario.correo_usuario}")
- 
+
             print("========== VARIABLES EMAIL ==========")
             print("EMAIL_HOST_USER:", settings.EMAIL_HOST_USER)
             print("DEFAULT_FROM_EMAIL:", settings.DEFAULT_FROM_EMAIL)
             print("EMAIL_HOST_PASSWORD existe:", bool(settings.EMAIL_HOST_PASSWORD))
             print("====================================")
- 
             print("Probando DNS Brevo...")
- 
             try:
                 ip = socket.gethostbyname("smtp-relay.brevo.com")
                 print("IP encontrada:", ip)
             except Exception as e:
                 print("ERROR DNS:", e)
- 
+
             resultado = send_mail(
                 subject='Restablecer contraseña - TiendaMoa',
                 message=f'''Hola {usuario.nombres_usuario},
- 
+
 Haz clic en el siguiente enlace para restablecer tu contraseña:
- 
+
 {enlace}
- 
+
 Este enlace expira en 24 horas.
- 
+
 Si no solicitaste esto, ignora este correo.''',
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[usuario.correo_usuario],
                 fail_silently=False,
             )
- 
+
             print(f"Resultado send_mail: {resultado}")
             print("CORREO ENVIADO CORRECTAMENTE")
- 
+
         except Usuario.DoesNotExist:
             print(f"USUARIO NO ENCONTRADO: {correo}")
- 
+
         except Exception as e:
             print(f"ERROR EMAIL: {e}")
- 
+
         return redirect('reset_enviado')
- 
+
     return render(request, 'registration/password_reset_form.html')
+
+
+def reset_enviado(request):
+    return render(
+        request,
+        'registration/password_reset_done.html'
+    )
+
+
+def confirmar_reset(request, token):
+    try:
+        token_obj = TokenReset.objects.get(token=token)
+
+    except TokenReset.DoesNotExist:
+        return render(
+            request,
+            'registration/password_reset_confirm.html',
+            {'validlink': False}
+        )
+
+    if not token_obj.esta_vigente():
+        return render(
+            request,
+            'registration/password_reset_confirm.html',
+            {'validlink': False}
+        )
+
+    error = None
+
+    if request.method == 'POST':
+        nueva = request.POST.get('new_password1', '')
+        confirmar = request.POST.get('new_password2', '')
+
+        if nueva != confirmar:
+            error = 'Las contraseñas no coinciden.'
+
+        elif len(nueva) < 6:
+            error = 'La contraseña debe tener al menos 6 caracteres.'
+
+        else:
+            token_obj.usuario.set_password(nueva)
+            token_obj.usuario.save()
+
+            token_obj.usado = True
+            token_obj.save()
+
+            return redirect('reset_completo')
+
+    return render(
+        request,
+        'registration/password_reset_confirm.html',
+        {
+            'validlink': True,
+            'error': error
+        }
+    )
+
+
+def reset_completo(request):
+    return render(
+        request,
+        'registration/password_reset_complete.html'
+    )
