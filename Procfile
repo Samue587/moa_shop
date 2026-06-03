@@ -1,1 +1,1 @@
-web: gunicorn tienda.wsgi --bind 0.0.0.0:$PORT
+web: gunicorn tienda.wsgi --bind 0.0.0.0:$PORT --timeout 120
