@@ -17,7 +17,7 @@ from django.db.models import Sum, Count, F, ExpressionWrapper, FloatField
 from django.db.models.functions import TruncDay
 from AppMoa.decorators import permiso_requerido
 
-from django.core.mail import send_mail
+from django.core.mail import send_mail, get_connection
 from .models import TokenReset
 
 
@@ -2673,6 +2673,12 @@ def solicitar_reset(request):
             print("DEFAULT_FROM_EMAIL:", settings.DEFAULT_FROM_EMAIL)
             print("EMAIL_HOST_PASSWORD existe:", bool(settings.EMAIL_HOST_PASSWORD))
             print("====================================")
+
+            print("Probando conexión SMTP...")
+            conexion = get_connection()
+            conexion.open()
+            print("Conexión SMTP abierta correctamente")
+
 
             resultado = send_mail(
                 subject='Restablecer contraseña - TiendaMoa',
