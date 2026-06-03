@@ -2668,6 +2668,12 @@ def solicitar_reset(request):
             print(f"Enlace generado: {enlace}")
             print(f"Enviando correo a: {usuario.correo_usuario}")
 
+            print("========== VARIABLES EMAIL ==========")
+            print("EMAIL_HOST_USER:", settings.EMAIL_HOST_USER)
+            print("DEFAULT_FROM_EMAIL:", settings.DEFAULT_FROM_EMAIL)
+            print("EMAIL_HOST_PASSWORD existe:", bool(settings.EMAIL_HOST_PASSWORD))
+            print("====================================")
+
             resultado = send_mail(
                 subject='Restablecer contraseña - TiendaMoa',
                 message=f'''Hola {usuario.nombres_usuario},
