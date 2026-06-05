@@ -577,8 +577,6 @@ def checkout_procesar(request):
             # TOTAL CON ENVÍO
             monto_final = total_carrito + costo_envio
 
-            monto_final = total + costo_envio
-
             venta = Venta.objects.create(
                 usuario=usuario,
                 subtotal=subtotal,
@@ -598,13 +596,6 @@ def checkout_procesar(request):
                         f"'{variacion.producto.nombre_producto}' "
                         f"({variacion.talla} - {variacion.color})."
                     )
-
-                monto_final=total,
-
-            for item in carrito['items']:
-                variacion = VariacionProducto.objects.select_for_update().get(pk=item['variacion_id'])
-                if variacion.stock_actual < item['cantidad']:
-                    raise Exception(f"Stock insuficiente para '{variacion.producto.nombre_producto}' ({variacion.talla} - {variacion.color}).")
 
 
                 DetalleVenta.objects.create(
