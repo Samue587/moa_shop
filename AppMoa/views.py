@@ -235,11 +235,39 @@ def registro_view(request):
         u.set_password(password)
         u.save()
 
+        # ── Correo de bienvenida ──
+        try:
+            configuration = sib_api_v3_sdk.Configuration()
+            configuration.api_key['api-key'] = settings.BREVO_API_KEY
+
+            api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+                sib_api_v3_sdk.ApiClient(configuration)
+            )
+
+            send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+                to=[{"email": email, "name": nombres}],
+                sender={"email": "mauriciomorales0217@gmail.com", "name": "Tienda MOA"},
+                subject="¡Bienvenido a Tienda MOA!",
+                text_content=f'''¡Hola {nombres}!
+
+Bienvenido a Tienda MOA. Tu cuenta ha sido creada exitosamente.
+
+Ya puedes iniciar sesión y comenzar a comprar.
+
+¡Gracias por unirte a nosotros!
+
+Tienda MOA'''
+            )
+
+            api_instance.send_transac_email(send_smtp_email)
+
+        except Exception as e:
+            print(f"Error enviando bienvenida: {e}")
+
         messages.success(request, 'Registro exitoso. Ya puedes iniciar sesión.')
         return redirect('login')
 
     return render(request, 'registro.html')
-
 
 # ╔══════════════════════════════════════════════════════════════════════╗
 # ║                        TIENDA PÚBLICA                                ║
