@@ -8,7 +8,7 @@
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --bg:      #F6F5F2;
+            --bg: #F6F5F2;
             --white:   #FFFFFF;
             --ink:     #1A1A1A;
             --muted:   #888;
@@ -18,19 +18,88 @@
             --success: #22C55E;
             --grad:    linear-gradient(135deg, #E8973A 0%, #F7C948 100%);
         }
-        body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+     /* ══════════════════════════════════════
+   DARK MODE — Variables globales
+══════════════════════════════════════ */
+body.dark-mode {
+    --bg:     #0f0f0f;
+    --white:  #1a1a1a;
+    --ink:    #f0f0f0;
+    --muted:  #aaa;
+    --border: #333;
+}
+
+/* Navbar */
+body.dark-mode .navbar         { background: #1a1a1a; }
+body.dark-mode .logo-oa        { color: #f0f0f0; }
+body.dark-mode .nav-link       { color: #f0f0f0; }
+body.dark-mode .search-input   { background: #2a2a2a; border-color: #444; color: #f0f0f0; }
+
+/* Carrito y usuario */
+body.dark-mode .cart-btn       { background: #004E89; color: white; }
+body.dark-mode .cart-count     { background: var(--primary); }
+body.dark-mode .user-menu-btn  { background: #2a2a2a; color: #f0f0f0; }
+body.dark-mode .user-dropdown  { background: #1a1a1a; }
+body.dark-mode .dropdown-item  { color: #f0f0f0; border-color: #333; }
+body.dark-mode .dropdown-item:hover { background: #2a2a2a; }
+
+/* Categorías */
+body.dark-mode .category-chip-light { background: #1a1a1a; color: #f0f0f0; }
+
+/* Tarjetas de producto */
+body.dark-mode .product-card          { background: #1a1a1a; border-color: #333; }
+body.dark-mode .product-name          { color: #f0f0f0; }
+body.dark-mode .product-image-wrapper { background: #2a2a2a; }
+
+/* Tarjetas de variación (talla/color) */
+body.dark-mode .variacion-card          { background: #1a1a1a !important; }
+body.dark-mode .variacion-card.selected { background: #2a1a0a !important; }
+body.dark-mode .variacion-card *        { color: #f0f0f0 !important; }
+body.dark-mode .var-stock               { color: #aaa !important; }
+body.dark-mode .var-stock.low           { color: #F59E0B !important; }
+
+/* Botón agregar al carrito */
+
+/* Botones inline con style="background:white" */
+body.dark-mode a[style*="background:white"],
+body.dark-mode a[style*="background: white"] {
+    background:   #2a2a2a !important;
+    color:        #f0f0f0 !important;
+    border-color: #555    !important;
+}
+
+/* Botón ojo 👁 (border-radius:50%) */
+body.dark-mode a[style*="border-radius:50%"] {
+    background:   #2a2a2a !important;
+    border-color: #555    !important;
+}
+
+/* Botón agregar naranja — mantener color naranja */
+body.dark-mode a[style*="background:var(--primary)"],
+body.dark-mode a[style*="background: var(--primary)"] {
+    background: var(--primary) !important;
+    color:      white          !important;
+}
+
+        body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; transition: background 0.3s, color 0.3s; }
 
         /* NAVBAR */
-        .navbar { background: var(--white); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
-        .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-        .logo { font-family: 'Darker Grotesque', sans-serif; font-size: 28px; font-weight: 900; color: var(--ink); text-decoration: none; letter-spacing: -1px; }
-        .logo span { color: var(--primary); }
-        .nav-right { display: flex; align-items: center; gap: 16px; }
-        .back-link { display: flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: color .2s; }
-        .back-link:hover { color: var(--ink); }
-        .cart-btn { position: relative; display: flex; align-items: center; gap: 8px; background: var(--ink); color: white; padding: 9px 18px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 600; transition: background .2s; }
-        .cart-btn:hover { background: #333; }
-        .cart-badge { position: absolute; top: -6px; right: -6px; background: var(--primary); color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+        /* PON esto: */
+.navbar { background: #ffffff !important; box-shadow: 0 2px 20px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 100; }
+.navbar-inner { max-width: 1100px; margin: 0 auto; padding: 0 30px; height: 72px; display: flex; align-items: center; justify-content: space-between; }
+.logo { text-decoration: none; display: flex; align-items: center; gap: 10px; }
+.logo-sq { width: 44px; height: 38px; background: #FF6B35; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.logo-sq span { font-family: 'Darker Grotesque', sans-serif; font-size: 32px; font-weight: 900; color: white; line-height: 1; }
+.logo-text { display: flex; flex-direction: column; line-height: 1; }
+.logo-oa { font-family: 'Darker Grotesque', sans-serif; font-size: 20px; font-weight: 900; color: #1A1A2E !important; }
+.logo-shop { font-size: 11px; font-weight: 600; color: #FF6B35; letter-spacing: 4px; text-transform: uppercase; }
+.nav-back { display: flex; align-items: center; gap: 6px; color: #888 !important; text-decoration: none; font-size: 14px; font-weight: 600; transition: color 0.2s; }
+.nav-back:hover { color: #1A1A2E !important; }
+.nav-right { display: flex; align-items: center; gap: 16px; }
+.cart-btn { position: relative; display: flex; align-items: center; gap: 8px; background: #1A1A2E; color: white; padding: 9px 18px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 600; transition: background .2s; }
+.cart-btn:hover { background: #333; }
+.cart-badge { position: absolute; top: -6px; right: -6px; background: #FF6B35; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
 
         /* ALERTAS */
         .alerts { max-width: 1200px; margin: 0 auto; padding: 20px 32px 0; }
@@ -43,7 +112,7 @@
         .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
 
         /* FOTO */
-        .photo-wrap { background: var(--white); border-radius: 20px; border: 1px solid var(--border); overflow: hidden; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 80px; }
+        .photo-wrap { background: var(--white); border-radius: 20px; border: 1px solid var(--border); overflow: hidden; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 80px; transition: background 0.3s; }
         .photo-wrap img { width: 100%; height: 100%; object-fit: cover; }
 
         /* INFO */
@@ -51,57 +120,54 @@
         .breadcrumb { font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
         .breadcrumb a { color: var(--muted); text-decoration: none; }
         .breadcrumb a:hover { color: var(--ink); }
-
         .product-name { font-family: 'Darker Grotesque', sans-serif; font-size: 40px; font-weight: 900; line-height: 1.1; color: var(--ink); }
-
         .product-price { font-family: 'Darker Grotesque', sans-serif; font-size: 36px; font-weight: 900; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .price-note { font-size: 13px; color: var(--muted); margin-top: 2px; }
-
         .divider { height: 1px; background: var(--border); }
 
         /* VARIACIONES */
-        .section-label { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 12px; }
+        /* VARIACIONES */
+.section-label { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 12px; }
 
-        .variaciones-list { display: flex; flex-direction: column; gap: 10px; }
-        .variacion-card { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-radius: 12px; border: 2px solid var(--border); background: var(--white); cursor: pointer; transition: all .2s; }
-        .variacion-card:hover { border-color: var(--primary); }
-        .variacion-card.selected { border-color: var(--primary); background: #FFF8F0; }
-        .var-left { display: flex; align-items: center; gap: 10px; }
-        .var-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); background: var(--white); flex-shrink: 0; transition: all .2s; display: flex; align-items: center; justify-content: center; }
-        .variacion-card.selected .var-radio { border-color: var(--primary); background: var(--primary); }
-        .variacion-card.selected .var-radio::after { content: ''; width: 7px; height: 7px; border-radius: 50%; background: white; display: block; }
-        .var-info { display: flex; flex-direction: column; gap: 2px; }
-        .var-name { font-size: 14px; font-weight: 700; color: var(--ink); }
-        .var-sku { font-size: 12px; color: var(--muted); }
-        .var-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-        .var-price { font-family: 'Darker Grotesque', sans-serif; font-size: 18px; font-weight: 800; color: var(--ink); }
-        .var-stock { font-size: 12px; color: var(--muted); }
-        .var-stock.low { color: #F59E0B; font-weight: 600; }
+/* Colores */
+.colores-wrap { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+.color-btn { width: 32px; height: 32px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: all .2s; }
+.color-btn:hover { transform: scale(1.1); }
+.color-btn.selected { border-color: var(--primary); box-shadow: 0 0 0 2px white, 0 0 0 4px var(--primary); }
 
-        .no-stock { text-align: center; padding: 24px; background: var(--white); border-radius: 12px; border: 1px solid var(--border); color: var(--muted); font-size: 14px; }
+/* Tallas */
+.tallas-wrap { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.talla-btn { min-width: 48px; height: 40px; padding: 0 12px; border-radius: 8px; border: 2px solid var(--border); background: var(--white); color: var(--ink); font-size: 14px; font-weight: 700; cursor: pointer; transition: all .2s; }
+.talla-btn:hover { border-color: var(--primary); }
+.talla-btn.selected { border-color: var(--primary); background: var(--primary); color: white; }
+.talla-btn:disabled { opacity: .35; cursor: not-allowed; text-decoration: line-through; }
+
+/* Dark mode */
+body.dark-mode .talla-btn { background: #1a1a1a; color: #f0f0f0; border-color: #444; }
+body.dark-mode .talla-btn.selected { background: var(--primary); color: white; }
 
         /* CANTIDAD */
         .qty-section { display: flex; align-items: center; gap: 16px; }
         .qty-label { font-size: 14px; font-weight: 600; color: var(--ink); }
-        .qty-wrap { display: flex; align-items: center; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+        .qty-wrap { display: flex; align-items: center; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; transition: background 0.3s; }
         .qty-btn { width: 40px; height: 40px; border: none; background: transparent; font-size: 20px; font-weight: 600; cursor: pointer; transition: background .2s; display: flex; align-items: center; justify-content: center; color: var(--ink); }
         .qty-btn:hover { background: var(--border); }
-        #cantidad-display { width: 44px; text-align: center; font-size: 16px; font-weight: 700; }
+        #cantidad-display { width: 44px; text-align: center; font-size: 16px; font-weight: 700; color: var(--ink); }
 
         /* ACCIONES */
         .action-section { display: flex; flex-direction: column; gap: 10px; }
-        .btn-add { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px; background: var(--ink); color: white; border: none; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all .25s; font-family: inherit; }
-        .btn-add:hover:not(:disabled) { background: #333; }
+.btn-add { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px; background: var(--bg); color: var(--ink); border: 1px solid var(--border); border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all .25s; font-family: inherit; }        .btn-add:hover:not(:disabled) { background: #1a56db !important; }
         .btn-add:disabled { opacity: .4; cursor: not-allowed; }
         .btn-cart { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; background: var(--bg); color: var(--ink); border: 1px solid var(--border); border-radius: 14px; font-size: 15px; font-weight: 600; text-decoration: none; transition: all .25s; }
-        .btn-cart:hover { border-color: var(--ink); }
+        .btn-cart:hover { background: #1a56db !important; color: white !important; border-color: #1a56db !important; }
 
+        
         /* DESCRIPCIÓN */
         .desc-text { font-size: 15px; color: var(--muted); line-height: 1.7; }
 
         /* META */
         .meta-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-        .chip { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font-size: 13px; color: var(--muted); }
+        .chip { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font-size: 13px; color: var(--muted); transition: background 0.3s; }
         .chip strong { color: var(--ink); }
 
         @media (max-width: 800px) {
@@ -115,12 +181,19 @@
 </head>
 <body>
 
-<!-- NAVBAR -->
 <nav class="navbar">
-    <div class="nav-inner">
-        <a href="{% url 'tienda' %}" class="logo">M<span>O</span>A</a>
+    <div class="navbar-inner">
+        <a href="{% url 'tienda' %}" class="logo">
+            <div class="logo-sq">
+                <span>M</span>
+            </div>
+            <div class="logo-text">
+                <span class="logo-oa">OA</span>
+                <span class="logo-shop">Shop</span>
+            </div>
+        </a>
         <div class="nav-right">
-            <a href="{% url 'tienda' %}" class="back-link">← Volver</a>
+            <a href="{% url 'tienda' %}" class="nav-back">← Volver</a>
             <a href="{% url 'carrito_ver' %}" class="cart-btn">
                 🛒 Carrito
                 {% if cantidad_carrito > 0 %}
@@ -131,7 +204,6 @@
     </div>
 </nav>
 
-<!-- ALERTAS -->
 {% if messages %}
 <div class="alerts">
     {% for message in messages %}
@@ -145,7 +217,6 @@
 <div class="page">
     <div class="product-grid">
 
-        <!-- FOTO -->
         <div class="photo-wrap">
             {% if producto.foto %}
                 <img src="/imagenes/{{ producto.foto }}" alt="{{ producto.nombre_producto }}">
@@ -154,10 +225,8 @@
             {% endif %}
         </div>
 
-        <!-- INFO -->
         <div class="product-info">
 
-            <!-- Breadcrumb -->
             <div class="breadcrumb">
                 <a href="{% url 'tienda' %}">Tienda</a>
                 <span>›</span>
@@ -166,56 +235,34 @@
                 <span>{{ producto.nombre_producto }}</span>
             </div>
 
-            <!-- Nombre -->
             <h1 class="product-name">{{ producto.nombre_producto }}</h1>
 
             <div class="divider"></div>
 
-            <!-- Variaciones -->
             {% if variaciones %}
-
             <form action="{% url 'carrito_agregar' %}" method="post" id="form-agregar">
                 {% csrf_token %}
                 <input type="hidden" name="variacion_id" id="variacion-id-input" value="">
                 <input type="hidden" name="cantidad" id="cantidad-input" value="1">
 
                 <div>
-                    <div class="section-label">Selecciona talla y color</div>
-                    <div class="variaciones-list">
-                        {% for var in variaciones %}
-                        <div class="variacion-card {% if forloop.first %}selected{% endif %}"
-                             onclick="seleccionarVariacion(this, {{ var.id }}, {{ var.precio_con_iva }})">
-                            <div class="var-left">
-                                <div class="var-radio"></div>
-                                <div class="var-info">
-                                    <div class="var-name">Talla {{ var.talla }} — {{ var.color }}</div>
-                                    <div class="var-sku">SKU: {{ var.sku_unico }}</div>
-                                </div>
-                            </div>
-                            <div class="var-right">
-                                <div class="var-price">${{ var.precio_con_iva|floatformat:0|intcomma }}</div>
-                                <div class="var-stock {% if var.stock_actual <= 5 %}low{% endif %}">
-                                    {% if var.stock_actual <= 5 %}
-                                        ¡Solo {{ var.stock_actual }} disponibles!
-                                    {% else %}
-                                        {{ var.stock_actual }} disponibles
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
+                    <div>
+    <div class="section-label">Elige un color: <strong id="color-label">—</strong></div>
+    <div class="colores-wrap" id="colores-wrap"></div>
 
-                <!-- Precio dinámico -->
+    <div class="section-label">Elige una talla: <strong id="talla-label">—</strong></div>
+    <div class="tallas-wrap" id="tallas-wrap"></div>
+
+   <div id="stock-info" style="font-size:13px; color:var(--muted); margin-bottom:8px;"></div>
+</div>
+</div>
+                           
+
                 <div>
-                    <div class="product-price" id="precio-display">
-                        ${{ variaciones.0.precio_con_iva|floatformat:0|intcomma }}
-                    </div>
+                    <div class="product-price" id="precio-display">${{ variaciones.0.precio_con_iva|floatformat:0|intcomma }}</div>
                     <div class="price-note">IVA incluido</div>
                 </div>
 
-                <!-- Cantidad -->
                 <div class="qty-section">
                     <span class="qty-label">Cantidad</span>
                     <div class="qty-wrap">
@@ -225,16 +272,11 @@
                     </div>
                 </div>
 
-                <!-- Botones -->
                 <div class="action-section">
                     {% if usuario %}
-                        <button type="submit" class="btn-add" id="btn-agregar">
-                            🛒 Agregar al carrito
-                        </button>
+                        <button type="submit" class="btn-add" id="btn-agregar">🛒 Agregar al carrito</button>
                     {% else %}
-                        <a href="{% url 'login' %}" class="btn-add" style="text-decoration:none;">
-                            🔒 Inicia sesión para comprar
-                        </a>
+                        <a href="{% url 'login' %}" class="btn-add" style="text-decoration:none;">🔒 Inicia sesión para comprar</a>
                     {% endif %}
                     <a href="{% url 'carrito_ver' %}" class="btn-cart">Ver carrito</a>
                 </div>
@@ -242,14 +284,11 @@
             </form>
 
             {% else %}
-            <div class="no-stock">
-                😔 Este producto no tiene stock disponible en este momento.
-            </div>
+            <div class="no-stock">😔 Este producto no tiene stock disponible en este momento.</div>
             {% endif %}
 
             <div class="divider"></div>
 
-            <!-- Descripción -->
             {% if producto.descripcion_producto %}
             <div>
                 <div class="section-label">Descripción</div>
@@ -257,7 +296,6 @@
             </div>
             {% endif %}
 
-            <!-- Meta -->
             <div>
                 <div class="section-label">Detalles</div>
                 <div class="meta-chips">
@@ -272,40 +310,125 @@
 </div>
 
 <script>
-    let cantidadActual = 1;
+   const variaciones = [
+    {% for var in variaciones %}
+    {
+        id: {{ var.id }},
+        talla: "{{ var.talla }}",
+        color: "{{ var.color }}",
+        precio: {{ var.precio_con_iva }},
+        stock: {{ var.stock_actual }}
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+];
 
-    // Seleccionar la primera variación al cargar
-    document.addEventListener('DOMContentLoaded', function () {
-        const primera = document.querySelector('.variacion-card');
-        if (primera) {
-            const id = primera.getAttribute('onclick').match(/\d+/)[0];
-            const precio = primera.getAttribute('onclick').match(/[\d.]+/g)[1];
-            document.getElementById('variacion-id-input').value = id;
-            actualizarPrecio(precio);
-        }
+// Colores únicos
+const coloresUnicos = [...new Set(variaciones.map(v => v.color))];
+// Tallas únicas
+const tallasUnicas  = [...new Set(variaciones.map(v => v.talla))];
+
+let colorSeleccionado = null;
+let tallaSeleccionada = null;
+
+// Mapa de colores CSS
+const colorMap = {
+    'negro':'#1a1a1a','blanco':'#ffffff','rojo':'#e74c3c',
+    'azul':'#3498db','verde':'#27ae60','gris':'#95a5a6',
+    'amarillo':'#f1c40f','naranja':'#e67e22','rosa':'#e91e63',
+    'morado':'#9b59b6','cafe':'#795548','beige':'#f5f0e8',
+    'blanca':'#ffffff','negra':'#1a1a1a','gris oscuro':'#555'
+};
+
+function getColor(nombre) {
+    return colorMap[nombre.toLowerCase()] || '#ccc';
+}
+
+// Renderizar colores
+const coloresWrap = document.getElementById('colores-wrap');
+coloresUnicos.forEach(color => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'color-btn';
+    btn.title = color;
+    btn.style.background = getColor(color);
+    if (getColor(color) === '#ffffff') btn.style.border = '3px solid #ddd';
+    btn.onclick = () => seleccionarColor(color, btn);
+    coloresWrap.appendChild(btn);
+});
+
+// Renderizar tallas
+const tallasWrap = document.getElementById('tallas-wrap');
+tallasUnicas.forEach(talla => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'talla-btn';
+    btn.textContent = talla;
+    btn.dataset.talla = talla;
+    btn.onclick = () => seleccionarTalla(talla, btn);
+    tallasWrap.appendChild(btn);
+});
+
+function seleccionarColor(color, btn) {
+    colorSeleccionado = color;
+    document.getElementById('color-label').textContent = color;
+    document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    tallaSeleccionada = null;
+    document.getElementById('talla-label').textContent = '—';
+    document.getElementById('variacion-id-input').value = '';
+
+    tallasUnicas.forEach(talla => {
+        const tallaBtn = tallasWrap.querySelector(`[data-talla="${talla}"]`);
+        if (!tallaBtn) return;
+        const existe = variaciones.find(v => 
+            v.color.trim().toLowerCase() === color.trim().toLowerCase() && 
+            v.talla.trim().toLowerCase() === talla.trim().toLowerCase() && 
+            v.stock > 0
+        );
+        tallaBtn.disabled = !existe;
+        tallaBtn.classList.remove('selected');
     });
+    actualizarVariacion();
+}
 
-    function seleccionarVariacion(el, variacionId, precio) {
-        document.querySelectorAll('.variacion-card').forEach(c => c.classList.remove('selected'));
-        el.classList.add('selected');
-        document.getElementById('variacion-id-input').value = variacionId;
-        actualizarPrecio(precio);
-        cantidadActual = 1;
-        document.getElementById('cantidad-display').textContent = 1;
-        document.getElementById('cantidad-input').value = 1;
-    }
+function seleccionarTalla(talla, btn) {
+    if (btn.disabled) return;
+    tallaSeleccionada = talla;
+    document.getElementById('talla-label').textContent = talla;
+    document.querySelectorAll('.talla-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    actualizarVariacion();
+}
 
-    function actualizarPrecio(precio) {
-        const num = parseInt(precio);
-        const formatted = num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-        document.getElementById('precio-display').textContent = '$' + formatted;
-    }
+function actualizarVariacion() {
+    if (!colorSeleccionado || !tallaSeleccionada) return;
+    const v = variaciones.find(x => 
+        x.color.trim().toLowerCase() === colorSeleccionado.trim().toLowerCase() && 
+        x.talla.trim().toLowerCase() === tallaSeleccionada.trim().toLowerCase()
+    );
+    if (!v) return;
+    document.getElementById('variacion-id-input').value = v.id;
+    const num = parseInt(v.precio);
+    document.getElementById('precio-display').textContent = '$' + num.toLocaleString('es-CO');
+    const stockEl = document.getElementById('stock-info');
+    stockEl.textContent = v.stock <= 5 ? `⚠️ ¡Solo ${v.stock} disponibles!` : `✅ ${v.stock} disponibles`;
+    stockEl.style.color = v.stock <= 5 ? '#F59E0B' : 'var(--muted)';
+}
 
-    function cambiarCantidad(delta) {
-        cantidadActual = Math.max(1, cantidadActual + delta);
-        document.getElementById('cantidad-display').textContent = cantidadActual;
-        document.getElementById('cantidad-input').value = cantidadActual;
+// Cantidad
+let cantidadActual = 1;
+function cambiarCantidad(delta) {
+    cantidadActual = Math.max(1, cantidadActual + delta);
+    document.getElementById('cantidad-display').textContent = cantidadActual;
+    document.getElementById('cantidad-input').value = cantidadActual;
+}
+
+// Tema
+(function() {
+    if (localStorage.getItem('moa_tema') === 'dark') {
+        document.body.classList.add('dark-mode');
     }
+})();
 </script>
 
 </body>

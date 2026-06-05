@@ -665,4 +665,3 @@ class TokenReset(models.Model):
 
     def __str__(self):
         return f"Token de {self.usuario.correo_usuario}"
-

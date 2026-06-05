@@ -19,12 +19,65 @@
             --muted:        #888;
             --success:      #28A745;
         }
-        body {
-            font-family: 'Instrument Sans', sans-serif;
-            background: var(--light);
-            color: var(--dark);
-            min-height: 100vh;
-        }
+/* ══════════════════════════════════════
+   DARK MODE — Variables globales
+══════════════════════════════════════ */
+body.dark-mode {
+    --bg:     #0f0f0f;
+    --white:  #1a1a1a;
+    --ink:    #f0f0f0;
+    --muted:  #aaa;
+    --border: #333;
+}
+
+/* Navbar */
+body.dark-mode .navbar     { background: #ffffff !important; }
+body.dark-mode .logo-oa    { color: #1A1A2E !important; }
+body.dark-mode .nav-back   { color: #888 !important; }
+
+/* Cards */
+body.dark-mode .card       { background: #1a1a1a; }
+body.dark-mode .card-title { color: #f0f0f0; border-color: #333; }
+
+/* Labels y textos */
+body.dark-mode label       { color: #f0f0f0; }
+
+/* Inputs y selects */
+body.dark-mode input[type="text"],
+body.dark-mode input[type="number"],
+body.dark-mode input[type="tel"],
+body.dark-mode select {
+    background: #2a2a2a;
+    border-color: #444;
+    color: #f0f0f0;
+}
+body.dark-mode input:focus,
+body.dark-mode select:focus {
+    background: #333;
+    border-color: var(--primary);
+}
+body.dark-mode select:disabled,
+body.dark-mode input[readonly] {
+    background: #222;
+    color: #666;
+    border-color: #333;
+}
+
+/* Preview dirección */
+body.dark-mode #direccion_preview {
+    background: #222 !important;
+    color: #f0f0f0 !important;
+    border-color: #444 !important;
+}
+
+/* Resumen */
+body.dark-mode .resumen-item  { border-color: #333; }
+body.dark-mode .item-nombre   { color: #f0f0f0; }
+body.dark-mode .item-precio   { color: #f0f0f0; }
+body.dark-mode .item-foto     { background: #2a2a2a; }
+body.dark-mode .resume-line   { color: #f0f0f0; }
+ 
+        body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; transition: background 0.3s, color 0.3s; }
 
         /* ── NAVBAR ── */
         .navbar {
@@ -809,6 +862,13 @@ if(selDepto.value){
 }
 
 actualizarDireccion();
+
+(function() {
+    if (localStorage.getItem('moa_tema') === 'dark') {
+        document.body.classList.add('dark-mode');
+    }
+})();
+
 
 </script>
 

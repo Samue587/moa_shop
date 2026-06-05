@@ -152,11 +152,13 @@
 </div>
 
 <!-- TABLA PRINCIPAL -->
-<div class="card">
-  <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+<div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
     <h3 class="card-title">📋 Detalle de Inventario</h3>
-    <a href="?{{ request.GET.urlencode }}&export=excel" class="btn btn-sm btn-success">📊 Exportar Excel</a>
-  </div>
+    <div style="display:flex;gap:10px;">
+        <a href="{% url 'exportar_inventario_excel' %}" class="btn btn-success btn-sm">📊 Exportar Excel</a>
+        <a href="{% url 'exportar_inventario_pdf' %}"   class="btn btn-danger  btn-sm">📄 Exportar PDF</a>
+    </div>
+</div>
   <div class="card-body" style="padding:0;overflow-x:auto;">
     <table class="table">
       <thead>

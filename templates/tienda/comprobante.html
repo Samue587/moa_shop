@@ -18,30 +18,36 @@
       --green:  #22c55e;
       --navy:   #1e2d4a;
     }
-    body {
-      font-family: 'Instrument Sans', sans-serif;
-      background: var(--cream);
-      color: var(--ink);
-      min-height: 100vh;
-    }
+     /* DARK MODE */
+        body.dark-mode {
+            --bg: #0f0f0f;
+            --white: #1a1a1a;
+            --ink: #f0f0f0;
+            --muted: #aaa;
+            --border: #333;
+        }
+        body.dark-mode .navbar { background: #1a1a1a; }
+        body.dark-mode .items-panel,
+        body.dark-mode .summary-panel,
+        body.dark-mode .empty-card,
+        body.dark-mode .empty-logged { background: #1a1a1a; }
+        body.dark-mode .cart-item:hover { background: #222; }
+        body.dark-mode .qty-wrap { background: #2a2a2a; }
+        body.dark-mode .qty-btn { color: #f0f0f0; }
+        body.dark-mode .btn-continue { background: #2a2a2a; color: #f0f0f0; border-color: #444; }
+        body.dark-mode .item-meta span { background: #2a2a2a; border-color: #444; }
+ 
+        body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; transition: background 0.3s, color 0.3s; }
 
     /* NAVBAR */
-    .navbar {
-      background: var(--ink);
-      padding: 0 2rem;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .navbar-brand {
-      font-family: 'Darker Grotesque', sans-serif;
-      font-weight: 900;
-      font-size: 1.6rem;
-      color: var(--white);
-      text-decoration: none;
-    }
-    .navbar-brand span { color: var(--orange); }
+    .navbar { background: #ffffff !important; box-shadow: 0 2px 20px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 100; }
+.navbar-inner { max-width: 1100px; margin: 0 auto; padding: 0 30px; height: 72px; display: flex; align-items: center; justify-content: space-between; }
+.logo { text-decoration: none; display: flex; align-items: center; gap: 10px; }
+.logo-sq { width: 44px; height: 38px; background: #FF6B35; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.logo-sq span { font-family: 'Darker Grotesque', sans-serif; font-size: 32px; font-weight: 900; color: white; line-height: 1; }
+.logo-text { display: flex; flex-direction: column; line-height: 1; }
+.logo-oa { font-family: 'Darker Grotesque', sans-serif; font-size: 20px; font-weight: 900; color: #1A1A2E !important; }
+.logo-shop { font-size: 11px; font-weight: 600; color: #FF6B35; letter-spacing: 4px; text-transform: uppercase; }
 
     /* HERO */
     .confirm-hero {
@@ -369,7 +375,17 @@
 
 <!-- NAVBAR -->
 <nav class="navbar">
-  <a href="{% url 'tienda' %}" class="navbar-brand">MOA<span>.</span></a>
+    <div class="navbar-inner">
+        <a href="{% url 'tienda' %}" class="logo">
+            <div class="logo-sq">
+                <span>M</span>
+            </div>
+            <div class="logo-text">
+                <span class="logo-oa">OA</span>
+                <span class="logo-shop">Shop</span>
+            </div>
+        </a>
+    </div>
 </nav>
 
 <!-- HERO -->
@@ -546,6 +562,13 @@
   </div>
 
 </div><!-- factura-wrapper -->
+<script>
+(function() {
+    if (localStorage.getItem('moa_tema') === 'dark') {
+        document.body.classList.add('dark-mode');
+    }
+})();
+</script>
 
 </body>
 </html>

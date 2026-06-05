@@ -152,6 +152,17 @@ urlpatterns = [
    path('admin/reportes/clientes/',   views.reporte_clientes,   name='reporte_clientes'),
    path('admin/reportes/', views.reportes_hub, name='reportes_hub'),
 
+# ══════════════════════════════════════════════════════
+# EXPORTAR — REPORTES
+# ══════════════════════════════════════════════════════
+path('admin/exportar/clientes/excel/',    views.exportar_clientes_excel,    name='exportar_clientes_excel'),
+path('admin/exportar/clientes/pdf/',      views.exportar_clientes_pdf,      name='exportar_clientes_pdf'),
+path('admin/exportar/envios/excel/',      views.exportar_envios_excel,      name='exportar_envios_excel'),
+path('admin/exportar/envios/pdf/',        views.exportar_envios_pdf,        name='exportar_envios_pdf'),
+path('admin/exportar/inventario/excel/',  views.exportar_inventario_excel,  name='exportar_inventario_excel'),
+path('admin/exportar/inventario/pdf/',    views.exportar_inventario_pdf,    name='exportar_inventario_pdf'),
+path('admin/exportar/categorias/excel/',  views.exportar_categorias_excel,  name='exportar_categorias_excel'),
+path('admin/exportar/categorias/pdf/',    views.exportar_categorias_pdf,    name='exportar_categorias_pdf'),
 
 
 ]

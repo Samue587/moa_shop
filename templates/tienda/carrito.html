@@ -19,15 +19,56 @@
             --success:  #22C55E;
             --grad:     linear-gradient(135deg, #E8973A 0%, #F7C948 100%);
         }
-        body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+       /* ══════════════════════════════════════
+   DARK MODE — Variables globales
+══════════════════════════════════════ */
+body.dark-mode {
+    --bg:     #0f0f0f;
+    --white:  #1a1a1a;
+    --ink:    #f0f0f0;
+    --muted:  #aaa;
+    --border: #333;
+}
+
+/* Navbar */
+
+/* Paneles principales */
+body.dark-mode .items-panel,
+body.dark-mode .summary-panel,
+body.dark-mode .empty-card,
+body.dark-mode .empty-logged { background: #1a1a1a; }
+
+/* Items del carrito */
+body.dark-mode .cart-item:hover  { background: #222; }
+body.dark-mode .item-meta span   { background: #2a2a2a; border-color: #444; }
+
+/* Controles de cantidad */
+body.dark-mode .qty-wrap { background: #2a2a2a; }
+body.dark-mode .qty-btn  { color: #f0f0f0; }
+
+/* Botones */
+body.dark-mode .btn-continue  { background: #2a2a2a; color: #f0f0f0; border-color: #444; }
+body.dark-mode .btn-checkout  { background: #1A1A1A !important; color: #ffffff !important; border: 1px solid #444; }
+body.dark-mode .btn-checkout:hover { background: #1a56db !important; border-color: #1a56db; }
+ body.dark-mode .navbar { background: #ffffff !important; }
+ body.dark-mode .btn-explore,
+body.dark-mode .btn-main { background: #1A1A1A !important; color: #ffffff !important; border: 1px solid #444; }
+body.dark-mode .btn-explore { background: #1A1A1A !important; color: #ffffff !important; border: 1px solid #444; }
+body.dark-mode .btn-explore:hover { background: #1a56db !important; border-color: #1a56db; }
+
+        body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; transition: background 0.3s, color 0.3s; }
 
         /* ── NAVBAR ── */
-        .navbar { background: var(--white); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
-        .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-        .logo { font-family: 'Darker Grotesque', sans-serif; font-size: 28px; font-weight: 900; color: var(--ink); text-decoration: none; letter-spacing: -1px; }
-        .logo span { color: var(--primary); }
-        .back-link { display: flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: color .2s; }
-        .back-link:hover { color: var(--ink); }
+        .navbar { background: #ffffff !important; box-shadow: 0 2px 20px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 100; }
+.navbar-inner { max-width: 1100px; margin: 0 auto; padding: 0 30px; height: 72px; display: flex; align-items: center; justify-content: space-between; }
+.logo { text-decoration: none; display: flex; align-items: center; gap: 10px; }
+.logo-sq { width: 44px; height: 38px; background: #FF6B35; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.logo-sq span { font-family: 'Darker Grotesque', sans-serif; font-size: 32px; font-weight: 900; color: white; line-height: 1; }
+.logo-text { display: flex; flex-direction: column; line-height: 1; }
+.logo-oa { font-family: 'Darker Grotesque', sans-serif; font-size: 20px; font-weight: 900; color: #1A1A2E !important; }
+.logo-shop { font-size: 11px; font-weight: 600; color: #FF6B35; letter-spacing: 4px; text-transform: uppercase; }
+.nav-back { display: flex; align-items: center; gap: 6px; color: #888 !important; text-decoration: none; font-size: 14px; font-weight: 600; transition: color 0.2s; }
+.nav-back:hover { color: #1A1A2E !important; }
 
         /* ── PÁGINA VACÍA / NO LOGUEADO ── */
         .empty-page { min-height: calc(100vh - 68px); display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
@@ -100,19 +141,17 @@
 
         .summary-actions { padding: 0 24px 24px; display: flex; flex-direction: column; gap: 10px; }
         .btn-checkout { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 15px; background: var(--ink); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all .25s; font-family: inherit; text-decoration: none; }
-        .btn-checkout:hover { background: #333; }
+        .btn-checkout:hover { background: #1a56db !important; color: white; }
         .btn-continue { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; background: var(--bg); color: var(--ink); border: 1px solid var(--border); border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all .25s; font-family: inherit; text-decoration: none; }
-        .btn-continue:hover { border-color: var(--ink); }
-        .btn-clear { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 11px; background: transparent; color: var(--muted); border: none; border-radius: 12px; font-size: 13px; font-weight: 500; cursor: pointer; transition: color .2s; font-family: inherit; }
-        .btn-clear:hover { color: var(--danger); }
-
+        .btn-continue:hover { background: #1a56db !important; color: white !important; border-color: #1a56db !important; }s
+.btn-clear { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 14px; background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .2s; font-family: inherit; }
         /* ── CARRITO VACÍO (logueado) ── */
         .empty-logged { text-align: center; padding: 80px 40px; background: var(--white); border-radius: 16px; border: 1px solid var(--border); }
         .empty-logged svg { width: 100px; height: 100px; opacity: .3; margin-bottom: 24px; }
         .empty-logged h3 { font-family: 'Darker Grotesque', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 8px; }
         .empty-logged p { color: var(--muted); font-size: 15px; margin-bottom: 28px; }
         .btn-explore { display: inline-flex; align-items: center; gap: 8px; padding: 13px 32px; background: var(--ink); color: white; border-radius: 12px; font-weight: 700; font-size: 15px; text-decoration: none; transition: background .25s; }
-        .btn-explore:hover { background: #333; }
+.btn-explore:hover { background: #1a56db; }
 
         @media (max-width: 860px) {
             .cart-grid { grid-template-columns: 1fr; }
@@ -128,12 +167,21 @@
 
 <!-- NAVBAR -->
 <nav class="navbar">
-    <div class="nav-inner">
-        <a href="{% url 'tienda' %}" class="logo">M<span>O</span>A</a>
-        <a href="{% url 'tienda' %}" class="back-link">← Volver a la tienda</a>
+    <div class="navbar-inner">
+        <a href="{% url 'tienda' %}" class="logo">
+            <div class="logo-sq">
+                <span>M</span>
+            </div>
+            <div class="logo-text">
+                <span class="logo-oa">OA</span>
+                <span class="logo-shop">Shop</span>
+            </div>
+        </a>
+        <a href="{% url 'tienda' %}" class="nav-back">
+            ← Volver a la tienda
+        </a>
     </div>
 </nav>
-
 <!-- ══════════════════════════════════════════
      ESTADO 1: Usuario NO logueado
 ══════════════════════════════════════════ -->
@@ -284,10 +332,10 @@
 
                 <form action="{% url 'carrito_limpiar' %}" method="post" style="margin:0;">
                     {% csrf_token %}
-                    <button type="submit" class="btn-clear"
-                        onclick="return confirm('¿Vaciar el carrito?')">
-                        🗑 Vaciar carrito
-                    </button>
+                    <button type="submit" class="btn-clear" style="font-size: 15px; padding: 14px; border: 1px solid var(--border);"
+    onclick="return confirm('¿Vaciar el carrito?')">
+    🗑 Vaciar carrito
+</button>
                 </form>
             </div>
         </div>
@@ -310,6 +358,13 @@
 
 </div>
 {% endif %}
+<script>
+(function() {
+    if (localStorage.getItem('moa_tema') === 'dark') {
+        document.body.classList.add('dark-mode');
+    }
+})();
+</script>
 
 </body>
 </html>

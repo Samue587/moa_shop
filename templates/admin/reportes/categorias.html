@@ -44,7 +44,10 @@
 <div class="card" style="margin-bottom:20px;">
   <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
     <h3>📊 Ventas por Categoría</h3>
-    <a href="?{{ request.GET.urlencode }}&export=excel" class="btn btn-success btn-sm">📊 Exportar Excel</a>
+    <div style="display:flex;gap:10px;">
+        <a href="{% url 'exportar_categorias_excel' %}" class="btn btn-success btn-sm">📊 Exportar Excel</a>
+        <a href="{% url 'exportar_categorias_pdf' %}"   class="btn btn-danger  btn-sm">📄 Exportar PDF</a>
+    </div>
   </div>
   <div class="table-responsive">
     <table>
@@ -81,6 +84,7 @@
 </div>
 
 <!-- TOP PRODUCTO POR CATEGORÍA -->
+
 <div class="card">
   <div class="card-header"><h3>🏆 Producto más vendido por Categoría</h3></div>
   <div class="table-responsive">

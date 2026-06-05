@@ -22,13 +22,15 @@
         <form action="{% url 'crear_variacion' producto.id %}" method="post">
             {% csrf_token %}
  
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Talla <span class="required">*</span></label>
-                    <input type="text" name="talla" class="form-control"
-                           placeholder="Ej: S, M, L, XL, 38, 40"
-                           value="{{ form.talla|default:'' }}" maxlength="5" required>
-                </div>
+           <input type="hidden" name="talla" id="talla-input" value="{{ form.talla|default:'' }}" required>
+<div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:6px;">
+    {% for t in tallas_disponibles %}
+    <button type="button" onclick="elegirTalla('{{ t }}')"
+        style="padding:8px 14px; border-radius:8px; border:2px solid #e0e6ed; background:white; font-weight:600; cursor:pointer; font-size:13px;"
+        id="talla-btn-{{ t }}">{{ t }}</button>
+    {% endfor %}
+</div>
+<span class="form-help">Talla seleccionada: <strong id="talla-label">—</strong></span>
                 <div class="form-group">
                     <label class="form-label">Color <span class="required">*</span></label>
                     <input type="text" name="color" class="form-control"
@@ -151,5 +153,16 @@ iva.addEventListener(
     calcularPrecios
 )
 
+function elegirTalla(t) {
+    document.getElementById('talla-input').value = t;
+    document.getElementById('talla-label').textContent = t;
+    document.querySelectorAll('[id^="talla-btn-"]').forEach(b => {
+        b.style.background = 'white';
+        b.style.borderColor = '#e0e6ed';
+        b.style.color = '#1A1A1A';
+    });
+    const btn = document.getElementById('talla-btn-' + t);
+    if (btn) { btn.style.background = '#144272'; btn.style.borderColor = '#144272'; btn.style.color = 'white'; }
+}
 </script>
 {% endblock %}
