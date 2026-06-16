@@ -1,7 +1,10 @@
 from functools import wraps
 from django.shortcuts import redirect
+import logging
 
 from .models import Usuario, RolPermiso
+
+logger = logging.getLogger(__name__)
 
 
 # =====================================================
@@ -102,10 +105,13 @@ def permiso_requerido(slug_permiso):
             ).exists()
 
             if not tiene_permiso:
-
-                print("NO TIENE PERMISO:", slug_permiso)
-                print("ROL:", usuario.rol.nombre_rol)
-
+                rol_nombre = usuario.rol.nombre_rol if getattr(usuario, 'rol', None) else "SIN_ROL"
+                logger.warning(
+                    "Acceso denegado: permiso=%s, rol=%s, usuario_id=%s",
+                    slug_permiso,
+                    rol_nombre,
+                    getattr(usuario, 'id', None),
+                )
                 return redirect('admin_dashboard')
 
             return view_func(
