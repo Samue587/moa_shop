@@ -4,17 +4,17 @@
 {% block navbar_title %}Proveedores{% endblock %}
  
 
-{% if 'ver_proovedores' in permisos_usuario %}
-    {% block content %}
-        <div class="page-header">
-            <div>
-                <div class="page-title">🏭 Proveedores</div>
-                <div class="breadcrumb">
-                    <a href="{% url 'admin_dashboard' %}">Dashboard</a> › Proveedores
-                </div>
-            </div>
-            <a href="{% url 'crear_proveedor' %}" class="btn btn-success">➕ Nuevo Proveedor</a>
-        </div>
+{% if permisos_usuario.tiene_permiso('ver_proveedores') %}    {% block content %}
+        <div class="empty-state">
+    <div class="empty-icon">🏭</div>
+
+    {% if permisos_usuario.tiene_permiso('crear_proveedores') %}
+        <p>No hay proveedores registrados. <a href="{% url 'crear_proveedor' %}">Crear el primero</a></p>
+    {% else %}
+        <p>No hay proveedores registrados.</p>
+    {% endif %}
+
+</div>
         
         <div class="card">
             <div class="card-header">
@@ -56,8 +56,12 @@
                             </td>
                             <td>
                                 <div style="display:flex;gap:8px;">
-                                    <a href="{% url 'editar_proveedor' proveedor.id %}" class="btn btn-warning btn-sm">✏️ Editar</a>
-                                    <a href="{% url 'eliminar_proveedor' proveedor.id %}" class="btn btn-danger btn-sm">🗑️ Eliminar</a>
+                           {% if permisos_usuario.tiene_permiso('editar_proveedores') %}
+                           <a href="{% url 'editar_proveedor' proveedor.id %}" class="btn btn-warning btn-sm">✏️ Editar</a>
+                        {% endif %}                             
+                      {% if permisos_usuario.tiene_permiso('eliminar_proveedores') %}
+                      <a href="{% url 'eliminar_proveedor' proveedor.id %}" class="btn btn-danger btn-sm">🗑️ Eliminar</a>
+                               {% endif %}
                                 </div>
                             </td>
                         </tr>
@@ -66,7 +70,13 @@
                             <td colspan="6">
                                 <div class="empty-state">
                                     <div class="empty-icon">🏭</div>
-                                    <p>No hay proveedores registrados. <a href="{% url 'crear_proveedor' %}">Crear el primero</a></p>
+                                    {% if permisos_usuario.tiene_permiso('crear_proveedores') %}
+                                   <p>No hay proveedores registrados. <a href="{% url 'crear_proveedor' %}">Crear el primero</a></p>
+                                  {% else %}
+                                  <p>No hay proveedores registrados.</p>
+                                      {% endif %}
+                                      <p>No hay proveedores registrados.</p>
+                               {% endif %}
                                 </div>
                             </td>
                         </tr>

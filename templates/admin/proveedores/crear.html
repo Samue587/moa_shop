@@ -5,8 +5,7 @@
  
 
 
-{% if 'crear_proovedores' in permisos_usuario %}
-    {% block content %}
+{% if permisos_usuario.tiene_permiso('crear_proveedores') %}    {% block content %}
         <div class="page-header">
             <div>
                 <div class="page-title">➕ Nuevo Proveedor</div>
