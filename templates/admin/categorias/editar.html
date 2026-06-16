@@ -3,8 +3,12 @@
 {% block menu_categorias %}active{% endblock %}
 {% block navbar_title %}Editar Categoría{% endblock %}
 
-{% if permisos_usuario.tiene_permiso('editar_categorias') %}
 {% block content %}
+{% if not permisos_usuario.tiene_permiso('editar_categorias') %}
+    <div class="alert alert-danger">
+        No tienes permiso para editar categorías.
+    </div>
+{% else %}
 <div class="page-header">
     <div>
         <div class="page-title">✏️ Editar Categoría</div>
@@ -55,5 +59,5 @@
         </form>
     </div>
 </div>
-{% endblock %}
 {% endif %}
+{% endblock %}

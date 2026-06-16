@@ -53,22 +53,27 @@
                         {% endif %}
                     </td>
                     <td>
-                        <div style="display:flex;gap:8px;">
-                            {% if permisos_usuario.tiene_permiso('editar_categorias') %}
-                            <a href="{% url 'editar_categoria' categoria.id %}" class="btn btn-warning btn-sm">✏️ Editar</a>
-                            {% endif %}
-                            {% if permisos_usuario.tiene_permiso('eliminar_categorias') %}
-                            <a href="{% url 'eliminar_categoria' categoria.id %}" class="btn btn-danger btn-sm">🗑️ Eliminar</a>
-                            {% endif %}
-                        </div>
-                    </td>
+    <div style="display:flex;gap:8px;">
+        {% if permisos_usuario.tiene_permiso('editar_categorias') %}
+        <a href="{% url 'editar_categoria' categoria.id %}" class="btn btn-warning btn-sm">✏️ Editar</a>
+        {% endif %}
+
+        {% if permisos_usuario.tiene_permiso('eliminar_categorias') %}
+        <a href="{% url 'eliminar_categoria' categoria.id %}" class="btn btn-danger btn-sm">🗑️ Eliminar</a>
+        {% endif %}
+    </div>
+</td>
                 </tr>
                 {% empty %}
                 <tr>
                     <td colspan="6">
                         <div class="empty-state">
                             <div class="empty-icon">📚</div>
-                            <p>No hay categorías registradas. <a href="{% url 'crear_categoria' %}">Crear la primera</a></p>
+                           {% if permisos_usuario.tiene_permiso('crear_categorias') %}
+                             <p>No hay categorías registradas. <a href="{% url 'crear_categoria' %}">Crear la primera</a></p>
+                           {% else %}
+                        <p>No hay categorías registradas.</p>
+                         {% endif %}
                         </div>
                     </td>
                 </tr>

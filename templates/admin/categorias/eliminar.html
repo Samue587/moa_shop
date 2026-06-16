@@ -3,8 +3,12 @@
 {% block menu_categorias %}active{% endblock %}
 {% block navbar_title %}Eliminar Categoría{% endblock %}
 
-{% if permisos_usuario.tiene_permiso('eliminar_categorias') %}
 {% block content %}
+{% if not permisos_usuario.tiene_permiso('eliminar_categorias') %}
+    <div class="alert alert-danger">
+        No tienes permiso para eliminar categorías.
+    </div>
+{% else %}
 <div class="page-header">
     <div>
         <div class="page-title">🗑️ Eliminar Categoría</div>
@@ -55,5 +59,5 @@
  
     </div>
 </div>
-{% endblock %}
 {% endif %}
+{% endblock %}

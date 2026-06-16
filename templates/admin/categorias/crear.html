@@ -3,8 +3,12 @@
 {% block menu_categorias %}active{% endblock %}
 {% block navbar_title %}Crear Categoría{% endblock %}
 
-{% if permisos_usuario.tiene_permiso('crear_categorias') %}
 {% block content %}
+{% if not permisos_usuario.tiene_permiso('crear_categorias') %}
+    <div class="alert alert-danger">
+        No tienes permiso para crear categorías.
+    </div>
+{% else %}
 <div class="page-header">
     <div>
         <div class="page-title">➕ Nueva Categoría</div>
@@ -53,5 +57,5 @@
         </form>
     </div>
 </div>
-{% endblock %}
 {% endif %}
+{% endblock %}
