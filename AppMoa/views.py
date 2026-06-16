@@ -19,10 +19,6 @@ from django.db.models.functions import TruncDay
 from AppMoa.decorators import permiso_requerido
 from .models import TokenReset
 
-# Al inicio del archivo, junto a los demás imports
-from django.db.models import Count, Sum
-from django.db.models import Sum
-
 import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 
@@ -73,9 +69,6 @@ CIUDADES_POR_DEPARTAMENTO = {
     "Huila": ["Neiva", "Pitalito", "Garzón", "La Plata", "Palermo"],
     "La Guajira": ["Riohacha", "Maicao"],
     "Magdalena": ["Santa Marta", "Ciénaga", "El Banco"],
-    "Huila": ["Neiva", "Pitalito", "Garzón"],
-    "La Guajira": ["Riohacha", "Maicao"],
-    "Magdalena": ["Santa Marta", "Ciénaga"],
     "Meta": ["Villavicencio", "Acacías"],
     "Nariño": ["Pasto", "Tumaco", "Ipiales"],
     "Norte de Santander": ["Cúcuta", "Ocaña", "Pamplona"],
