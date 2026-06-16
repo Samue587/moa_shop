@@ -93,7 +93,6 @@ COSTOS_ENVIO = {
     "Sucre": 22000,
     "Tolima": 13000,
     "Valle del Cauca": 18000,
-    "Putumayo": 26000,
     "Caquetá": 25000,
     "Putumayo": 28000,
 }
