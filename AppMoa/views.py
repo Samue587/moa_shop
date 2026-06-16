@@ -1606,7 +1606,7 @@ def crear_catalogo(request):
 
 
 @admin_required
-@permiso_requerido("crear_catalogos")
+@permiso_requerido("editar_catalogos")
 def editar_catalogo(request, id):
     catalogo = get_object_or_404(Catalogo, pk=id)
     if request.method == "POST":
@@ -2351,6 +2351,7 @@ def crear_entrada(request):
 
 
 @admin_required
+@permiso_requerido("ver_entradas")
 def detalle_entrada(request, id):
     entrada = get_object_or_404(Entrada.objects.select_related("proveedor"), pk=id)
     detalles = DetalleEntrada.objects.select_related("variacion__producto").filter(
@@ -2441,6 +2442,7 @@ def listar_ventas(request):
 
 
 @admin_required
+@permiso_requerido("ver_ventas")
 def detalle_venta(request, id):
     venta = get_object_or_404(Venta.objects.select_related("usuario"), pk=id)
     detalles = DetalleVenta.objects.select_related("variacion__producto").filter(
@@ -2732,6 +2734,7 @@ def listar_envios(request):
 
 
 @admin_required
+@permiso_requerido("ver_envios")
 def detalle_envio(request, id):
     envio = get_object_or_404(
         Envio.objects.select_related("venta__usuario", "usuario"), pk=id
@@ -2887,6 +2890,7 @@ def envio_cambiar_estado(request, id):
 
 
 @admin_required
+@permiso_requerido("ver_reportes")
 def reporte_inventario(request):
     """Reporte 1 — Inventario por Producto"""
     filtro_talla = request.GET.get("talla", "")
@@ -3045,6 +3049,7 @@ def reporte_inventario(request):
 
 
 @admin_required
+@permiso_requerido("ver_reportes")
 def reporte_ventas(request):
     """Reporte 2 — Ventas por Fecha y Usuario"""
     busqueda_usuario = request.GET.get("busqueda_usuario", "").strip()
@@ -3137,6 +3142,7 @@ def reporte_ventas(request):
 
 
 @admin_required
+@permiso_requerido("ver_reportes")
 def reporte_categorias(request):
     """Reporte 3 — Ventas por Categoría"""
     from django.db.models import F, ExpressionWrapper, FloatField
@@ -3198,6 +3204,7 @@ def reporte_categorias(request):
 
 
 @admin_required
+@permiso_requerido("ver_reportes")
 def reporte_envios(request):
     """Reporte 4 — Estado de Envíos"""
     filtro_estado = request.GET.get("estado", "")
@@ -3271,6 +3278,7 @@ def reporte_envios(request):
 
 
 @admin_required
+@permiso_requerido("ver_reportes")
 def reporte_clientes(request):
     """Reporte 5 — Comportamiento de Clientes"""
     busqueda = request.GET.get("q", "").strip()
@@ -3325,6 +3333,7 @@ def reporte_clientes(request):
 
 
 @admin_required
+@permiso_requerido("ver_reportes")
 def reportes_hub(request):
     return render(request, "admin/reportes/reportes_hub.html")
 

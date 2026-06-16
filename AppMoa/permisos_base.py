@@ -7,6 +7,9 @@ MODULOS = [
     'entradas',
     'roles',
     'permisos',
+    'catalogos',
+    'envios',
+    'reportes',
     'dashboard'
 ]
 
