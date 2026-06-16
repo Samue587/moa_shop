@@ -4,6 +4,11 @@
 {% block navbar_title %}Eliminar Catálogo{% endblock %}
  
 {% block content %}
+{% if not permisos_usuario.tiene_permiso('eliminar_catalogos') %}
+    <div class="alert alert-danger">
+        No tienes permiso para eliminar catálogos.
+    </div>
+{% else %}
 <div class="page-header">
     <div>
         <div class="page-title">🗑️ Eliminar Catálogo</div>
@@ -57,4 +62,5 @@
  
     </div>
 </div>
+{% endif %}
 {% endblock %}

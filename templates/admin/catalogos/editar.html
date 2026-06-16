@@ -4,6 +4,11 @@
     {% block navbar_title %}Editar Catálogo{% endblock %}
     
     {% block content %}
+    {% if not permisos_usuario.tiene_permiso('editar_catalogos') %}
+    <div class="alert alert-danger">
+        No tienes permiso para editar catálogos.
+    </div>
+{% else %}
     <div class="page-header">
         <div>
             <div class="page-title">✏️ Editar Catálogo</div>
@@ -69,4 +74,5 @@
     
         </div>
     </div>
+    {% endblock %}
     {% endblock %}
