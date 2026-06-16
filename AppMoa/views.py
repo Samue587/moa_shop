@@ -41,17 +41,6 @@ from .models import (
 # =================PERMISOS=========================================
 
 
-def permisos_usuario(request):
-
-    permisos = []
-
-    if request.user.is_authenticated:
-
-        permisos = request.user.rol.permisos.values_list("slug", flat=True)
-
-    return {"permisos_usuario": permisos}
-
-
 UPLOAD_DIR = settings.MEDIA_ROOT
 
 CIUDADES_POR_DEPARTAMENTO = {
