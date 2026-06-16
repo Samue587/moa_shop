@@ -5,6 +5,7 @@ MODULOS = [
     'clientes',
     'proveedores',
     'entradas',
+    'variaciones',
     'roles',
     'permisos',
     'catalogos',
@@ -12,7 +13,6 @@ MODULOS = [
     'reportes',
     'dashboard'
 ]
-
 ACCIONES = [
     ('ver', 'Ver'),
     ('crear', 'Crear'),
