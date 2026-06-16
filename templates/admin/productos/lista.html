@@ -11,7 +11,9 @@
                 <a href="{% url 'admin_dashboard' %}">Dashboard</a> › Productos
             </div>
         </div>
+        {% if permisos_usuario.tiene_permiso('crear_productos') %}
         <a href="{% url 'crear_producto' %}" class="btn btn-success">➕ Nuevo Producto</a>
+        {% endif %}
     </div>
     
     <!-- FILTROS -->
@@ -97,9 +99,13 @@
     
                 <!-- Acciones -->
                 <div style="display:flex;gap:6px;padding-top:12px;border-top:1px solid #f0f0f0;flex-wrap:wrap;">
+                    {% if permisos_usuario.tiene_permiso('editar_productos') %}
                     <a href="{% url 'editar_producto' producto.id %}" class="btn btn-warning btn-sm" style="flex:1;justify-content:center;">✏️ Editar</a>
+                    {% endif %}
                     <a href="{% url 'admin_variaciones' producto.id %}" class="btn btn-info btn-sm" style="flex:1;justify-content:center;">🎨 Variaciones</a>
+                    {% if permisos_usuario.tiene_permiso('eliminar_productos') %}
                     <a href="{% url 'eliminar_producto' producto.id %}" class="btn btn-danger btn-sm" style="flex:1;justify-content:center;">🗑️</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -126,7 +132,7 @@
     <div class="card">
         <div class="empty-state">
             <div class="empty-icon">📦</div>
-            <p>No hay productos registrados. <a href="{% url 'crear_producto' %}">Crear el primero</a></p>
+            <p>No hay productos registrados. {% if permisos_usuario.tiene_permiso('crear_productos') %}<a href="{% url 'crear_producto' %}">Crear el primero</a>{% endif %}</p>
         </div>
     </div>
     {% endif %}

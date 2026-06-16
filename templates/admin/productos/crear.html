@@ -3,7 +3,7 @@
 {% block menu_productos %}active{% endblock %}
 {% block navbar_title %}Crear Producto{% endblock %}
 
-{% if 'crear_productos' in permisos_usuario %}
+{% if permisos_usuario.tiene_permiso('crear_productos') %}
     {% block content %}
         <div class="page-header">
             <div>

@@ -4,7 +4,7 @@
 {% block navbar_title %}Eliminar Producto{% endblock %}
  
 
-{% if 'eliminar_productos' in permisos_usuario %}
+{% if permisos_usuario.tiene_permiso('eliminar_productos') %}
     {% block content %}
    
         <div class="page-header">
