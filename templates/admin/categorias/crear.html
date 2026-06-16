@@ -2,7 +2,8 @@
 {% block title %}Crear Categoría — TiendaMoa07{% endblock %}
 {% block menu_categorias %}active{% endblock %}
 {% block navbar_title %}Crear Categoría{% endblock %}
- 
+
+{% if permisos_usuario.tiene_permiso('crear_categorias') %}
 {% block content %}
 <div class="page-header">
     <div>
@@ -53,3 +54,4 @@
     </div>
 </div>
 {% endblock %}
+{% endif %}

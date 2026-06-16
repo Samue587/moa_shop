@@ -2,7 +2,8 @@
 {% block title %}Eliminar Categoría — TiendaMoa07{% endblock %}
 {% block menu_categorias %}active{% endblock %}
 {% block navbar_title %}Eliminar Categoría{% endblock %}
- 
+
+{% if permisos_usuario.tiene_permiso('eliminar_categorias') %}
 {% block content %}
 <div class="page-header">
     <div>
@@ -55,3 +56,4 @@
     </div>
 </div>
 {% endblock %}
+{% endif %}
