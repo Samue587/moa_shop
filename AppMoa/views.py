@@ -2888,15 +2888,101 @@ def eliminar_envio(request, id):
 
 
 @admin_required
+@admin_required
 def envio_cambiar_estado(request, id):
     if request.method == "POST":
-        envio = get_object_or_404(Envio, pk=id)
-        envio.estado_envio = (
+        envio = get_object_or_404(Envio.objects.select_related('venta__usuario'), pk=id)
+        nuevo_estado = (
             request.POST.get("estado")
             or request.POST.get("estado_envio")
             or envio.estado_envio
         )
+        envio.estado_envio = nuevo_estado
         envio.save()
+
+        if nuevo_estado in ['EN_CAMINO', 'ENTREGADO', 'CANCELADO']:
+            try:
+                usuario = envio.venta.usuario
+                if nuevo_estado == 'EN_CAMINO':
+                    asunto = f"🚚 Tu pedido #{envio.venta.id} va en camino — MOA"
+                    mensaje = f"""
+                    <div style="font-family:sans-serif; max-width:600px; margin:0 auto; background:#f7f7f7; padding:30px; border-radius:12px;">
+                        <div style="background:#FF6B35; padding:20px; border-radius:8px; text-align:center; margin-bottom:24px;">
+                            <h1 style="color:white; font-size:26px; margin:0;">MOA Moda</h1>
+                            <p style="color:rgba(255,255,255,0.8); margin:4px 0 0;">Actualización de tu pedido</p>
+                        </div>
+                        <h2 style="color:#1A1A2E;">🚚 ¡Tu pedido va en camino!</h2>
+                        <p style="color:#555;">Hola <strong>{usuario.nombres_usuario}</strong>, tu pedido ya fue despachado y está en camino.</p>
+                        <div style="background:white; border-radius:10px; padding:20px; margin:20px 0; border-left:4px solid #FF6B35;">
+                            <p style="margin:0; color:#555;"><strong>Pedido:</strong> #{envio.venta.id}</p>
+                            <p style="margin:6px 0 0; color:#555;"><strong>Empresa:</strong> {envio.empresa_transportadora or '—'}</p>
+                            <p style="margin:6px 0 0; color:#555;"><strong>N° Guía:</strong> {envio.numero_guia or '—'}</p>
+                            <p style="margin:6px 0 0; color:#555;"><strong>Llegada estimada:</strong> {envio.fecha_estipulada_llegada.strftime('%d/%m/%Y') if envio.fecha_estipulada_llegada else '—'}</p>
+                            <p style="margin:6px 0 0; color:#555;"><strong>Dirección:</strong> {envio.direccion_completa}</p>
+                        </div>
+                        <p style="color:#555;">Cuando recibas tu pedido, recuerda confirmarlo desde tu perfil.</p>
+                        <div style="text-align:center; margin-top:28px;">
+                            <p style="color:#aaa; font-size:12px;">© 2026 MOA Moda — Colombia, Bogotá D.C.</p>
+                        </div>
+                    </div>
+                    """
+                elif nuevo_estado == 'ENTREGADO':
+                    asunto = f"✅ Tu pedido #{envio.venta.id} fue marcado como entregado — MOA"
+                    mensaje = f"""
+                    <div style="font-family:sans-serif; max-width:600px; margin:0 auto; background:#f7f7f7; padding:30px; border-radius:12px;">
+                        <div style="background:#FF6B35; padding:20px; border-radius:8px; text-align:center; margin-bottom:24px;">
+                            <h1 style="color:white; font-size:26px; margin:0;">MOA Moda</h1>
+                            <p style="color:rgba(255,255,255,0.8); margin:4px 0 0;">Actualización de tu pedido</p>
+                        </div>
+                        <h2 style="color:#1A1A2E;">✅ Pedido entregado</h2>
+                        <p style="color:#555;">Hola <strong>{usuario.nombres_usuario}</strong>, el administrador marcó tu pedido como entregado.</p>
+                        <div style="background:white; border-radius:10px; padding:20px; margin:20px 0; border-left:4px solid #22c55e;">
+                            <p style="margin:0; color:#555;"><strong>Pedido:</strong> #{envio.venta.id}</p>
+                            <p style="margin:6px 0 0; color:#555;"><strong>Dirección entregada:</strong> {envio.direccion_completa}</p>
+                        </div>
+                        <p style="color:#555;">Si tienes alguna novedad con tu pedido, contáctanos.</p>
+                        <div style="text-align:center; margin-top:28px;">
+                            <p style="color:#aaa; font-size:12px;">© 2026 MOA Moda — Colombia, Bogotá D.C.</p>
+                        </div>
+                    </div>
+                    """
+                else:  # CANCELADO
+                    asunto = f"❌ Tu pedido #{envio.venta.id} fue cancelado — MOA"
+                    mensaje = f"""
+                    <div style="font-family:sans-serif; max-width:600px; margin:0 auto; background:#f7f7f7; padding:30px; border-radius:12px;">
+                        <div style="background:#e74c3c; padding:20px; border-radius:8px; text-align:center; margin-bottom:24px;">
+                            <h1 style="color:white; font-size:26px; margin:0;">MOA Moda</h1>
+                            <p style="color:rgba(255,255,255,0.8); margin:4px 0 0;">Actualización de tu pedido</p>
+                        </div>
+                        <h2 style="color:#1A1A2E;">❌ Pedido cancelado</h2>
+                        <p style="color:#555;">Hola <strong>{usuario.nombres_usuario}</strong>, lamentamos informarte que tu pedido fue cancelado.</p>
+                        <div style="background:white; border-radius:10px; padding:20px; margin:20px 0; border-left:4px solid #e74c3c;">
+                            <p style="margin:0; color:#555;"><strong>Pedido:</strong> #{envio.venta.id}</p>
+                            <p style="margin:6px 0 0; color:#555;"><strong>Dirección:</strong> {envio.direccion_completa}</p>
+                        </div>
+                        <p style="color:#555;">Si tienes dudas sobre esta cancelación, por favor contáctanos.</p>
+                        <div style="text-align:center; margin-top:28px;">
+                            <p style="color:#aaa; font-size:12px;">© 2026 MOA Moda — Colombia, Bogotá D.C.</p>
+                        </div>
+                    </div>
+                    """
+
+                configuration = sib_api_v3_sdk.Configuration()
+                configuration.api_key['api-key'] = settings.BREVO_API_KEY
+                api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+                    sib_api_v3_sdk.ApiClient(configuration)
+                )
+                send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+                    to=[{"email": usuario.correo_usuario, "name": usuario.nombres_usuario}],
+                    sender={"email": "mauriciomorales0217@gmail.com", "name": "Tienda MOA"},
+                    subject=asunto,
+                    html_content=mensaje,
+                )
+                api_instance.send_transac_email(send_smtp_email)
+
+            except Exception as e:
+                print(f"Error enviando correo de estado: {e}")
+
         messages.success(
             request,
             f'Estado del envío #{id} actualizado a "{envio.get_estado_envio_display()}".',
