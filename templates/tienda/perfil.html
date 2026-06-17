@@ -286,7 +286,27 @@
                                 <div style="margin-top:12px; padding:10px 14px; background:#f8f8f8; border-radius:8px; font-size:12px; color:var(--gray); display:flex; align-items:center; gap:6px;">
                                     📬 <span>{{ envio.direccion_envio }}{% if envio.barrio_envio %}, {{ envio.barrio_envio }}{% endif %} — {{ envio.ciudad_envio }}, {{ envio.departamento_envio }}</span>
                                 </div>
+
+                                {# Botón confirmar llegada #}
+                                {% if envio.estado_envio == 'EN_CAMINO' or envio.estado_envio == 'ENTREGADO' %}
+                                    {% if not envio.confirmado_llegada %}
+                                    <form method="post" action="{% url 'confirmar_llegada' envio.id %}" style="margin-top:12px;">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                            onclick="return confirm('¿Confirmas que recibiste tu pedido #{{ venta.id }}?')"
+                                            style="padding:10px 24px; background:#22c55e; color:white; border:none; border-radius:50px; font-size:13px; font-weight:700; cursor:pointer; width:100%;">
+                                            ✅ Confirmar recepción del pedido
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    <div style="margin-top:12px; padding:10px 14px; background:#d4edda; border-radius:8px; text-align:center; font-size:13px; font-weight:700; color:#155724;">
+                                        ✓ Recibido confirmado el {{ envio.fecha_confirmacion_llegada|date:"d/m/Y H:i" }}
+                                    </div>
+                                    {% endif %}
+                                {% endif %}
+
                             {% else %}
+
                                 <div style="display:flex; align-items:center; gap:10px; padding:10px 14px; background:#f0f4ff; border-radius:8px;">
                                     <span style="font-size:20px;">🕐</span>
                                     <div>

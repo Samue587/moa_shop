@@ -646,6 +646,8 @@ class Envio(models.Model):
     costo_envio = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, validators=[MinValueValidator(0)]
     )
+    confirmado_llegada = models.BooleanField(default=False)
+    fecha_confirmacion_llegada = models.DateTimeField(null=True, blank=True)
 
     creado_en = models.DateTimeField(auto_now_add=True)
     actualizado_en = models.DateTimeField(auto_now=True)

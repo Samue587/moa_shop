@@ -646,11 +646,11 @@ def checkout_procesar(request):
             monto_final = total_carrito + costo_envio
 
             venta = Venta.objects.create(
-    usuario=usuario,
-    subtotal=subtotal,
-    monto_iva=iva,
-    monto_final=monto_final,
-)
+                usuario=usuario,
+                subtotal=subtotal,
+                monto_iva=iva,
+                monto_final=monto_final,
+            )
 
             for item in carrito["items"]:
                 variacion = VariacionProducto.objects.select_for_update().get(
@@ -4185,6 +4185,72 @@ def exportar_categorias_pdf(request):
         f'attachment; filename="categorias_{timezone.now().strftime("%d%m%Y")}.pdf"'
     )
     return response
+
+
+# ══════════════════════════════════════════════════════
+# CONFIRMACIÓN DE LLEGADA
+# ══════════════════════════════════════════════════════
+
+
+@login_required_custom
+def confirmar_llegada_cliente(request, envio_id):
+    usuario = get_usuario_sesion(request)
+    envio = get_object_or_404(
+        Envio.objects.select_related("venta__usuario"), pk=envio_id
+    )
+
+    if envio.usuario != usuario:
+        messages.error(request, "No tienes permiso para confirmar este envío.")
+        return redirect("perfil_usuario")
+
+    if envio.confirmado_llegada:
+        messages.info(request, "Ya habías confirmado la llegada de este pedido.")
+        return redirect("perfil_usuario")
+
+    envio.estado_envio = "ENTREGADO"
+    envio.confirmado_llegada = True
+    envio.fecha_confirmacion_llegada = timezone.now()
+    envio.save()
+
+    try:
+        configuration = sib_api_v3_sdk.Configuration()
+        configuration.api_key["api-key"] = settings.BREVO_API_KEY
+        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+            sib_api_v3_sdk.ApiClient(configuration)
+        )
+        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+            to=[{"email": usuario.correo_usuario, "name": usuario.nombres_usuario}],
+            sender={"email": "mauriciomorales0217@gmail.com", "name": "Tienda MOA"},
+            subject=f"✅ Pedido #{envio.venta.id} confirmado como recibido — MOA",
+            html_content=f"""
+            <div style="font-family:sans-serif; max-width:600px; margin:0 auto; background:#f7f7f7; padding:30px; border-radius:12px;">
+                <div style="background:#FF6B35; padding:20px; border-radius:8px; text-align:center; margin-bottom:24px;">
+                    <h1 style="color:white; font-size:26px; margin:0;">MOA Moda</h1>
+                    <p style="color:rgba(255,255,255,0.8); margin:4px 0 0;">Confirmación de entrega</p>
+                </div>
+                <h2 style="color:#1A1A2E;">¡Gracias por confirmar tu pedido! 🎉</h2>
+                <p style="color:#555;">Hola <strong>{usuario.nombres_usuario}</strong>, confirmamos que tu pedido fue recibido exitosamente.</p>
+                <div style="background:white; border-radius:10px; padding:20px; margin:20px 0; border-left:4px solid #22c55e;">
+                    <p style="margin:0; color:#555;"><strong>Pedido:</strong> #{envio.venta.id}</p>
+                    <p style="margin:6px 0 0; color:#555;"><strong>Fecha de confirmación:</strong> {timezone.now().strftime('%d/%m/%Y %H:%M')}</p>
+                    <p style="margin:6px 0 0; color:#555;"><strong>Dirección entregada:</strong> {envio.direccion_completa}</p>
+                </div>
+                <p style="color:#555;">Si tienes alguna novedad con tu pedido, contáctanos.</p>
+                <div style="text-align:center; margin-top:28px;">
+                    <p style="color:#aaa; font-size:12px;">© 2026 MOA Moda — Colombia, Bogotá D.C.</p>
+                </div>
+            </div>
+            """,
+        )
+        api_instance.send_transac_email(send_smtp_email)
+    except Exception as e:
+        print(f"Error enviando correo de confirmación: {e}")
+
+    messages.success(
+        request,
+        f"¡Pedido #{envio.venta.id} confirmado como recibido! Te enviamos un correo de confirmación.",
+    )
+    return redirect("perfil_usuario")
 
 
 # ══════════════════════════════════════════════════════

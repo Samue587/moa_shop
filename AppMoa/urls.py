@@ -26,6 +26,8 @@ urlpatterns = [
     # PERFIL DE USUARIO
     # ══════════════════════════════════════════════════════
     path("perfil/", views.perfil_usuario, name="perfil_usuario"),
+    path("perfil/confirmar-llegada/<int:envio_id>/", views.confirmar_llegada_cliente, name="confirmar_llegada"),
+
     # ══════════════════════════════════════════════════════
     # CARRITO
     # ══════════════════════════════════════════════════════
