@@ -13,4 +13,4 @@ media/
 staticfiles/
 
 # logs
-*.log
+*.logn         
