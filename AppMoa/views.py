@@ -1,41 +1,40 @@
 import os
-import uuid
 import socket
-
-from decimal import Decimal
+import uuid
 from datetime import date, timedelta
+from decimal import Decimal
 
+import sib_api_v3_sdk
+from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.hashers import check_password, make_password
 from django.core.paginator import Paginator
 from django.db import transaction
-from django.db.models import Q, Sum, Count, F, ExpressionWrapper, FloatField
+from django.db.models import Count, ExpressionWrapper, F, FloatField, Q, Sum
+from django.db.models.functions import TruncDay
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from django.conf import settings
-from django.db.models.functions import TruncDay
-from AppMoa.decorators import permiso_requerido
-from .models import TokenReset
-
-import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 
+from AppMoa.decorators import permiso_requerido
+
 from .models import (
-    Rol,
-    Permiso,
-    RolPermiso,
-    Usuario,
-    Proveedor,
     Catalogo,
     Categoria,
-    Producto,
-    VariacionProducto,
-    Entrada,
     DetalleEntrada,
-    Venta,
     DetalleVenta,
+    Entrada,
     Envio,
+    Permiso,
+    Producto,
+    Proveedor,
+    Rol,
+    RolPermiso,
+    TokenReset,
+    Usuario,
+    VariacionProducto,
+    Venta,
 )
 
 # =================PERMISOS=========================================
@@ -826,8 +825,9 @@ def perfil_usuario(request):
 
 @admin_required
 def panel_admin(request):
-    from django.utils import timezone
     from datetime import timedelta
+
+    from django.utils import timezone
 
     hoy = timezone.now().date()
 
@@ -2465,7 +2465,7 @@ def detalle_venta(request, id):
 def exportar_ventas_excel(request):
     try:
         import openpyxl
-        from openpyxl.styles import Font, PatternFill, Alignment
+        from openpyxl.styles import Alignment, Font, PatternFill
     except ImportError:
         messages.error(request, "Ejecuta: pip install openpyxl")
         return redirect("admin_ventas")
@@ -2538,19 +2538,20 @@ def exportar_ventas_excel(request):
 def exportar_ventas_pdf(request):
     try:
         import io
+
         from reportlab.lib import colors
+        from reportlab.lib.enums import TA_CENTER, TA_RIGHT
         from reportlab.lib.pagesizes import letter
-        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
         from reportlab.lib.units import mm
         from reportlab.platypus import (
+            HRFlowable,
+            Paragraph,
             SimpleDocTemplate,
+            Spacer,
             Table,
             TableStyle,
-            Paragraph,
-            Spacer,
-            HRFlowable,
         )
-        from reportlab.lib.enums import TA_CENTER, TA_RIGHT
     except ImportError:
         messages.error(request, "Ejecuta: pip install reportlab")
         return redirect("admin_ventas")
@@ -2873,6 +2874,7 @@ def eliminar_envio(request, id):
 
 
 @admin_required
+@permiso_requerido("cambiar_estado_envios")
 def envio_cambiar_estado(request, id):
     if request.method == "POST":
         envio = get_object_or_404(Envio, pk=id)
@@ -2969,7 +2971,7 @@ def reporte_inventario(request):
     if exportar == "excel":
         try:
             import openpyxl
-            from openpyxl.styles import Font, PatternFill, Alignment
+            from openpyxl.styles import Alignment, Font, PatternFill
 
             wb = openpyxl.Workbook()
             ws = wb.active
@@ -3009,8 +3011,9 @@ def reporte_inventario(request):
                         estado,
                     ]
                 )
-            from django.http import HttpResponse
             import io
+
+            from django.http import HttpResponse
 
             buffer = io.BytesIO()
             wb.save(buffer)
@@ -3145,7 +3148,7 @@ def reporte_ventas(request):
 @permiso_requerido("ver_reportes")
 def reporte_categorias(request):
     """Reporte 3 — Ventas por Categoría"""
-    from django.db.models import F, ExpressionWrapper, FloatField
+    from django.db.models import ExpressionWrapper, F, FloatField
 
     fecha_inicio = request.GET.get("fecha_inicio", "")
     fecha_fin = request.GET.get("fecha_fin", "")
@@ -3348,7 +3351,7 @@ def reportes_hub(request):
 def exportar_clientes_excel(request):
     try:
         import openpyxl
-        from openpyxl.styles import Font, PatternFill, Alignment
+        from openpyxl.styles import Alignment, Font, PatternFill
     except ImportError:
         messages.error(request, "Ejecuta: pip install openpyxl")
         return redirect("reporte_clientes")
@@ -3401,19 +3404,20 @@ def exportar_clientes_excel(request):
 def exportar_clientes_pdf(request):
     try:
         import io
+
         from reportlab.lib import colors
+        from reportlab.lib.enums import TA_CENTER
         from reportlab.lib.pagesizes import letter
-        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
         from reportlab.lib.units import mm
         from reportlab.platypus import (
+            HRFlowable,
+            Paragraph,
             SimpleDocTemplate,
+            Spacer,
             Table,
             TableStyle,
-            Paragraph,
-            Spacer,
-            HRFlowable,
         )
-        from reportlab.lib.enums import TA_CENTER
     except ImportError:
         messages.error(request, "Ejecuta: pip install reportlab")
         return redirect("reporte_clientes")
@@ -3547,7 +3551,7 @@ def exportar_clientes_pdf(request):
 def exportar_envios_excel(request):
     try:
         import openpyxl
-        from openpyxl.styles import Font, PatternFill, Alignment
+        from openpyxl.styles import Alignment, Font, PatternFill
     except ImportError:
         messages.error(request, "Ejecuta: pip install openpyxl")
         return redirect("reporte_envios")
@@ -3617,19 +3621,20 @@ def exportar_envios_excel(request):
 def exportar_envios_pdf(request):
     try:
         import io
+
         from reportlab.lib import colors
+        from reportlab.lib.enums import TA_CENTER
         from reportlab.lib.pagesizes import letter
         from reportlab.lib.styles import ParagraphStyle
         from reportlab.lib.units import mm
         from reportlab.platypus import (
+            HRFlowable,
+            Paragraph,
             SimpleDocTemplate,
+            Spacer,
             Table,
             TableStyle,
-            Paragraph,
-            Spacer,
-            HRFlowable,
         )
-        from reportlab.lib.enums import TA_CENTER
     except ImportError:
         messages.error(request, "Ejecuta: pip install reportlab")
         return redirect("reporte_envios")
@@ -3757,7 +3762,7 @@ def exportar_envios_pdf(request):
 def exportar_inventario_excel(request):
     try:
         import openpyxl
-        from openpyxl.styles import Font, PatternFill, Alignment
+        from openpyxl.styles import Alignment, Font, PatternFill
     except ImportError:
         messages.error(request, "Ejecuta: pip install openpyxl")
         return redirect("reporte_inventario")
@@ -3816,19 +3821,20 @@ def exportar_inventario_excel(request):
 def exportar_inventario_pdf(request):
     try:
         import io
+
         from reportlab.lib import colors
+        from reportlab.lib.enums import TA_CENTER
         from reportlab.lib.pagesizes import letter
         from reportlab.lib.styles import ParagraphStyle
         from reportlab.lib.units import mm
         from reportlab.platypus import (
+            HRFlowable,
+            Paragraph,
             SimpleDocTemplate,
+            Spacer,
             Table,
             TableStyle,
-            Paragraph,
-            Spacer,
-            HRFlowable,
         )
-        from reportlab.lib.enums import TA_CENTER
     except ImportError:
         messages.error(request, "Ejecuta: pip install reportlab")
         return redirect("reporte_inventario")
@@ -3965,12 +3971,12 @@ def exportar_inventario_pdf(request):
 def exportar_categorias_excel(request):
     try:
         import openpyxl
-        from openpyxl.styles import Font, PatternFill, Alignment
+        from openpyxl.styles import Alignment, Font, PatternFill
     except ImportError:
         messages.error(request, "Ejecuta: pip install openpyxl")
         return redirect("reporte_categorias")
 
-    from django.db.models import F, ExpressionWrapper, FloatField
+    from django.db.models import ExpressionWrapper, F, FloatField
 
     por_categoria = (
         DetalleVenta.objects.annotate(
@@ -4027,24 +4033,25 @@ def exportar_categorias_excel(request):
 def exportar_categorias_pdf(request):
     try:
         import io
+
         from reportlab.lib import colors
+        from reportlab.lib.enums import TA_CENTER
         from reportlab.lib.pagesizes import letter
         from reportlab.lib.styles import ParagraphStyle
         from reportlab.lib.units import mm
         from reportlab.platypus import (
+            HRFlowable,
+            Paragraph,
             SimpleDocTemplate,
+            Spacer,
             Table,
             TableStyle,
-            Paragraph,
-            Spacer,
-            HRFlowable,
         )
-        from reportlab.lib.enums import TA_CENTER
     except ImportError:
         messages.error(request, "Ejecuta: pip install reportlab")
         return redirect("reporte_categorias")
 
-    from django.db.models import F, ExpressionWrapper, FloatField
+    from django.db.models import ExpressionWrapper, F, FloatField
 
     NARANJA = colors.HexColor("#FF6B35")
     NAVY = colors.HexColor("#1e2d4a")
