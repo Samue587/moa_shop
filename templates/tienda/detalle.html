@@ -259,8 +259,8 @@ body.dark-mode .talla-btn.selected { background: var(--primary); color: white; }
                            
 
                 <div>
-                    <div class="product-price" id="precio-display">${{ variaciones.0.precio_con_iva|floatformat:0|intcomma }}</div>
-                    <div class="price-note">IVA incluido</div>
+<div class="product-price" id="precio-display"></div>    
+ <div class="price-note">IVA incluido</div>
                 </div>
 
                 <div class="qty-section">
@@ -316,12 +316,12 @@ body.dark-mode .talla-btn.selected { background: var(--primary); color: white; }
         id: {{ var.id }},
         talla: "{{ var.talla }}",
         color: "{{ var.color }}",
-        precio: {{ var.precio_con_iva }},
+        precio: {{ var.precio_con_iva|stringformat:"d" }},
         stock: {{ var.stock_actual }}
     }{% if not forloop.last %},{% endif %}
     {% endfor %}
 ];
-
+console.log(variaciones);
 // Colores únicos
 const coloresUnicos = [...new Set(variaciones.map(v => v.color))];
 // Tallas únicas
@@ -408,8 +408,8 @@ function actualizarVariacion() {
     );
     if (!v) return;
     document.getElementById('variacion-id-input').value = v.id;
-    const num = parseInt(v.precio);
-    document.getElementById('precio-display').textContent = '$' + num.toLocaleString('es-CO');
+    const num = Math.round(v.precio);
+    document.getElementById('precio-display').textContent = '$ ' + num.toLocaleString('es-CO') + ' COP';    
     const stockEl = document.getElementById('stock-info');
     stockEl.textContent = v.stock <= 5 ? `⚠️ ¡Solo ${v.stock} disponibles!` : `✅ ${v.stock} disponibles`;
     stockEl.style.color = v.stock <= 5 ? '#F59E0B' : 'var(--muted)';
@@ -429,6 +429,8 @@ function cambiarCantidad(delta) {
         document.body.classList.add('dark-mode');
     }
 })();
+const precioInicial = {{ variaciones.0.precio_con_iva|stringformat:"d" }};
+document.getElementById('precio-display').textContent = '$ ' + Math.round(precioInicial).toLocaleString('es-CO') + ' COP';
 </script>
 
 </body>

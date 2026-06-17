@@ -1,22 +1,23 @@
 {% extends 'admin/base_admin.html' %}
 {% load humanize %}
-{% block title %}Detalle Envío #{{ envio.numero_envio }} — TiendaMoa07{% endblock %}
+{% block title %}Detalle Envío #{{ envio.numero_guia }} — TiendaMoa07{% endblock %}
 {% block menu_envios %}active{% endblock %}
 {% block navbar_title %}Detalle de Envío{% endblock %}
 
 {% block content %}
 <div class="page-header">
     <div>
-        <div class="page-title">🚚 Envío #{{ envio.numero_envio }}</div>
+        <div class="page-title">🚚 Envío #{{ envio.numero_guia }}</div>
         <div class="breadcrumb">
             <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
             <a href="{% url 'admin_envios' %}">Envíos</a> ›
             Detalle
         </div>
     </div>
+
     <div style="display:flex; gap:10px;">
         <a href="{% url 'editar_envio' envio.id %}" class="btn btn-warning">✏️ Editar</a>
-        <a href="{% url 'admin_envios' %}"          class="btn btn-secondary">← Volver</a>
+        <a href="{% url 'admin_envios' %}" class="btn btn-secondary">← Volver</a>
     </div>
 </div>
 
@@ -31,18 +32,28 @@
                     <td style="color:#7f8c8d; padding:8px 0; width:45%;">N° Envío</td>
                     <td><strong>#{{ envio.numero_guia }}</strong></td>
                 </tr>
+
                 <tr>
                     <td style="color:#7f8c8d; padding:8px 0;">Empresa</td>
                     <td>{{ envio.empresa_transportadora }}</td>
                 </tr>
+
                 <tr>
                     <td style="color:#7f8c8d; padding:8px 0;">Fecha envío</td>
                     <td>{{ envio.fecha_envio|date:"d/m/Y" }}</td>
                 </tr>
+
                 <tr>
                     <td style="color:#7f8c8d; padding:8px 0;">Llegada estimada</td>
-                    <td>{{ envio.fecha_estipulada_llegada|date:"d/m/Y" }}</td>
+                    <td>
+                        {% if envio.fecha_estipulada_llegada %}
+                            {{ envio.fecha_estipulada_llegada|date:"d/m/Y" }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
                 </tr>
+
                 <tr>
                     <td style="color:#7f8c8d; padding:8px 0;">Costo</td>
                     <td>
@@ -53,6 +64,7 @@
                         {% endif %}
                     </td>
                 </tr>
+
                 <tr>
                     <td style="color:#7f8c8d; padding:8px 0;">Estado</td>
                     <td>
@@ -69,6 +81,7 @@
                         {% endif %}
                     </td>
                 </tr>
+
                 {% if envio.especificaciones_llegada %}
                 <tr>
                     <td style="color:#7f8c8d; padding:8px 0;">Especificaciones</td>
@@ -88,43 +101,50 @@
                     <td style="color:#7f8c8d; padding:8px 0; width:45%;">Cliente</td>
                     <td>
                         <strong>
-                            {# Nuevo modelo: nombres_usuario + apellidos_usuario #}
                             {{ envio.usuario.nombres_usuario }} {{ envio.usuario.apellidos_usuario }}
                         </strong>
                     </td>
                 </tr>
+
                 <tr>
                     <td style="color:#7f8c8d; padding:8px 0;">Correo</td>
                     <td>{{ envio.usuario.correo_usuario }}</td>
                 </tr>
+
                 <tr>
                     <td style="color:#7f8c8d; padding:8px 0;">Documento</td>
                     <td>{{ envio.usuario.numero_documento }}</td>
                 </tr>
+
                 <tr>
                     <td style="color:#7f8c8d; padding:8px 0;">Dirección</td>
                     <td>{{ envio.direccion_envio }}</td>
                 </tr>
+
                 {% if envio.barrio_envio %}
                 <tr>
                     <td style="color:#7f8c8d; padding:8px 0;">Barrio</td>
                     <td>{{ envio.barrio_envio }}</td>
                 </tr>
                 {% endif %}
+
                 <tr>
                     <td style="color:#7f8c8d; padding:8px 0;">Ciudad</td>
                     <td>{{ envio.ciudad_envio }}</td>
                 </tr>
+
                 <tr>
                     <td style="color:#7f8c8d; padding:8px 0;">Departamento</td>
                     <td>{{ envio.departamento_envio }}</td>
                 </tr>
+
                 {% if envio.telefono_llegada %}
                 <tr>
-                    <td style="color:#7f8c8d; padding:8px 0;">Teléfono llegada</td>
+                    <td style="color:#7f8c8d; padding:8px 0;">Teléfono</td>
                     <td>{{ envio.telefono_llegada }}</td>
                 </tr>
                 {% endif %}
+
                 <tr>
                     <td style="color:#7f8c8d; padding:8px 0;">Venta</td>
                     <td>
@@ -138,7 +158,7 @@
     </div>
 </div>
 
-<!-- PRODUCTOS DE LA VENTA -->
+<!-- PRODUCTOS -->
 <div class="card" style="margin-top:24px;">
     <div class="card-header"><h3>🛍️ Productos de la venta</h3></div>
     <div class="card-body" style="padding:0;">
@@ -151,10 +171,10 @@
                     <th>Subtotal</th>
                 </tr>
             </thead>
+
             <tbody>
                 {% for d in detalles %}
                 <tr>
-                    {# Nuevo modelo: detalle -> variacion -> producto #}
                     <td>{{ d.variacion.producto.nombre_producto }}</td>
                     <td>{{ d.variacion.talla_variacion }} / {{ d.variacion.color_variacion }}</td>
                     <td>{{ d.cantidad_detalle }}</td>
@@ -162,7 +182,9 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4" class="empty-state"><p>No hay productos en esta venta.</p></td>
+                    <td colspan="4" class="empty-state">
+                        <p>No hay productos en esta venta.</p>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -170,21 +192,43 @@
     </div>
 </div>
 
-<!-- CAMBIAR ESTADO RÁPIDO -->
+<!-- CAMBIAR ESTADO -->
 <div class="card" style="margin-top:24px;">
     <div class="card-header"><h3>⚡ Cambiar estado</h3></div>
     <div class="card-body">
-        <form method="post" action="{% url 'envio_cambiar_estado' envio.id %}"
+
+        <form method="post"
+              action="{% url 'envio_cambiar_estado' envio.id %}"
               style="display:flex; gap:12px; align-items:center;">
+
             {% csrf_token %}
+
             <select name="estado" class="form-control" style="max-width:220px;">
-                <option value="PENDIENTE" {% if envio.estado_envio == 'PENDIENTE' %}selected{% endif %}>⏳ Pendiente</option>
-                <option value="EN_CAMINO" {% if envio.estado_envio == 'EN_CAMINO' %}selected{% endif %}>🚚 En camino</option>
-                <option value="ENTREGADO" {% if envio.estado_envio == 'ENTREGADO' %}selected{% endif %}>✅ Entregado</option>
-                <option value="CANCELADO" {% if envio.estado_envio == 'CANCELADO' %}selected{% endif %}>❌ Cancelado</option>
+
+                <option value="PENDIENTE" {% if envio.estado_envio == 'PENDIENTE' %}selected{% endif %}>
+                    ⏳ Pendiente
+                </option>
+
+                <option value="EN_CAMINO" {% if envio.estado_envio == 'EN_CAMINO' %}selected{% endif %}>
+                    🚚 En camino
+                </option>
+
+                <option value="ENTREGADO" {% if envio.estado_envio == 'ENTREGADO' %}selected{% endif %}>
+                    ✅ Entregado
+                </option>
+
+                <option value="CANCELADO" {% if envio.estado_envio == 'CANCELADO' %}selected{% endif %}>
+                    ❌ Cancelado
+                </option>
+
             </select>
-            <button type="submit" class="btn btn-success">Actualizar estado</button>
+
+            <button type="submit" class="btn btn-success">
+                Actualizar estado
+            </button>
+
         </form>
+
     </div>
 </div>
 

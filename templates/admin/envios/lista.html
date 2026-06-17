@@ -17,16 +17,20 @@
 <div class="card">
     <div class="card-header">
         <h3>Todos los envíos</h3>
+
         <form method="get" style="display:flex; gap:10px; margin:0;">
             <input type="text" name="q" value="{{ busqueda }}"
                    placeholder="Buscar por n°, empresa, estado o cliente…"
                    class="search-input" style="min-width:280px;">
+
             <button type="submit" class="btn btn-primary btn-sm">🔍 Buscar</button>
+
             {% if busqueda %}
                 <a href="{% url 'admin_envios' %}" class="btn btn-secondary btn-sm">✖ Limpiar</a>
             {% endif %}
         </form>
     </div>
+
     <div class="card-body" style="padding:0;">
         <div class="table-responsive">
             <table>
@@ -43,22 +47,34 @@
                         <th>Acciones</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     {% for envio in envios %}
                     <tr>
                         <td><strong>#{{ envio.numero_guia }}</strong></td>
+
                         <td>
-                            {# Nuevo modelo: nombres_usuario + apellidos_usuario #}
                             {{ envio.usuario.nombres_usuario }} {{ envio.usuario.apellidos_usuario }}<br>
                             <small style="color:#7f8c8d;">Venta #{{ envio.venta.id }}</small>
                         </td>
+
                         <td>
                             {{ envio.ciudad_envio }}, {{ envio.departamento_envio }}<br>
                             <small style="color:#7f8c8d;">{{ envio.direccion_envio }}</small>
                         </td>
+
                         <td>{{ envio.empresa_transportadora }}</td>
+
                         <td>{{ envio.fecha_envio|date:"d/m/Y" }}</td>
-                        <td>{{ envio.fecha_estipulada_llegada|date:"d/m/Y" }}</td>
+
+                        <td>
+                            {% if envio.fecha_estipulada_llegada %}
+                                {{ envio.fecha_estipulada_llegada|date:"d/m/Y" }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
                         <td>
                             {% if envio.costo_envio == 0 %}
                                 <span style="color:#27ae60; font-weight:600;">Gratis</span>
@@ -66,6 +82,7 @@
                                 $ {{ envio.costo_envio|floatformat:0|intcomma }}
                             {% endif %}
                         </td>
+
                         <td>
                             {% if envio.estado_envio == 'ENTREGADO' %}
                                 <span class="badge badge-entregado">✅ Entregado</span>
@@ -79,30 +96,49 @@
                                 <span class="badge badge-warning">{{ envio.estado_envio }}</span>
                             {% endif %}
                         </td>
+
                         <td style="white-space:nowrap;">
-                            {# Cambio rápido de estado inline #}
-                          {% if permisos_usuario.tiene_permiso('cambiar_estado_envios') %}
-<form method="post" action="{% url 'envio_cambiar_estado' envio.id %}" style="display:inline;">
-    {% csrf_token %}
-    <select name="estado" onchange="this.form.submit()"
-        style="padding:5px 8px; border-radius:6px; border:2px solid #e0e6ed; font-size:12px; cursor:pointer; margin-right:4px;">
-                                    <option value="PENDIENTE"  {% if envio.estado_envio == 'PENDIENTE'  %}selected{% endif %}>⏳ Pendiente</option>
-                                    <option value="EN_CAMINO"  {% if envio.estado_envio == 'EN_CAMINO'  %}selected{% endif %}>🚚 En camino</option>
-                                    <option value="ENTREGADO"  {% if envio.estado_envio == 'ENTREGADO'  %}selected{% endif %}>✅ Entregado</option>
-                                    <option value="CANCELADO"  {% if envio.estado_envio == 'CANCELADO'  %}selected{% endif %}>❌ Cancelado</option>
+
+                            <form method="post"
+                                  action="{% url 'envio_cambiar_estado' envio.id %}"
+                                  style="display:inline;">
+
+                                {% csrf_token %}
+
+                                <select name="estado"
+                                        onchange="this.form.submit()"
+                                        style="padding:5px 8px; border-radius:6px; border:2px solid #e0e6ed; font-size:12px; cursor:pointer; margin-right:4px;">
+
+                                    <option value="PENDIENTE"
+                                        {% if envio.estado_envio == 'PENDIENTE' %}selected{% endif %}>
+                                        ⏳ Pendiente
+                                    </option>
+
+                                    <option value="EN_CAMINO"
+                                        {% if envio.estado_envio == 'EN_CAMINO' %}selected{% endif %}>
+                                        🚚 En camino
+                                    </option>
+
+                                    <option value="ENTREGADO"
+                                        {% if envio.estado_envio == 'ENTREGADO' %}selected{% endif %}>
+                                        ✅ Entregado
+                                    </option>
+
+                                    <option value="CANCELADO"
+                                        {% if envio.estado_envio == 'CANCELADO' %}selected{% endif %}>
+                                        ❌ Cancelado
+                                    </option>
+
                                 </select>
                             </form>
-                            {% if permisos_usuario.tiene_permiso('ver_envios') %}
-                         <a href="{% url 'detalle_envio' envio.id %}" class="btn btn-info btn-sm">👁</a>
-                                  {% endif %}
-                            {% if permisos_usuario.tiene_permiso('editar_envios') %}
-                           <a href="{% url 'editar_envio' envio.id %}" class="btn btn-warning btn-sm">✏️</a>
-                                {% endif %}
-                             {% if permisos_usuario.tiene_permiso('eliminar_envios') %}
-                               <a href="{% url 'eliminar_envio' envio.id %}" class="btn btn-danger btn-sm">🗑</a>
-                   {% endif %}                       
-                </td>
+
+                            <a href="{% url 'detalle_envio' envio.id %}" class="btn btn-info btn-sm">👁</a>
+                            <a href="{% url 'editar_envio' envio.id %}" class="btn btn-warning btn-sm">✏️</a>
+                            <a href="{% url 'eliminar_envio' envio.id %}" class="btn btn-danger btn-sm">🗑</a>
+
+                        </td>
                     </tr>
+
                     {% empty %}
                     <tr>
                         <td colspan="9" class="empty-state">

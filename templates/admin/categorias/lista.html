@@ -2,7 +2,7 @@
 {% block title %}Categorías — TiendaMoa07{% endblock %}
 {% block menu_categorias %}active{% endblock %}
 {% block navbar_title %}Gestión de Categorías{% endblock %}
- 
+
 {% block content %}
 <div class="page-header">
     <div>
@@ -11,11 +11,9 @@
             <a href="{% url 'admin_dashboard' %}">Dashboard</a> › Categorías
         </div>
     </div>
-    {% if permisos_usuario.tiene_permiso('crear_categorias') %}
     <a href="{% url 'crear_categoria' %}" class="btn btn-success">➕ Nueva Categoría</a>
-    {% endif %}
 </div>
- 
+
 <div class="card">
     <div class="card-header">
         <h3>📚 Categorías registradas</h3>
@@ -53,27 +51,18 @@
                         {% endif %}
                     </td>
                     <td>
-    <div style="display:flex;gap:8px;">
-        {% if permisos_usuario.tiene_permiso('editar_categorias') %}
-        <a href="{% url 'editar_categoria' categoria.id %}" class="btn btn-warning btn-sm">✏️ Editar</a>
-        {% endif %}
-
-        {% if permisos_usuario.tiene_permiso('eliminar_categorias') %}
-        <a href="{% url 'eliminar_categoria' categoria.id %}" class="btn btn-danger btn-sm">🗑️ Eliminar</a>
-        {% endif %}
-    </div>
-</td>
+                        <div style="display:flex;gap:8px;">
+                            <a href="{% url 'editar_categoria' categoria.id %}" class="btn btn-warning btn-sm">✏️ Editar</a>
+                            <a href="{% url 'eliminar_categoria' categoria.id %}" class="btn btn-danger btn-sm">🗑️ Eliminar</a>
+                        </div>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
                     <td colspan="6">
                         <div class="empty-state">
                             <div class="empty-icon">📚</div>
-                           {% if permisos_usuario.tiene_permiso('crear_categorias') %}
-                             <p>No hay categorías registradas. <a href="{% url 'crear_categoria' %}">Crear la primera</a></p>
-                           {% else %}
-                        <p>No hay categorías registradas.</p>
-                         {% endif %}
+                            <p>No hay categorías registradas. <a href="{% url 'crear_categoria' %}">Crear la primera</a></p>
                         </div>
                     </td>
                 </tr>

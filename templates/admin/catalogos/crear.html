@@ -2,13 +2,8 @@
 {% block title %}Nuevo Catálogo - MOA{% endblock %}
 {% block menu_catalogos %}active{% endblock %}
 {% block navbar_title %}Nuevo Catálogo{% endblock %}
- 
+
 {% block content %}
-{% if not permisos_usuario.tiene_permiso('crear_catalogos') %}
-    <div class="alert alert-danger">
-        No tienes permiso para crear catálogos.
-    </div>
-{% else %}
 
 <div class="page-header">
     <div>
@@ -20,7 +15,7 @@
         </div>
     </div>
 </div>
- 
+
 {% if messages %}
     {% for message in messages %}
         <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">
@@ -28,13 +23,13 @@
         </div>
     {% endfor %}
 {% endif %}
- 
+
 <div class="card" style="max-width:620px;">
     <div class="card-body">
- 
+
         <form method="post">
             {% csrf_token %}
- 
+
             <div class="form-group">
                 <label class="form-label">📝 Nombre del Catálogo *</label>
                 <input
@@ -47,7 +42,7 @@
                     maxlength="150"
                 >
             </div>
- 
+
             <div class="form-group">
                 <label class="form-label">📄 Descripción</label>
                 <textarea
@@ -58,15 +53,15 @@
                     style="resize:vertical;"
                 >{{ form_data.descripcion_catalogo|default:'' }}</textarea>
             </div>
- 
- 
+
             <div style="display:flex; gap:12px; margin-top:24px;">
                 <button type="submit" class="btn btn-primary">💾 Guardar Catálogo</button>
                 <a href="{% url 'admin_catalogos' %}" class="btn btn-secondary">❌ Cancelar</a>
             </div>
+
         </form>
- 
+
     </div>
 </div>
-{% endif %}
+
 {% endblock %}

@@ -350,6 +350,13 @@ function mostrarTab(tab, btn) {
         {% endif %}
     {% endfor %}
 {% endif %}
+
+// ← ESTO va FUERA del bloque messages, suelto aquí:
+window.addEventListener('DOMContentLoaded', function() {
+    if (window.location.hash === '#pedidos') {
+        mostrarTab('historial', document.querySelectorAll('.nav-item')[2]);
+    }
+});
 </script>
 
 </body>

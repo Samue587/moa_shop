@@ -4,11 +4,7 @@
 {% block navbar_title %}Crear Categoría{% endblock %}
 
 {% block content %}
-{% if not permisos_usuario.tiene_permiso('crear_categorias') %}
-    <div class="alert alert-danger">
-        No tienes permiso para crear categorías.
-    </div>
-{% else %}
+
 <div class="page-header">
     <div>
         <div class="page-title">➕ Nueva Categoría</div>
@@ -19,43 +15,72 @@
         </div>
     </div>
 </div>
- 
+
 <div class="card" style="max-width:650px;">
     <div class="card-header">
         <h3>📚 Datos de la Categoría</h3>
     </div>
+
     <div class="card-body">
         <form action="{% url 'crear_categoria' %}" method="post">
             {% csrf_token %}
- 
+
             <div class="form-group">
-                <label class="form-label">Nombre <span class="required">*</span></label>
-                <input type="text" name="nombre" class="form-control"
+                <label class="form-label">
+                    Nombre <span class="required">*</span>
+                </label>
+
+                <input type="text"
+                       name="nombre"
+                       class="form-control"
                        placeholder="Ej: Camisetas, Zapatos, Accesorios"
-                       value="{{ form.nombre|default:'' }}" required>
-                <span class="form-help">El nombre debe ser único.</span>
+                       value="{{ form.nombre|default:'' }}"
+                       required>
+
+                <span class="form-help">
+                    El nombre debe ser único.
+                </span>
             </div>
- 
+
             <div class="form-group">
                 <label class="form-label">Descripción</label>
-                <textarea name="descripcion" class="form-control"
+
+                <textarea name="descripcion"
+                          class="form-control"
                           placeholder="Descripción opcional de la categoría...">{{ form.descripcion|default:'' }}</textarea>
             </div>
- 
+
             <div class="form-group">
                 <label class="form-label">Estado</label>
+
                 <select name="estado" class="form-control">
-                    <option value="ACTIVO" {% if form.estado == 'ACTIVO' or not form %}selected{% endif %}>✅ Activo</option>
-                    <option value="INACTIVO" {% if form.estado == 'INACTIVO' %}selected{% endif %}>❌ Inactivo</option>
+                    <option value="ACTIVO"
+                        {% if form.estado == 'ACTIVO' or not form %}
+                            selected
+                        {% endif %}>
+                        ✅ Activo
+                    </option>
+
+                    <option value="INACTIVO"
+                        {% if form.estado == 'INACTIVO' %}
+                            selected
+                        {% endif %}>
+                        ❌ Inactivo
+                    </option>
                 </select>
             </div>
- 
+
             <div class="form-actions">
-                <button type="submit" class="btn btn-success">✅ Crear Categoría</button>
-                <a href="{% url 'admin_categorias' %}" class="btn btn-secondary">❌ Cancelar</a>
+                <button type="submit" class="btn btn-success">
+                    ✅ Crear Categoría
+                </button>
+
+                <a href="{% url 'admin_categorias' %}" class="btn btn-secondary">
+                    ❌ Cancelar
+                </a>
             </div>
         </form>
     </div>
 </div>
-{% endif %}
+
 {% endblock %}

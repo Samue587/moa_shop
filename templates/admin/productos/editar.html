@@ -3,104 +3,172 @@
 {% block menu_productos %}active{% endblock %}
 {% block navbar_title %}Editar Producto{% endblock %}
 
-{% if permisos_usuario.tiene_permiso('editar_productos') %}
-    {% block content %}
-    
-        <div class="page-header">
-            <div>
-                <div class="page-title">✏️ Editar Producto</div>
-                <div class="breadcrumb">
-                    <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
-                    <a href="{% url 'admin_productos' %}">Productos</a> ›
-                    Editar
-                </div>
-            </div>
-            <a href="{% url 'admin_variaciones' producto.id %}" class="btn btn-info">🎨 Ver Variaciones</a>
-        </div>
-        
-        <div class="card" style="max-width:750px;">
-            <div class="card-header"><h3>📦 {{ producto.nombre_producto }}</h3></div>
-            <div class="card-body">
-                <form action="{% url 'editar_producto' producto.id %}" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-        
-                    <div class="form-group">
-                        <label class="form-label">Nombre del Producto <span class="required">*</span></label>
-                        <input type="text" name="nombre_producto" class="form-control"
-                            value="{{ form.nombre_producto|default:producto.nombre_producto }}" required>
-                    </div>
-        
-                    <div class="form-group">
-                        <label class="form-label">Descripción</label>
-                        <textarea name="descripcion_producto" class="form-control">{{ form.descripcion_producto|default:producto.descripcion_producto }}</textarea>
-                    </div>
-        
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Categoría <span class="required">*</span></label>
-                            <select name="categoria" class="form-control" required>
-                                {% for cat in categorias %}
-                                    <option value="{{ cat.id }}" {% if cat.id == producto.categoria.id %}selected{% endif %}>
-                                        {{ cat.nombre }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Proveedor <span class="required">*</span></label>
-                            <select name="proveedor" class="form-control" required>
-                                {% for prov in proveedores %}
-                                    <option value="{{ prov.id }}" {% if prov.id == producto.proveedor.id %}selected{% endif %}>
-                                        {{ prov.nombre_proveedor }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-        
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Catálogo</label>
-                            <select name="catalogo" class="form-control">
-                                <option value="">— Sin catálogo —</option>
-                                {% for cat in catalogos %}
-                                    <option value="{{ cat.id }}" {% if producto.catalogo and cat.id == producto.catalogo.id %}selected{% endif %}>
-                                        {{ cat.nombre_catalogo }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Estado</label>
-                            <select name="estado" class="form-control">
-                                <option value="DISPONIBLE"    {% if producto.estado == 'DISPONIBLE' %}selected{% endif %}>✅ Disponible</option>
-                                <option value="NO_DISPONIBLE" {% if producto.estado == 'NO_DISPONIBLE' %}selected{% endif %}>⚠️ No Disponible</option>
-                            </select>
-                        </div>
-                    </div>
-        
-                    <!-- Foto actual -->
-                    <div class="form-group">
-                        <label class="form-label">Foto del Producto</label>
-                        {% if producto.foto %}
-                        <div style="margin-bottom:10px;">
-                            <img src="{{ producto.foto_url }}" alt="{{ producto.nombre_producto }}"
-                                style="width:100px;height:100px;object-fit:cover;border-radius:8px;border:2px solid #e0e6ed;">
-                            <span style="font-size:12px;color:#7f8c8d;margin-left:10px;">Foto actual</span>
-                        </div>
-                        {% endif %}
-                        <input type="file" name="archivoFoto" class="form-control" accept="image/*">
-                        <span class="form-help">Deja vacío para conservar la foto actual. PNG, JPG o WEBP. Máximo 5MB.</span>
-                    </div>
-        
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-warning">💾 Guardar Cambios</button>
-                        <a href="{% url 'admin_productos' %}" class="btn btn-secondary">❌ Cancelar</a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    
-    {% endblock %}
+{% block content %}
 
-{% endif %}
+<div class="page-header">
+    <div>
+        <div class="page-title">✏️ Editar Producto</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_productos' %}">Productos</a> ›
+            Editar
+        </div>
+    </div>
+
+    <a href="{% url 'admin_variaciones' producto.id %}" class="btn btn-info">
+        🎨 Ver Variaciones
+    </a>
+</div>
+
+<div class="card" style="max-width:750px;">
+    <div class="card-header">
+        <h3>📦 {{ producto.nombre_producto }}</h3>
+    </div>
+
+    <div class="card-body">
+        <form action="{% url 'editar_producto' producto.id %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label">
+                    Nombre del Producto <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    name="nombre_producto"
+                    class="form-control"
+                    value="{{ form.nombre_producto|default:producto.nombre_producto }}"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Descripción</label>
+
+                <textarea
+                    name="descripcion_producto"
+                    class="form-control"
+                >{{ form.descripcion_producto|default:producto.descripcion_producto }}</textarea>
+            </div>
+
+            <div class="form-row">
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Categoría <span class="required">*</span>
+                    </label>
+
+                    <select name="categoria" class="form-control" required>
+                        {% for cat in categorias %}
+                            <option value="{{ cat.id }}"
+                                {% if cat.id == producto.categoria.id %}
+                                    selected
+                                {% endif %}>
+                                {{ cat.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Proveedor <span class="required">*</span>
+                    </label>
+
+                    <select name="proveedor" class="form-control" required>
+                        {% for prov in proveedores %}
+                            <option value="{{ prov.id }}"
+                                {% if prov.id == producto.proveedor.id %}
+                                    selected
+                                {% endif %}>
+                                {{ prov.nombre_proveedor }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="form-row">
+
+                <div class="form-group">
+                    <label class="form-label">Catálogo</label>
+
+                    <select name="catalogo" class="form-control">
+                        <option value="">— Sin catálogo —</option>
+
+                        {% for cat in catalogos %}
+                            <option value="{{ cat.id }}"
+                                {% if producto.catalogo and cat.id == producto.catalogo.id %}
+                                    selected
+                                {% endif %}>
+                                {{ cat.nombre_catalogo }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Estado</label>
+
+                    <select name="estado" class="form-control">
+                        <option value="DISPONIBLE"
+                            {% if producto.estado == 'DISPONIBLE' %}
+                                selected
+                            {% endif %}>
+                            ✅ Disponible
+                        </option>
+
+                        <option value="NO_DISPONIBLE"
+                            {% if producto.estado == 'NO_DISPONIBLE' %}
+                                selected
+                            {% endif %}>
+                            ⚠️ No Disponible
+                        </option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Foto del Producto</label>
+
+                {% if producto.foto %}
+                <div style="margin-bottom:10px;">
+                    <img src="{{ producto.foto.url }}"
+                         alt="{{ producto.nombre_producto }}"
+                         style="width:100px;height:100px;object-fit:cover;border-radius:8px;border:2px solid #e0e6ed;">
+
+                    <span style="font-size:12px;color:#7f8c8d;margin-left:10px;">
+                        Foto actual
+                    </span>
+                </div>
+                {% endif %}
+
+                <input type="file"
+                       name="archivoFoto"
+                       class="form-control"
+                       accept="image/*">
+
+                <span class="form-help">
+                    Deja vacío para conservar la foto actual.
+                    PNG, JPG o WEBP. Máximo 5MB.
+                </span>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-warning">
+                    💾 Guardar Cambios
+                </button>
+
+                <a href="{% url 'admin_productos' %}" class="btn btn-secondary">
+                    ❌ Cancelar
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+{% endblock %}

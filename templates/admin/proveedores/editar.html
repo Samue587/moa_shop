@@ -4,11 +4,6 @@
 {% block navbar_title %}Editar Proveedor{% endblock %}
 
 {% block content %}
-{% if not permisos_usuario.tiene_permiso('editar_proveedores') %}
-    <div class="alert alert-danger">
-        No tienes permiso para editar proveedores.
-    </div>
-{% else %}
 <div class="page-header">
     <div>
         <div class="page-title">✏️ Editar Proveedor</div>
@@ -134,5 +129,4 @@ const cnt = document.getElementById('obs_count');
 cnt.textContent = obs.value.length;
 obs.addEventListener('input', () => cnt.textContent = obs.value.length);
 </script>
-{% endif %}
 {% endblock %}

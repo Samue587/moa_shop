@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 # SEGURIDAD
 # ══════════════════════════════════════════════════════
 SECRET_KEY = "WxRBkz9vMM-cyOKJd7ihcWTnYvlJtUeF6et-4pnxG81j2QQAyJmgK8s1Xk7KMnLdVDc"
-DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 

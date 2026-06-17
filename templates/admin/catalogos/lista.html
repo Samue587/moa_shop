@@ -12,9 +12,9 @@
             Catálogos
         </div>
     </div>
-{% if permisos_usuario.tiene_permiso('crear_catalogos') %}
+
 <a href="{% url 'crear_catalogo' %}" class="btn btn-primary">➕ Nuevo Catálogo</a>
-{% endif %}
+
 </div>
 
 {% if messages %}
@@ -79,13 +79,11 @@
                     </td>
                     <td style="text-align:right; padding-right:24px;">
                         <div style="display:flex; gap:6px; justify-content:flex-end;">
-                            {% if permisos_usuario.tiene_permiso('editar_catalogos') %}
+                            
 <a href="{% url 'editar_catalogo' catalogo.id %}" class="btn btn-sm btn-warning" title="Editar">✏️</a>
-{% endif %}
 
-{% if permisos_usuario.tiene_permiso('eliminar_catalogos') %}
 <a href="{% url 'eliminar_catalogo' catalogo.id %}" class="btn btn-sm btn-danger" title="Eliminar">🗑️</a>
-{% endif %}
+
                         </div>
                     </td>
                 </tr>
@@ -98,9 +96,8 @@
             <div style="font-size:56px; margin-bottom:16px;">📭</div>
             <h3 style="font-size:18px; margin-bottom:8px; color:#2c3e50;">No hay catálogos registrados</h3>
             <p style="font-size:14px; margin-bottom:24px;">Crea el primer catálogo para organizar tus productos.</p>
-            {% if permisos_usuario.tiene_permiso('crear_catalogos') %}
+            
 <a href="{% url 'crear_catalogo' %}" class="btn btn-primary">➕ Crear primer catálogo</a>
-{% endif %}
 
         </div>
         {% endif %}

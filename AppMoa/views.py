@@ -10,6 +10,8 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
 from django.core.paginator import Paginator
 from django.db import transaction
+
+# Al inicio del archivo, junto a los demás imports
 from django.db.models import Count, ExpressionWrapper, F, FloatField, Q, Sum
 from django.db.models.functions import TruncDay
 from django.http import HttpResponse, JsonResponse
@@ -40,6 +42,17 @@ from .models import (
 # =================PERMISOS=========================================
 
 
+def permisos_usuario(request):
+
+    permisos = []
+
+    if request.user.is_authenticated:
+
+        permisos = request.user.rol.permisos.values_list("slug", flat=True)
+
+    return {"permisos_usuario": permisos}
+
+
 UPLOAD_DIR = settings.MEDIA_ROOT
 
 CIUDADES_POR_DEPARTAMENTO = {
@@ -56,6 +69,9 @@ CIUDADES_POR_DEPARTAMENTO = {
     "Huila": ["Neiva", "Pitalito", "Garzón", "La Plata", "Palermo"],
     "La Guajira": ["Riohacha", "Maicao"],
     "Magdalena": ["Santa Marta", "Ciénaga", "El Banco"],
+    "Huila": ["Neiva", "Pitalito", "Garzón"],
+    "La Guajira": ["Riohacha", "Maicao"],
+    "Magdalena": ["Santa Marta", "Ciénaga"],
     "Meta": ["Villavicencio", "Acacías"],
     "Nariño": ["Pasto", "Tumaco", "Ipiales"],
     "Norte de Santander": ["Cúcuta", "Ocaña", "Pamplona"],
@@ -92,6 +108,7 @@ COSTOS_ENVIO = {
     "Sucre": 22000,
     "Tolima": 13000,
     "Valle del Cauca": 18000,
+    "Putumayo": 26000,
     "Caquetá": 25000,
     "Putumayo": 28000,
 }
@@ -629,11 +646,11 @@ def checkout_procesar(request):
             monto_final = total_carrito + costo_envio
 
             venta = Venta.objects.create(
-                usuario=usuario,
-                subtotal=subtotal,
-                monto_iva=iva,
-                monto_final=monto_final,
-            )
+    usuario=usuario,
+    subtotal=subtotal,
+    monto_iva=iva,
+    monto_final=monto_final,
+)
 
             for item in carrito["items"]:
                 variacion = VariacionProducto.objects.select_for_update().get(
@@ -1606,7 +1623,7 @@ def crear_catalogo(request):
 
 
 @admin_required
-@permiso_requerido("editar_catalogos")
+@permiso_requerido("crear_catalogos")
 def editar_catalogo(request, id):
     catalogo = get_object_or_404(Catalogo, pk=id)
     if request.method == "POST":
@@ -2190,8 +2207,8 @@ def editar_variacion(request, producto_id, id):
             variacion.talla = talla
             variacion.color = color
             variacion.sku_unico = sku
-            variacion.precio_compra = Decimal(precio_compra)
-            variacion.precio_base = float(precio_base)
+            variacion.precio_compra = Decimal(precio_compra.replace(",", "."))
+            variacion.precio_base = float(precio_base.replace(",", "."))
             variacion.iva_porcentaje = float(iva_porcentaje)
             variacion.stock_actual = int(stock_actual)
             variacion.stock_minimo = int(stock_minimo)
@@ -2351,7 +2368,6 @@ def crear_entrada(request):
 
 
 @admin_required
-@permiso_requerido("ver_entradas")
 def detalle_entrada(request, id):
     entrada = get_object_or_404(Entrada.objects.select_related("proveedor"), pk=id)
     detalles = DetalleEntrada.objects.select_related("variacion__producto").filter(
@@ -2442,7 +2458,6 @@ def listar_ventas(request):
 
 
 @admin_required
-@permiso_requerido("ver_ventas")
 def detalle_venta(request, id):
     venta = get_object_or_404(Venta.objects.select_related("usuario"), pk=id)
     detalles = DetalleVenta.objects.select_related("variacion__producto").filter(
@@ -2735,7 +2750,6 @@ def listar_envios(request):
 
 
 @admin_required
-@permiso_requerido("ver_envios")
 def detalle_envio(request, id):
     envio = get_object_or_404(
         Envio.objects.select_related("venta__usuario", "usuario"), pk=id
@@ -2874,7 +2888,6 @@ def eliminar_envio(request, id):
 
 
 @admin_required
-@permiso_requerido("cambiar_estado_envios")
 def envio_cambiar_estado(request, id):
     if request.method == "POST":
         envio = get_object_or_404(Envio, pk=id)
@@ -2892,7 +2905,6 @@ def envio_cambiar_estado(request, id):
 
 
 @admin_required
-@permiso_requerido("ver_reportes")
 def reporte_inventario(request):
     """Reporte 1 — Inventario por Producto"""
     filtro_talla = request.GET.get("talla", "")
@@ -3052,7 +3064,6 @@ def reporte_inventario(request):
 
 
 @admin_required
-@permiso_requerido("ver_reportes")
 def reporte_ventas(request):
     """Reporte 2 — Ventas por Fecha y Usuario"""
     busqueda_usuario = request.GET.get("busqueda_usuario", "").strip()
@@ -3145,7 +3156,6 @@ def reporte_ventas(request):
 
 
 @admin_required
-@permiso_requerido("ver_reportes")
 def reporte_categorias(request):
     """Reporte 3 — Ventas por Categoría"""
     from django.db.models import ExpressionWrapper, F, FloatField
@@ -3207,7 +3217,6 @@ def reporte_categorias(request):
 
 
 @admin_required
-@permiso_requerido("ver_reportes")
 def reporte_envios(request):
     """Reporte 4 — Estado de Envíos"""
     filtro_estado = request.GET.get("estado", "")
@@ -3281,7 +3290,6 @@ def reporte_envios(request):
 
 
 @admin_required
-@permiso_requerido("ver_reportes")
 def reporte_clientes(request):
     """Reporte 5 — Comportamiento de Clientes"""
     busqueda = request.GET.get("q", "").strip()
@@ -3336,7 +3344,6 @@ def reporte_clientes(request):
 
 
 @admin_required
-@permiso_requerido("ver_reportes")
 def reportes_hub(request):
     return render(request, "admin/reportes/reportes_hub.html")
 

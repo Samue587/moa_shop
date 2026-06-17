@@ -1,111 +1,192 @@
 {% extends "admin/base_admin.html" %}
-{% block title %}Detalle Entrada #{{ entrada.id }} — TiendaMoa07{% endblock %}
+{% block title %}Nueva Entrada — TiendaMoa07{% endblock %}
 {% block menu_inventario %}active{% endblock %}
-{% block navbar_title %}Detalle de Entrada{% endblock %}
+{% block navbar_title %}Nueva Entrada de Inventario{% endblock %}
 
 {% block content %}
 <div class="page-header">
     <div>
-        <div class="page-title">👁️ Entrada #{{ entrada.id }}</div>
+        <div class="page-title">➕ Nueva Entrada</div>
         <div class="breadcrumb">
             <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
             <a href="{% url 'admin_inventario' %}">Inventario</a> ›
-            Detalle
-        </div>
-    </div>
-    <a href="{% url 'admin_inventario' %}" class="btn btn-secondary">← Volver</a>
-</div>
-
-<!-- Resumen de la entrada -->
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
-    <div class="card" style="margin:0;">
-        <div class="card-body" style="padding:20px;">
-            <div style="font-size:12px;color:#7f8c8d;font-weight:600;text-transform:uppercase;margin-bottom:6px;">Proveedor</div>
-            <div style="font-size:16px;font-weight:700;color:#2c3e50;">🏭 {{ entrada.proveedor.nombre_proveedor }}</div>
-        </div>
-    </div>
-    <div class="card" style="margin:0;">
-        <div class="card-body" style="padding:20px;">
-            <div style="font-size:12px;color:#7f8c8d;font-weight:600;text-transform:uppercase;margin-bottom:6px;">Fecha de Entrada</div>
-            <div style="font-size:16px;font-weight:700;color:#2c3e50;">📅 {{ entrada.fecha_entrada|date:"d/m/Y H:i" }}</div>
-        </div>
-    </div>
-    <div class="card" style="margin:0;">
-        <div class="card-body" style="padding:20px;">
-            <div style="font-size:12px;color:#7f8c8d;font-weight:600;text-transform:uppercase;margin-bottom:6px;">Ítems recibidos</div>
-            <div style="font-size:16px;font-weight:700;color:#144272;">📦 {{ entrada.detalles.count }} producto(s)</div>
-        </div>
-    </div>
-    <div class="card" style="margin:0;">
-        <div class="card-body" style="padding:20px;">
-            <div style="font-size:12px;color:#7f8c8d;font-weight:600;text-transform:uppercase;margin-bottom:6px;">Total Unidades</div>
-            <div style="font-size:16px;font-weight:700;color:#1a7a4a;">✅ {{ entrada.total_entrada }} uds.</div>
+            Nueva Entrada
         </div>
     </div>
 </div>
 
-<!-- Tabla de detalles -->
-<div class="card">
-    <div class="card-header"><h3>🗂️ Productos Recibidos</h3></div>
-    <div class="table-responsive">
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>SKU</th>
-                    <th>Producto</th>
-                    <th>Talla</th>
-                    <th>Color</th>
-                    <th style="text-align:center;">Cantidad</th>
-                    <th style="text-align:center;">Precio Compra</th>
-                    <th style="text-align:center;">Subtotal</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for detalle in entrada.detalles.all %}
-                <tr>
-                    <td style="color:#7f8c8d;font-size:13px;">{{ forloop.counter }}</td>
-                    <td>
-                        <span style="background:#f0f4ff;color:#144272;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:600;font-family:monospace;">
-                            {{ detalle.variacion.sku_unico }}
-                        </span>
-                    </td>
-                    <td style="font-weight:600;color:#2c3e50;">{{ detalle.variacion.producto.nombre_producto }}</td>
-                    <td>
-                        <span style="background:#f8f9fa;padding:3px 8px;border-radius:6px;font-size:13px;">
-                            {{ detalle.variacion.talla }}
-                        </span>
-                    </td>
-                    <td style="font-size:13px;color:#2c3e50;">{{ detalle.variacion.color }}</td>
-                    <td style="text-align:center;">
-                        <span style="background:#e8f8f0;color:#1a7a4a;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:600;">
-                            {{ detalle.cantidades }}
-                        </span>
-                    </td>
-                    <td style="text-align:center;font-size:13px;color:#7f8c8d;">
-                        ${{ detalle.precio_comprado|floatformat:0 }}
-                    </td>
-                    <td style="text-align:center;font-weight:600;color:#144272;">
-                        ${% widthratio detalle.precio_comprado 1 detalle.cantidades %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="8" style="text-align:center;padding:40px;color:#7f8c8d;">
-                        No hay detalles registrados.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-            <tfoot>
-                <tr style="background:#f8f9fa;border-top:2px solid #e0e6ed;">
-                    <td colspan="7" style="padding:14px 16px;text-align:right;font-weight:700;color:#2c3e50;">TOTAL UNIDADES:</td>
-                    <td style="padding:14px 16px;text-align:center;font-weight:700;color:#144272;font-size:16px;">
-                        {{ entrada.total_entrada }} uds.
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<form method="post" id="formEntrada">
+    {% csrf_token %}
+
+    <!-- CABECERA -->
+    <div class="card" style="max-width:800px; margin-bottom:24px;">
+        <div class="card-header"><h3>📋 Datos de la Entrada</h3></div>
+        <div class="card-body">
+
+            <div class="form-group">
+                <label>🏭 Proveedor *</label>
+                <select name="proveedor" class="form-control" required>
+                    <option value="">— Seleccionar —</option>
+                    {% for p in proveedores %}
+                        <option value="{{ p.id }}">{{ p.nombre_proveedor }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>📅 Fecha de Entrada *</label>
+                <input type="datetime-local"
+                       name="fecha_entrada"
+                       class="form-control"
+                       value="{{ fecha_actual }}"
+                       required>
+            </div>
+
+        </div>
     </div>
-</div>
+
+    <!-- DETALLES -->
+    <div class="card" style="max-width:800px; margin-bottom:24px;">
+        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+            <h3>🗂️ Productos Recibidos</h3>
+            <button type="button" class="btn btn-primary btn-sm" onclick="agregarFila()">
+                ➕ Agregar Producto
+            </button>
+        </div>
+
+        <div class="card-body" style="padding:0;">
+            <table style="width:100%;" id="tablaDetalles">
+                <thead>
+                    <tr>
+                        <th>Variación</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Subtotal</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+
+                <tbody id="cuerpoDetalles"></tbody>
+
+                <tfoot>
+                    <tr>
+                        <td colspan="3" style="text-align:right;font-weight:700;">
+                            TOTAL:
+                        </td>
+                        <td id="totalGeneral">$0</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div id="mensajeVacio" style="text-align:center;padding:30px;color:#7f8c8d;">
+                📭 Agrega productos
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" name="totalFilas" id="totalFilas">
+    <input type="hidden" name="total_entrada" id="totalEntrada">
+
+    <button type="submit" class="btn btn-success">💾 Registrar Entrada</button>
+    <a href="{% url 'admin_inventario' %}" class="btn btn-secondary">Cancelar</a>
+
+</form>
+
+<script>
+const variaciones = [
+{% for v in variaciones %}
+{
+    id: {{ v.id }},
+    sku: "{{ v.sku_unico|escapejs }}",
+    nombre: "{{ v.producto.nombre_producto|escapejs }}",
+    stock: {{ v.stock_actual }},
+    precio: {{ v.precio_compra }}
+},
+{% endfor %}
+];
+
+let idx = 0;
+
+function agregarFila() {
+    const tbody = document.getElementById("cuerpoDetalles");
+    const i = idx++;
+
+    const opciones = variaciones.map(v =>
+        `<option value="${v.id}" data-precio="${v.precio}">
+            ${v.sku} - ${v.nombre}
+        </option>`
+    ).join("");
+
+    const tr = document.createElement("tr");
+    tr.id = "fila_" + i;
+
+    tr.innerHTML = `
+        <td>
+            <select name="variacion_${i}" onchange="setPrecio(${i})">
+                <option value="">Seleccione</option>
+                ${opciones}
+            </select>
+        </td>
+
+        <td>
+            <input type="number" name="cantidad_${i}" value="1" min="1"
+                   oninput="calc(${i})">
+        </td>
+
+        <td>
+            <input type="number" name="precio_${i}" value="0" readonly>
+        </td>
+
+        <td id="sub_${i}">$0</td>
+
+        <td>
+            <button type="button" onclick="eliminar(${i})">🗑️</button>
+        </td>
+    `;
+
+    tbody.appendChild(tr);
+    document.getElementById("mensajeVacio").style.display = "none";
+    document.getElementById("totalFilas").value = idx;
+}
+
+function setPrecio(i){
+    const sel = document.querySelector(`[name="variacion_${i}"]`);
+    const price = sel.options[sel.selectedIndex].dataset.precio || 0;
+    document.querySelector(`[name="precio_${i}"]`).value = price;
+    calc(i);
+}
+
+function calc(i){
+    const c = document.querySelector(`[name="cantidad_${i}"]`).value || 0;
+    const p = document.querySelector(`[name="precio_${i}"]`).value || 0;
+    const s = c * p;
+
+    document.getElementById("sub_" + i).innerText = "$" + s.toLocaleString();
+    total();
+}
+
+function total(){
+    let t = 0;
+    document.querySelectorAll("[id^='sub_']").forEach(x=>{
+        t += parseInt(x.innerText.replace(/\D/g,"")||0);
+    });
+    document.getElementById("totalGeneral").innerText = "$" + t.toLocaleString();
+    document.getElementById("totalEntrada").value = t;
+}
+
+function eliminar(i){
+    document.getElementById("fila_" + i)?.remove();
+    total();
+}
+</script>
+
 {% endblock %}

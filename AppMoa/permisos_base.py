@@ -1,21 +1,18 @@
 MODULOS = [
-    'productos',
-    'usuarios',
-    'ventas',
-    'clientes',
-    'proveedores',
-    'entradas',
-    'variaciones',
-    'roles',
-    'permisos',
-    'catalogos',
-    'envios',
-    'reportes',
-    'dashboard'
+    "productos",
+    "usuarios",
+    "ventas",
+    "clientes",
+    "proveedores",
+    "entradas",
+    "roles",
+    "permisos",
+    "dashboard",
 ]
+
 ACCIONES = [
-    ('ver', 'Ver'),
-    ('crear', 'Crear'),
-    ('editar', 'Editar'),
-    ('eliminar', 'Eliminar')
+    ("ver", "Ver"),
+    ("crear", "Crear"),
+    ("editar", "Editar"),
+    ("eliminar", "Eliminar"),
 ]

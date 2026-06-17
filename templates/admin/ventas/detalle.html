@@ -6,6 +6,25 @@
 
 {% block content %}
 
+
+<!-- AVISO NO CONFIRMADO -->
+{% if not venta.confirmado %}
+<div style="background:#fff3cd; border:2px solid #ffc107; border-radius:12px; padding:20px 24px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+    <div style="display:flex; align-items:center; gap:12px;">
+        <span style="font-size:28px;">⏳</span>
+        <div>
+            <div style="font-size:15px; font-weight:700; color:#856404;">Pedido pendiente de confirmación</div>
+            <div style="font-size:13px; color:#856404; margin-top:2px;">El cliente aún no ha confirmado este pedido. No proceses el envío hasta que confirme.</div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div style="background:#d4edda; border:2px solid #28a745; border-radius:12px; padding:16px 24px; margin-bottom:20px; display:flex; align-items:center; gap:12px;">
+    <span style="font-size:24px;">✅</span>
+    <div style="font-size:15px; font-weight:700; color:#155724;">Pedido confirmado por el cliente — puedes procesar el envío.</div>
+</div>
+{% endif %}
+
 <!-- BREADCRUMB -->
 <div class="page-header">
     <div>
