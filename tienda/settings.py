@@ -102,9 +102,9 @@ else:
             "ENGINE": "django.db.backends.mysql",
             "NAME": "tiendamoa07",
             "USER": "root",
-            "PASSWORD": "Level_one19",
+            "PASSWORD": "1028864373",
             "HOST": "127.0.0.1",
-            "PORT": "3308",
+            "PORT": "3307",
             "OPTIONS": {
                 "charset": "utf8mb4",
             },
