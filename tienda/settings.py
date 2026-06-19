@@ -104,7 +104,7 @@ else:
             "USER": "root",
             "PASSWORD": "Level_one19",
             "HOST": "127.0.0.1",
-            "PORT": "3306",
+            "PORT": "3308",
             "OPTIONS": {
                 "charset": "utf8mb4",
             },

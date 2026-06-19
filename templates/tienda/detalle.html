@@ -156,7 +156,7 @@ body.dark-mode .talla-btn.selected { background: var(--primary); color: white; }
 
         /* ACCIONES */
         .action-section { display: flex; flex-direction: column; gap: 10px; }
-.btn-add { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px; background: var(--bg); color: var(--ink); border: 1px solid var(--border); border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all .25s; font-family: inherit; }        .btn-add:hover:not(:disabled) { background: #1a56db !important; }
+        .btn-add { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px; background: var(--bg); color: var(--ink); border: 1px solid var(--border); border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all .25s; font-family: inherit; }        .btn-add:hover:not(:disabled) { background: #1a56db !important; }
         .btn-add:disabled { opacity: .4; cursor: not-allowed; }
         .btn-cart { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; background: var(--bg); color: var(--ink); border: 1px solid var(--border); border-radius: 14px; font-size: 15px; font-weight: 600; text-decoration: none; transition: all .25s; }
         .btn-cart:hover { background: #1a56db !important; color: white !important; border-color: #1a56db !important; }
@@ -274,7 +274,9 @@ body.dark-mode .talla-btn.selected { background: var(--primary); color: white; }
 
                 <div class="action-section">
                     {% if usuario %}
-                        <button type="submit" class="btn-add" id="btn-agregar">🛒 Agregar al carrito</button>
+                        <button type="submit" class="btn-add" id="btn-agregar" disabled>
+                            Selecciona color y talla
+                        </button>
                     {% else %}
                         <a href="{% url 'login' %}" class="btn-add" style="text-decoration:none;">🔒 Inicia sesión para comprar</a>
                     {% endif %}
@@ -401,18 +403,46 @@ function seleccionarTalla(talla, btn) {
 }
 
 function actualizarVariacion() {
-    if (!colorSeleccionado || !tallaSeleccionada) return;
-    const v = variaciones.find(x => 
-        x.color.trim().toLowerCase() === colorSeleccionado.trim().toLowerCase() && 
+
+    const btnAgregar = document.getElementById('btn-agregar');
+
+    if (!colorSeleccionado || !tallaSeleccionada) {
+        btnAgregar.disabled = true;
+        btnAgregar.textContent = 'Selecciona color y talla';
+        return;
+    }
+
+    const v = variaciones.find(x =>
+        x.color.trim().toLowerCase() === colorSeleccionado.trim().toLowerCase() &&
         x.talla.trim().toLowerCase() === tallaSeleccionada.trim().toLowerCase()
     );
-    if (!v) return;
+
+    if (!v) {
+        btnAgregar.disabled = true;
+        return;
+    }
+
     document.getElementById('variacion-id-input').value = v.id;
+
     const num = Math.round(v.precio);
-    document.getElementById('precio-display').textContent = '$ ' + num.toLocaleString('es-CO') + ' COP';    
+
+    document.getElementById('precio-display').textContent =
+        '$ ' + num.toLocaleString('es-CO') + ' COP';
+
     const stockEl = document.getElementById('stock-info');
-    stockEl.textContent = v.stock <= 5 ? `⚠️ ¡Solo ${v.stock} disponibles!` : `✅ ${v.stock} disponibles`;
-    stockEl.style.color = v.stock <= 5 ? '#F59E0B' : 'var(--muted)';
+
+    stockEl.textContent =
+        v.stock <= 5
+        ? `⚠️ ¡Solo ${v.stock} disponibles!`
+        : `✅ ${v.stock} disponibles`;
+
+    stockEl.style.color =
+        v.stock <= 5
+        ? '#F59E0B'
+        : 'var(--muted)';
+
+    btnAgregar.disabled = false;
+    btnAgregar.textContent = '🛒 Agregar al carrito';
 }
 
 // Cantidad
@@ -431,6 +461,20 @@ function cambiarCantidad(delta) {
 })();
 const precioInicial = {{ variaciones.0.precio_con_iva|stringformat:"d" }};
 document.getElementById('precio-display').textContent = '$ ' + Math.round(precioInicial).toLocaleString('es-CO') + ' COP';
+
+
+document.getElementById('form-agregar').addEventListener('submit', function(e) {
+
+    if (!colorSeleccionado || !tallaSeleccionada) {
+
+        e.preventDefault();
+
+        alert('Debes seleccionar un color y una talla antes de agregar al carrito.');
+
+        return false;
+    }
+
+});
 </script>
 
 </body>
