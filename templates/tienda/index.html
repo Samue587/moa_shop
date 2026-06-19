@@ -203,8 +203,7 @@
         </a>
         <nav class="nav-links">
             <a href="{% url 'tienda' %}" class="nav-link active">Inicio</a>
-            <a href="{% url 'tienda' %}" class="nav-link">Productos</a>
-            <a href="{% url 'tienda' %}?categoria=" class="nav-link">Categorías</a>
+
         </nav>
         <form action="{% url 'tienda' %}" method="get" class="search-bar">
             <input type="text" name="q" class="search-input" placeholder="Buscar productos..." value="{{ busqueda }}">
