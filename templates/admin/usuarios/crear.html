@@ -1,0 +1,139 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Nuevo Usuario — TiendaMoa07{% endblock %}
+{% block menu_usuarios %}active{% endblock %}
+{% block navbar_title %}Nuevo Usuario{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <div class="page-title">➕ Nuevo Usuario</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_usuarios' %}">Usuarios</a> › Nuevo
+        </div>
+    </div>
+</div>
+
+<div class="card" style="max-width:720px;">
+    <div class="card-header">
+        <h3>👤 Datos del Usuario</h3>
+    </div>
+
+    <div class="card-body">
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- NOMBRES + APELLIDOS -->
+            <div class="form-row">
+
+                <div class="form-group">
+                    <label class="form-label">👤 Nombres <span class="required">*</span></label>
+                    <input type="text" name="nombres" class="form-control"
+                           placeholder="Ej: Juan Carlos"
+                           value="{{ form.nombres|default:'' }}"
+                           required maxlength="150">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">👤 Apellidos</label>
+                    <input type="text" name="apellidos" class="form-control"
+                           placeholder="Ej: Pérez García"
+                           value="{{ form.apellidos|default:'' }}"
+                           maxlength="150">
+                </div>
+
+            </div>
+
+            <!-- EMAIL -->
+            <div class="form-group">
+                <label class="form-label">📧 Correo Electrónico <span class="required">*</span></label>
+                <input type="email" name="email" class="form-control"
+                       placeholder="Ej: juan@correo.com"
+                       value="{{ form.email|default:'' }}"
+                       required maxlength="150">
+            </div>
+
+            <!-- PASSWORD -->
+            <div class="form-group">
+                <label class="form-label">🔒 Contraseña <span class="required">*</span></label>
+                <input type="password" name="password" class="form-control"
+                       placeholder="Mínimo 6 caracteres"
+                       required>
+            </div>
+
+            <!-- DOCUMENTO -->
+            <div class="form-row">
+
+                <div class="form-group">
+                    <label class="form-label">🪪 Tipo de Documento</label>
+                    <select name="tipo_documento" class="form-control">
+                        <option value="">-- Seleccionar --</option>
+                        <option value="CC" {% if form.tipo_documento == 'CC' %}selected{% endif %}>Cédula de Ciudadanía</option>
+                        <option value="CE" {% if form.tipo_documento == 'CE' %}selected{% endif %}>Cédula de Extranjería</option>
+                        <option value="NIT" {% if form.tipo_documento == 'NIT' %}selected{% endif %}>NIT</option>
+                        <option value="PA" {% if form.tipo_documento == 'PA' %}selected{% endif %}>Pasaporte</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">🔢 Número de Documento</label>
+                    <input type="text" name="numero_documento" class="form-control"
+                           placeholder="Ej: 1234567890"
+                           value="{{ form.numero_documento|default:'' }}"
+                           maxlength="150">
+                </div>
+
+            </div>
+
+            <!-- ROL + ESTADO -->
+            <div class="form-row">
+
+                <div class="form-group">
+                    <label class="form-label">🛡️ Rol <span class="required">*</span></label>
+                    <select name="rol" class="form-control" required>
+                        <option value="">-- Seleccionar rol --</option>
+                        {% for rol in roles %}
+                            <option value="{{ rol.id }}"
+                                {% if form.rol == rol.id|stringformat:"s" %}selected{% endif %}>
+                                {{ rol.nombre_rol }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">🔘 Estado</label>
+                    <select name="estado" class="form-control">
+                        <option value="ACTIVO"
+                            {% if form.estado == 'ACTIVO' or not form %}selected{% endif %}>
+                            ✅ Activo
+                        </option>
+                        <option value="INACTIVO"
+                            {% if form.estado == 'INACTIVO' %}selected{% endif %}>
+                            ❌ Inactivo
+                        </option>
+                    </select>
+                </div>
+
+            </div>
+
+            <!-- BOTONES -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success">
+                    💾 Guardar Usuario
+                </button>
+
+                <a href="{% url 'admin_usuarios' %}" class="btn btn-secondary">
+                    ❌ Cancelar
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

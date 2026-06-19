@@ -1,0 +1,447 @@
+{% extends "admin/base_admin.html" %}
+{% load humanize %}
+
+{% block title %}Reporte Clientes — MOA{% endblock %}
+{% block menu_reportes %}active{% endblock %}
+{% block navbar_title %}👥 Reporte de Clientes{% endblock %}
+
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <div class="page-title">
+            👥 Reporte de Clientes
+        </div>
+
+        <div class="breadcrumb">
+
+            <a href="{% url 'admin_dashboard' %}">
+                Dashboard
+            </a>
+
+            ›
+
+            <a href="{% url 'reportes_hub' %}">
+                Reportes
+            </a>
+
+            ›
+
+            Clientes
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- STATS -->
+
+<div class="stats-grid">
+
+
+    <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #144272;">
+
+        <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">
+            Total clientes
+        </div>
+
+        <div style="font-size:28px; font-weight:800; color:#144272;">
+            {{ total_clientes }}
+        </div>
+
+        <div style="font-size:12px; color:#aab; margin-top:2px;">
+            clientes registrados
+        </div>
+
+    </div>
+
+
+
+    <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,000,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #27ae60;">
+
+        <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">
+            Clientes activos
+        </div>
+
+        <div style="font-size:28px; font-weight:800; color:#27ae60;">
+            {{ clientes_activos }}
+        </div>
+
+        <div style="font-size:12px; color:#aab; margin-top:2px;">
+            con al menos una compra
+        </div>
+
+    </div>
+
+
+
+    <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,000,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #e74c3c;">
+
+        <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">
+            Sin compras
+        </div>
+
+        <div style="font-size:28px; font-weight:800; color:#e74c3c;">
+            {{ clientes_inactivos }}
+        </div>
+
+        <div style="font-size:12px; color:#aab; margin-top:2px;">
+            nunca han comprado
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+<!-- TOP 5 CLIENTES -->
+
+<div class="card" style="margin-bottom:20px;">
+
+    <div class="card-header">
+        <h3>
+            🏆 Top 5 Clientes por Gasto
+        </h3>
+    </div>
+
+
+    <div class="table-responsive">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>#</th>
+                    <th>Cliente</th>
+                    <th>Email</th>
+                    <th>Compras</th>
+                    <th>Total Gastado</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+            {% for c in top_clientes %}
+
+                <tr>
+
+                    <td>
+                        <strong>
+                            {{ forloop.counter }}
+                        </strong>
+                    </td>
+
+
+                    <td>
+                        {{ c.get_full_name }}
+                    </td>
+
+
+                    <td style="font-size:12px;color:#7f8c8d;">
+                        {{ c.correo_usuario }}
+                    </td>
+
+
+                    <td>
+                        <span class="badge badge-info">
+                            {{ c.num_ventas }}
+                        </span>
+                    </td>
+
+
+                    <td>
+                        <strong style="color:#144272;">
+                            ${{ c.total_gastado|floatformat:0|intcomma }}
+                        </strong>
+                    </td>
+
+
+                </tr>
+
+
+            {% empty %}
+
+                <tr>
+
+                    <td colspan="5" style="text-align:center;color:#999;">
+                        Sin datos
+                    </td>
+
+                </tr>
+
+
+            {% endfor %}
+
+
+            </tbody>
+
+
+        </table>
+
+    </div>
+
+
+</div>
+
+
+
+
+<!-- FILTROS -->
+
+<div class="card" style="margin-bottom:20px;">
+
+    <div class="card-body" style="padding:20px 25px;">
+
+
+        <form method="get"
+              action="{% url 'reporte_clientes' %}"
+              style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;">
+
+
+            <div class="form-group" style="margin-bottom:0;">
+
+                <label class="form-label">
+                    BUSCAR CLIENTE
+                </label>
+
+
+                <input type="text"
+                       name="q"
+                       class="form-control"
+                       placeholder="Nombre o email..."
+                       value="{{ busqueda }}">
+
+
+            </div>
+
+
+
+            <div class="form-group" style="margin-bottom:0;">
+
+                <label class="form-label">
+                    ORDENAR POR
+                </label>
+
+
+                <select name="orden"
+                        class="form-control">
+
+
+                    <option value="ventas"
+                    {% if filtro_orden == 'ventas' %}selected{% endif %}>
+                        N° de Compras
+                    </option>
+
+
+                    <option value="gastado"
+                    {% if filtro_orden == 'gastado' %}selected{% endif %}>
+                        Total Gastado
+                    </option>
+
+
+                </select>
+
+
+            </div>
+
+
+
+            <button type="submit"
+                    class="btn btn-primary btn-sm">
+
+                🔍 Buscar Cliente
+
+            </button>
+
+
+        </form>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+<!-- TABLA CLIENTES -->
+
+
+<div class="card">
+
+
+    <div class="card-header"
+         style="display:flex;justify-content:space-between;align-items:center;">
+
+
+        <h3>
+            📋 Listado de Clientes
+        </h3>
+
+
+        <div style="display:flex;gap:10px;">
+
+            <a href="{% url 'exportar_clientes_excel' %}"
+               class="btn btn-success btn-sm">
+
+                📊 Exportar Excel
+
+            </a>
+
+
+            <a href="{% url 'exportar_clientes_pdf' %}"
+               class="btn btn-danger btn-sm">
+
+                📄 Exportar PDF
+
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    {% if clientes %}
+
+
+    <div class="table-responsive">
+
+
+        <table>
+
+
+            <thead>
+
+                <tr>
+
+                    <th>Cliente</th>
+                    <th>Email</th>
+                    <th>Estado</th>
+                    <th>N° Compras</th>
+                    <th>Total Gastado</th>
+                    <th>Miembro desde</th>
+
+                </tr>
+
+
+            </thead>
+
+
+
+            <tbody>
+
+
+            {% for c in clientes %}
+
+
+                <tr>
+
+
+                    <td>
+                        <strong>
+                            {{ c.get_full_name }}
+                        </strong>
+                    </td>
+
+
+                    <td style="font-size:12px;color:#7f8c8d;">
+                        {{ c.correo_usuario }}
+                    </td>
+
+
+                    <td>
+
+                        {% if c.activo %}
+
+                            <span class="badge badge-success">
+                                Activo
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge badge-danger">
+                                Inactivo
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="badge badge-info">
+                            {{ c.num_ventas|default:"0" }}
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <strong style="color:#144272;">
+                            ${{ c.total_gastado|default:0|floatformat:0|intcomma }}
+                        </strong>
+
+                    </td>
+
+
+                    <td style="font-size:12px;color:#7f8c8d;">
+                        {{ c.creado_en|date:"d/m/Y" }}
+                    </td>
+
+
+                </tr>
+
+
+            {% endfor %}
+
+
+            </tbody>
+
+
+        </table>
+
+
+    </div>
+
+
+    {% else %}
+
+
+    <div class="empty-state">
+
+        <div class="empty-icon">
+            📭
+        </div>
+
+        <p>
+            No hay clientes con ese criterio.
+        </p>
+
+
+    </div>
+
+
+    {% endif %}
+
+
+</div>
+
+
+{% endblock %}

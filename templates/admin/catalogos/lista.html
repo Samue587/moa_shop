@@ -1,0 +1,107 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Catálogos - MOA{% endblock %}
+{% block menu_catalogos %}active{% endblock %}
+{% block navbar_title %}Catálogos{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">📚 Catálogos</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            Catálogos
+        </div>
+    </div>
+
+<a href="{% url 'crear_catalogo' %}" class="btn btn-primary">➕ Nuevo Catálogo</a>
+
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="card">
+    <div class="card-body" style="padding:0;">
+
+        {% if catalogos %}
+        <div style="padding:16px 20px; border-bottom:1px solid #e0e6ed;">
+            <span style="color:#7f8c8d; font-size:14px;">
+                Total: <strong>{{ catalogos|length }} catálogo(s)</strong>
+            </span>
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Productos</th>
+                    <th>Fecha Creación</th>
+                    <th style="text-align:right; padding-right:24px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for catalogo in catalogos %}
+                <tr>
+                    <td style="color:#7f8c8d; font-size:13px;">{{ forloop.counter }}</td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div style="width:38px; height:38px; border-radius:8px; background:linear-gradient(135deg,#144272,#2a628f); display:flex; align-items:center; justify-content:center; color:#fff; font-size:16px; flex-shrink:0;">
+                                📚
+                            </div>
+                            <div style="font-weight:600; color:#2c3e50;">{{ catalogo.nombre_catalogo }}</div>
+                        </div>
+                    </td>
+                    <td style="color:#7f8c8d; font-size:14px; max-width:280px;">
+                        {% if catalogo.descripcion_catalogo %}
+                            {{ catalogo.descripcion_catalogo|truncatechars:80 }}
+                        {% else %}
+                            <span style="color:#bdc3c7; font-style:italic;">Sin descripción</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span style="background:#eaf0fb; color:#144272; padding:4px 10px; border-radius:20px; font-size:13px; font-weight:600;">
+                            {{ catalogo.producto_set.count }} producto(s)
+                        </span>
+                    </td>
+                    <td style="color:#7f8c8d; font-size:13px;">
+                        {% if catalogo.creado_en %}
+                            {{ catalogo.creado_en|date:"d/m/Y" }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td style="text-align:right; padding-right:24px;">
+                        <div style="display:flex; gap:6px; justify-content:flex-end;">
+                            
+<a href="{% url 'editar_catalogo' catalogo.id %}" class="btn btn-sm btn-warning" title="Editar">✏️</a>
+
+<a href="{% url 'eliminar_catalogo' catalogo.id %}" class="btn btn-sm btn-danger" title="Eliminar">🗑️</a>
+
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% else %}
+        <div style="text-align:center; padding:60px 20px; color:#7f8c8d;">
+            <div style="font-size:56px; margin-bottom:16px;">📭</div>
+            <h3 style="font-size:18px; margin-bottom:8px; color:#2c3e50;">No hay catálogos registrados</h3>
+            <p style="font-size:14px; margin-bottom:24px;">Crea el primer catálogo para organizar tus productos.</p>
+            
+<a href="{% url 'crear_catalogo' %}" class="btn btn-primary">➕ Crear primer catálogo</a>
+
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

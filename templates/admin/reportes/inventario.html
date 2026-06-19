@@ -1,0 +1,204 @@
+  {% extends "admin/base_admin.html" %}
+  {% load humanize %}
+  {% block title %}Reporte Inventario — MOA{% endblock %}
+  {% block navbar_title %}📦 Reporte de Inventario{% endblock %}
+
+  {% block content %}
+
+  <!-- STATS -->
+  <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:16px; margin-bottom:24px;">
+
+    <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #144272;">
+      <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">Total variaciones</div>
+      <div style="font-size:28px; font-weight:800; color:#144272;">{{ total_variaciones }}</div>
+      <div style="font-size:12px; color:#aab; margin-top:2px;">SKUs registrados</div>
+    </div>
+
+    <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #27ae60;">
+      <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">Stock total</div>
+      <div style="font-size:28px; font-weight:800; color:#27ae60;">{{ stock_total }}</div>
+      <div style="font-size:12px; color:#aab; margin-top:2px;">unidades disponibles</div>
+    </div>
+
+    <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #e67e22;">
+      <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">Bajo stock</div>
+      <div style="font-size:28px; font-weight:800; color:#e67e22;">{{ total_bajo_stock }}</div>
+      <div style="font-size:12px; color:#aab; margin-top:2px;">requieren reabastecimiento</div>
+    </div>
+
+    <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #e74c3c;">
+      <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">Agotados</div>
+      <div style="font-size:28px; font-weight:800; color:#e74c3c;">{{ total_agotados }}</div>
+      <div style="font-size:12px; color:#aab; margin-top:2px;">sin unidades disponibles</div>
+    </div>
+
+    <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #8e44ad;">
+      <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">Total productos</div>
+      <div style="font-size:28px; font-weight:800; color:#8e44ad;">{{ total_productos }}</div>
+      <div style="font-size:12px; color:#aab; margin-top:2px;">productos en catálogo</div>
+    </div>
+
+    <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #16a085;">
+      <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">Mayor rotación</div>
+      <div style="font-size:28px; font-weight:800; color:#16a085;">{{ total_mayor_rotacion }}</div>
+      <div style="font-size:12px; color:#aab; margin-top:2px;">unidades del más vendido</div>
+    </div>
+
+  </div>
+
+  <!-- FILTROS -->
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-header">
+      <h3 class="card-title">🔍 Filtros</h3>
+    </div>
+    <div class="card-body">
+      <form method="get" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:12px;font-weight:600;color:#666;">Talla</label>
+          <select name="talla" class="form-control" style="min-width:100px;">
+            <option value="">Todas</option>
+            {% for talla in tallas_disponibles %}
+              <option value="{{ talla }}" {% if request.GET.talla == talla %}selected{% endif %}>{{ talla }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:12px;font-weight:600;color:#666;">Color</label>
+          <select name="color" class="form-control" style="min-width:120px;">
+            <option value="">Todos</option>
+            {% for color in colores_disponibles %}
+              <option value="{{ color }}" {% if request.GET.color == color %}selected{% endif %}>{{ color }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:12px;font-weight:600;color:#666;">Categoría</label>
+          <select name="categoria" class="form-control" style="min-width:140px;">
+            <option value="">Todas</option>
+            {% for cat in categorias_disponibles %}
+              <option value="{{ cat.id }}" {% if request.GET.categoria == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:12px;font-weight:600;color:#666;">Estado stock</label>
+          <select name="estado_stock" class="form-control" style="min-width:150px;">
+            <option value="">Todos</option>
+            <option value="disponible" {% if request.GET.estado_stock == "disponible" %}selected{% endif %}>Disponible</option>
+            <option value="bajo_stock"  {% if request.GET.estado_stock == "bajo_stock"  %}selected{% endif %}>Bajo stock</option>
+            <option value="agotado"     {% if request.GET.estado_stock == "agotado"     %}selected{% endif %}>Agotado</option>
+          </select>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:flex-end;">
+          <button type="submit" class="btn btn-primary">Filtrar</button>
+          <a href="{% url 'reporte_inventario' %}" class="btn btn-secondary">Limpiar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ROTACIÓN -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">🔝 Mayor Rotación</h3></div>
+      <div class="card-body" style="padding:0;">
+        <table class="table">
+          <thead>
+            <tr><th>#</th><th>Producto</th><th>Unidades vendidas</th></tr>
+          </thead>
+          <tbody>
+            {% for item in productos_mayor_rotacion %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ item.nombre }}</td>
+              <td><span class="badge badge-success">{{ item.unidades_vendidas }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" style="text-align:center;color:#999;">Sin datos</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">📉 Menor Rotación</h3></div>
+      <div class="card-body" style="padding:0;">
+        <table class="table">
+          <thead>
+            <tr><th>#</th><th>Producto</th><th>Unidades vendidas</th></tr>
+          </thead>
+          <tbody>
+            {% for item in productos_menor_rotacion %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ item.nombre }}</td>
+              <td><span class="badge badge-warning">{{ item.unidades_vendidas }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" style="text-align:center;color:#999;">Sin datos</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TABLA PRINCIPAL -->
+  <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+      <h3 class="card-title">📋 Detalle de Inventario</h3>
+      <div style="display:flex;gap:10px;">
+          <a href="{% url 'exportar_inventario_excel' %}" class="btn btn-success btn-sm">📊 Exportar Excel</a>
+          <a href="{% url 'exportar_inventario_pdf' %}"   class="btn btn-danger  btn-sm">📄 Exportar PDF</a>
+      </div>
+  </div>
+    <div class="card-body" style="padding:0;overflow-x:auto;">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Categoría</th>
+            <th>Talla</th>
+            <th>Color</th>
+            <th>Stock</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for v in variaciones %}
+          <tr>
+            <td><strong>{{ v.producto.nombre_producto }}</strong></td>
+            <td>{{ v.producto.categoria.nombre|default:"—" }}</td>
+            <td>{{ v.talla|default:"—" }}</td>
+            <td>{{ v.color|default:"—" }}</td>
+            <td><strong>{{ v.stock_actual }}</strong></td>
+            <td>
+              {% if v.sin_stock %}
+                <span class="badge" style="background:#e74c3c;color:#fff;">Agotado</span>
+              {% elif v.bajo_stock %}
+                <span class="badge" style="background:#e67e22;color:#fff;">Bajo stock</span>
+              {% else %}
+                <span class="badge" style="background:#27ae60;color:#fff;">Disponible</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" style="text-align:center;padding:40px;color:#999;">
+              📭 No se encontraron productos con los filtros seleccionados.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% endblock %}

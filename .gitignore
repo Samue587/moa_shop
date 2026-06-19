@@ -1,0 +1,16 @@
+# entorno
+.env
+
+# python cache
+__pycache__/
+*.pyc
+
+# base de datos local
+db.sqlite3
+
+# archivos media y estáticos
+media/
+staticfiles/
+
+# logs
+*.logn         

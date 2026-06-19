@@ -1,0 +1,203 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Nueva Entrada — TiendaMoa07{% endblock %}
+{% block menu_inventario %}active{% endblock %}
+{% block navbar_title %}Nueva Entrada de Inventario{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <div class="page-title">➕ Nueva Entrada</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_inventario' %}">Inventario</a> ›
+            Nueva Entrada
+        </div>
+    </div>
+</div>
+
+<form method="post" id="formEntrada">
+    {% csrf_token %}
+
+    <!-- CABECERA -->
+    <div class="card" style="max-width:800px; margin-bottom:24px;">
+        <div class="card-header"><h3>📋 Datos de la Entrada</h3></div>
+        <div class="card-body">
+
+            <div class="form-group">
+                <label>🏭 Proveedor</label>
+                <select name="proveedor" class="form-control" required>
+                    <option value="">— Seleccionar proveedor —</option>
+                    {% for p in proveedores %}
+                        <option value="{{ p.id }}">{{ p.nombre_proveedor }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-top:10px;">
+                <label>📅 Fecha de Entrada</label>
+                <input type="datetime-local"
+                       name="fecha_entrada"
+                       class="form-control"
+                       value="{{ fecha_actual }}"
+                       required>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- DETALLES -->
+    <div class="card" style="max-width:800px; margin-bottom:24px;">
+        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+            <h3>🗂️ Productos Recibidos</h3>
+            <button type="button" class="btn btn-primary btn-sm" onclick="agregarFila()">
+                ➕ Agregar Producto
+            </button>
+        </div>
+
+        <div class="card-body" style="padding:0;">
+
+            <table style="width:100%;" id="tablaDetalles">
+
+                <thead>
+                    <tr style="background:#f8f9fa;">
+                        <th>VARIACIÓN</th>
+                        <th style="text-align:center;">CANTIDAD</th>
+                        <th style="text-align:center;">PRECIO COMPRA</th>
+                        <th style="text-align:center;">SUBTOTAL</th>
+                        <th style="text-align:center;">ACCIONES</th>
+                    </tr>
+                </thead>
+
+                <tbody id="cuerpoDetalles"></tbody>
+
+                <tfoot>
+                    <tr style="background:#f8f9fa;">
+                        <td colspan="3" style="text-align:right;font-weight:700;">
+                            TOTAL:
+                        </td>
+                        <td id="totalGeneral" style="text-align:center;font-weight:700;color:#144272;">
+                            $0
+                        </td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+
+            </table>
+
+            <div id="mensajeVacio" style="text-align:center;padding:40px;color:#7f8c8d;">
+                📭 Agrega productos para continuar
+            </div>
+
+        </div>
+    </div>
+
+    <!-- HIDDEN -->
+    <input type="hidden" name="totalFilas" id="totalFilas" value="0">
+    <input type="hidden" name="total_entrada" id="totalEntrada" value="0">
+
+    <div style="display:flex;gap:12px;max-width:800px;">
+        <button type="submit" class="btn btn-success">💾 Registrar Entrada</button>
+        <a href="{% url 'admin_inventario' %}" class="btn btn-secondary">❌ Cancelar</a>
+    </div>
+
+</form>
+
+<script>
+const variaciones = [
+{% for v in variaciones %}
+{
+    id: {{ v.id }},
+    sku: "{{ v.sku_unico|escapejs }}",
+    nombre: "{{ v.producto.nombre_producto|escapejs }} — {{ v.talla }} / {{ v.color }}",
+    stock: {{ v.stock_actual }},
+    precio: {{ v.precio_compra }}
+}{% if not  forloop.last %},{% endif %}
+{% endfor %}
+];
+
+let filaIndex = 0;
+
+function agregarFila() {
+
+    const tbody = document.getElementById('cuerpoDetalles');
+    const idx = filaIndex++;
+
+    const opciones = variaciones.map(v =>
+        `<option value="${v.id}" data-precio="${v.precio}">
+            ${v.sku} — ${v.nombre} (Stock: ${v.stock})
+        </option>`
+    ).join('');
+
+    const fila = document.createElement('tr');
+    fila.id = `fila_${idx}`;
+
+    fila.innerHTML = `
+        <td>
+            <select name="variacion_${idx}" onchange="actualizarPrecio(${idx})" required>
+                <option value="">— Seleccionar —</option>
+                ${opciones}
+            </select>
+        </td>
+
+        <td style="text-align:center;">
+            <input type="number" name="cantidad_${idx}" value="1"
+                   min="1" oninput="calcularSubtotal(${idx})">
+        </td>
+
+        <td style="text-align:center;">
+            <input type="number" name="precio_${idx}" value="0" readonly>
+        </td>
+
+        <td id="sub_${idx}" style="text-align:center;">$0</td>
+
+        <td style="text-align:center;">
+            <button type="button" onclick="eliminarFila(${idx})">🗑️</button>
+        </td>
+    `;
+
+    tbody.appendChild(fila);
+    document.getElementById('mensajeVacio').style.display = 'none';
+}
+
+function actualizarPrecio(idx){
+    const sel = document.querySelector(`[name="variacion_${idx}"]`);
+    const precio = sel.options[sel.selectedIndex].dataset.precio || 0;
+    document.querySelector(`[name="precio_${idx}"]`).value = precio;
+    calcularSubtotal(idx);
+}
+
+function calcularSubtotal(idx){
+    const cant = document.querySelector(`[name="cantidad_${idx}"]`).value || 0;
+    const precio = document.querySelector(`[name="precio_${idx}"]`).value || 0;
+    const sub = cant * precio;
+
+    document.getElementById(`sub_${idx}`).innerText = `$${sub}`;
+    calcularTotal();
+}
+
+function calcularTotal(){
+    let total = 0;
+
+    document.querySelectorAll('[id^="sub_"]').forEach(el => {
+        total += parseInt(el.innerText.replace('$','')) || 0;
+    });
+
+    document.getElementById('totalGeneral').innerText = `$${total}`;
+    document.getElementById('totalEntrada').value = total;
+}
+
+function eliminarFila(idx){
+    document.getElementById(`fila_${idx}`).remove();
+    calcularTotal();
+}
+
+document.getElementById('formEntrada').addEventListener('submit', function(e){
+    if(document.getElementById('cuerpoDetalles').children.length === 0){
+        e.preventDefault();
+        alert("Debes agregar al menos un producto");
+    }
+});
+</script>
+
+{% endblock %}

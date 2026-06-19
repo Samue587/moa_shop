@@ -1,0 +1,95 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Inventario — TiendaMoa07{% endblock %}
+{% block menu_inventario %}active{% endblock %}
+{% block navbar_title %}Entradas de Inventario{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <div class="page-title">📦 Inventario</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> › Inventario
+        </div>
+    </div>
+
+    <a href="{% url 'crear_entrada' %}" class="btn btn-success">➕ Nueva Entrada</a>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="card">
+    <div class="card-header">
+        <h3>📦 Entradas registradas</h3>
+        <span style="color:#7f8c8d;font-size:13px;">
+            {{ entradas|length }} entrada(s)
+        </span>
+    </div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Entrada</th>
+                    <th>Proveedor</th>
+                    <th>Fecha</th>
+                    <th>Ítems</th>
+                    <th>Total Unidades</th>
+                    <th style="text-align:right;">Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for entrada in entradas %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+
+                    <td>
+                        <strong>Entrada #{{ entrada.id }}</strong><br>
+                        <small style="color:#7f8c8d;">
+                            {{ entrada.creado_en|date:"d/m/Y" }}
+                        </small>
+                    </td>
+
+                    <td>{{ entrada.proveedor.nombre_proveedor }}</td>
+
+                    <td>{{ entrada.fecha_entrada|date:"d/m/Y H:i" }}</td>
+
+                    <td>
+                        <span>
+                            {{ entrada.detalles.count }} ítems
+                        </span>
+                    </td>
+
+                    <td>
+                        <span>
+                            {{ entrada.total_entrada }} uds.
+                        </span>
+                    </td>
+
+                    <td style="text-align:right;">
+                        <a href="{% url 'detalle_entrada' entrada.id %}" class="btn btn-sm btn-primary">👁️</a>
+                        <a href="{% url 'eliminar_entrada' entrada.id %}" class="btn btn-sm btn-danger">🗑️</a>
+                    </td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="empty-state">
+                        📦 No hay entradas registradas
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

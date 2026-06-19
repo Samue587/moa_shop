@@ -1,0 +1,63 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Eliminar Permiso — TiendaMoa07{% endblock %}
+{% block menu_permisos %}active{% endblock %}
+{% block navbar_title %}Eliminar Permiso{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">🗑️ Eliminar Permiso</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_permisos' %}">Permisos</a> ›
+            Eliminar
+        </div>
+    </div>
+</div>
+
+<div class="card" style="max-width:520px;">
+    <div class="card-body" style="text-align:center;padding:40px;">
+
+        <div style="font-size:60px;margin-bottom:20px;">⚠️</div>
+
+        <h3 style="color:#2c3e50;font-size:22px;margin-bottom:12px;">¿Eliminar este permiso?</h3>
+        <p style="color:#7f8c8d;margin-bottom:16px;font-size:15px;">
+            Estás a punto de eliminar permanentemente el permiso:
+        </p>
+
+        <div style="background:#f8f9fa;border:2px solid #e0e6ed;border-radius:10px;padding:16px 24px;margin-bottom:8px;display:inline-block;">
+            <span style="font-size:18px;font-weight:700;color:#144272;">🔑 {{ permiso.slug }}</span>
+        </div>
+        <p style="color:#7f8c8d;font-size:13px;margin-bottom:20px;">{{ permiso.descripcion }}</p>
+
+        {% with roles=permiso.rol_permisos.all %}
+        {% if roles %}
+        <div class="alert alert-warning" style="text-align:left;">
+            ⚡ Este permiso está asignado a
+            {% for rp in roles %}
+                <strong>{{ rp.rol.nombre_rol }}</strong>{% if not forloop.last %}, {% endif %}
+            {% endfor %}.
+            Se eliminará de esos roles.
+        </div>
+        {% else %}
+        <div class="alert alert-success" style="text-align:left;">
+            ✅ Este permiso no está asignado a ningún rol. Se puede eliminar sin problema.
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <p style="color:#e74c3c;font-size:13px;margin-bottom:28px;">
+            ⚠️ Esta acción <strong>no se puede deshacer</strong>.
+        </p>
+
+        <div style="display:flex;gap:12px;justify-content:center;">
+            <form action="{% url 'eliminar_permiso' permiso.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">🗑️ Sí, eliminar</button>
+            </form>
+            <a href="{% url 'admin_permisos' %}" class="btn btn-secondary">❌ Cancelar</a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

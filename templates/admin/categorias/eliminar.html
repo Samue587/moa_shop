@@ -1,0 +1,67 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Eliminar Categoría — TiendaMoa07{% endblock %}
+{% block menu_categorias %}active{% endblock %}
+{% block navbar_title %}Eliminar Categoría{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">🗑️ Eliminar Categoría</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_categorias' %}">Categorías</a> ›
+            Eliminar
+        </div>
+    </div>
+</div>
+
+<div class="card" style="max-width:520px;">
+    <div class="card-body" style="text-align:center;padding:40px;">
+
+        <div style="font-size:60px;margin-bottom:20px;">⚠️</div>
+
+        <h3 style="color:#2c3e50;font-size:22px;margin-bottom:12px;">
+            ¿Eliminar esta categoría?
+        </h3>
+
+        <p style="color:#7f8c8d;margin-bottom:16px;font-size:15px;">
+            Estás a punto de eliminar permanentemente:
+        </p>
+
+        <div style="background:#f8f9fa;border:2px solid #e0e6ed;border-radius:10px;padding:16px 24px;margin-bottom:20px;display:inline-block;">
+            <span style="font-size:18px;font-weight:700;color:#144272;">
+                📚 {{ categoria.nombre }}
+            </span>
+        </div>
+
+        {% if productos_count > 0 %}
+        <div class="alert alert-danger" style="text-align:left;">
+            ⚠️ Esta categoría tiene <strong>{{ productos_count }} producto(s)</strong> asociados.
+            Al eliminarla, todos esos productos también serán eliminados.
+        </div>
+        {% else %}
+        <div class="alert alert-success" style="text-align:left;">
+            ✅ Esta categoría no tiene productos. Se puede eliminar sin problema.
+        </div>
+        {% endif %}
+
+        <p style="color:#e74c3c;font-size:13px;margin-bottom:28px;">
+            ⚠️ Esta acción <strong>no se puede deshacer</strong>.
+        </p>
+
+        <div style="display:flex;gap:12px;justify-content:center;">
+            <form action="{% url 'eliminar_categoria' categoria.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">
+                    🗑️ Sí, eliminar
+                </button>
+            </form>
+
+            <a href="{% url 'admin_categorias' %}" class="btn btn-secondary">
+                ❌ Cancelar
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

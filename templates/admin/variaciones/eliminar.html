@@ -1,0 +1,49 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Eliminar Variación — TiendaMoa07{% endblock %}
+{% block menu_productos %}active{% endblock %}
+{% block navbar_title %}Eliminar Variación{% endblock %}
+ 
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">🗑️ Eliminar Variación</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_productos' %}">Productos</a> ›
+            <a href="{% url 'admin_variaciones' producto.id %}">{{ producto.nombre_producto }}</a> ›
+            Eliminar Variación
+        </div>
+    </div>
+</div>
+ 
+<div class="card" style="max-width:520px;">
+    <div class="card-body" style="text-align:center;padding:40px;">
+        <div style="font-size:60px;margin-bottom:20px;">⚠️</div>
+        <h3 style="color:#2c3e50;font-size:22px;margin-bottom:12px;">¿Eliminar esta variación?</h3>
+ 
+        <div style="background:#f8f9fa;border:2px solid #e0e6ed;border-radius:10px;padding:16px;margin-bottom:20px;">
+            <span style="font-size:16px;font-weight:700;color:#144272;">
+                🎨 {{ variacion.talla }} — {{ variacion.color }}
+            </span><br>
+            <code style="font-size:13px;color:#7f8c8d;">{{ variacion.sku_unico }}</code><br>
+            <span style="font-size:13px;color:#7f8c8d;">Stock: {{ variacion.stock_actual }} uds</span>
+        </div>
+ 
+        <div class="alert alert-warning" style="text-align:left;">
+            ⚡ Si hay ventas asociadas a esta variación, no podrá eliminarse.
+        </div>
+ 
+        <p style="color:#e74c3c;font-size:13px;margin-bottom:28px;">
+            Esta acción <strong>no se puede deshacer</strong>.
+        </p>
+ 
+        <div style="display:flex;gap:12px;justify-content:center;">
+            <form action="{% url 'eliminar_variacion' producto.id variacion.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">🗑️ Sí, eliminar</button>
+            </form>
+            <a href="{% url 'admin_variaciones' producto.id %}" class="btn btn-secondary">❌ Cancelar</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

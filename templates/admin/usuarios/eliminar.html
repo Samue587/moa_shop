@@ -1,0 +1,84 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Eliminar Usuario — TiendaMoa07{% endblock %}
+{% block menu_usuarios %}active{% endblock %}
+{% block navbar_title %}Eliminar Usuario{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <div class="page-title">🗑️ Eliminar Usuario</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_usuarios' %}">Usuarios</a> ›
+            Eliminar
+        </div>
+    </div>
+</div>
+
+<div class="card" style="max-width:520px;">
+    <div class="card-body" style="text-align:center;padding:40px;">
+
+        <div style="font-size:60px;margin-bottom:20px;">⚠️</div>
+
+        <h3 style="color:#2c3e50;font-size:22px;margin-bottom:12px;">
+            ¿Eliminar este usuario?
+        </h3>
+
+        <p style="color:#7f8c8d;margin-bottom:16px;font-size:15px;">
+            Estás a punto de eliminar permanentemente al usuario:
+        </p>
+
+        <div style="background:#f8f9fa;border:2px solid #e0e6ed;border-radius:10px;padding:16px 24px;margin-bottom:20px;display:inline-block;">
+
+            <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#144272,#205295);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:22px;margin:0 auto 10px;">
+                {{ usuario_edit.nombres_usuario|first|upper }}
+            </div>
+
+            <div style="font-size:18px;font-weight:700;color:#144272;">
+                {{ usuario_edit.nombres_usuario }} {{ usuario_edit.apellidos_usuario }}
+            </div>
+
+            <div style="font-size:13px;color:#7f8c8d;margin-top:4px;">
+                {{ usuario_edit.correo_usuario }}
+            </div>
+
+            {% if usuario_edit.rol %}
+            <div style="margin-top:8px;">
+                <span style="background:#eaf0fb;color:#144272;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;">
+                    🛡️ {{ usuario_edit.rol.nombre_rol }}
+                </span>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if ventas_count > 0 %}
+        <div class="alert alert-warning" style="text-align:left;">
+            ⚡ Este usuario tiene <strong>{{ ventas_count }} venta(s)</strong> registrada(s).
+            Su historial quedará sin usuario al eliminar la cuenta.
+        </div>
+        {% else %}
+        <div class="alert alert-success" style="text-align:left;">
+            ✅ Este usuario no tiene ventas registradas. Se puede eliminar sin problema.
+        </div>
+        {% endif %}
+
+        <p style="color:#e74c3c;font-size:13px;margin-bottom:28px;">
+            ⚠️ Esta acción <strong>no se puede deshacer</strong>.
+        </p>
+
+        <div style="display:flex;gap:12px;justify-content:center;">
+            <form action="{% url 'eliminar_usuario' usuario_edit.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">🗑️ Sí, eliminar</button>
+            </form>
+
+            <a href="{% url 'admin_usuarios' %}" class="btn btn-secondary">
+                ❌ Cancelar
+            </a>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

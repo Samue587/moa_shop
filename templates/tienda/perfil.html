@@ -1,0 +1,383 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - MOA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@700;800;900&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #FF6B35;
+            --primary-dark: #E85A2B;
+            --secondary: #004E89;
+            --dark: #1A1A2E;
+            --light: #F7F7F7;
+            --white: #FFFFFF;
+            --gray: #6C757D;
+            --success: #28A745;
+            --danger: #e74c3c;
+            --shadow: rgba(0,0,0,0.08);
+        }
+        body { font-family: 'Instrument Sans', sans-serif; background: var(--light); color: var(--dark); transition: background 0.3s, color 0.3s; }
+
+        /* ── DARK MODE ── */
+        body.dark-mode {
+            --light: #0f0f0f;
+            --white: #1a1a1a;
+            --dark: #f0f0f0;
+            --gray: #aaa;
+            --shadow: rgba(0,0,0,0.3);
+        }
+        body.dark-mode .form-control { background: #2a2a2a; border-color: #444; color: #f0f0f0; }
+        body.dark-mode .form-control:focus { background: #333; border-color: var(--primary); }
+        body.dark-mode .stat-row { border-color: #333; }
+        body.dark-mode .section-header { border-color: #333; }
+        body.dark-mode .nav-item { border-color: #333; }
+        body.dark-mode .nav-item:hover { background: #2a2a2a; }
+        body.dark-mode .nav-item.active { background: #2a1a10; }
+        body.dark-mode .avatar-rol { background: #1a2a4a; color: #90caf9; }
+
+        /* toggle switch */
+        .theme-toggle-wrap { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid #f0f0f0; cursor: pointer; }
+        .theme-toggle-wrap:last-child { border-bottom: none; }
+        .toggle-label { display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 14px; color: var(--dark); }
+        .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; inset: 0; background: #ccc; border-radius: 24px; transition: 0.3s; cursor: pointer; }
+        .toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: 0.3s; }
+        input:checked + .toggle-slider { background: var(--primary); }
+        input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+        .navbar { background: var(--white); box-shadow: 0 2px 20px var(--shadow); position: sticky; top: 0; z-index: 100; transition: background 0.3s; }
+        .navbar-container { max-width: 1200px; margin: 0 auto; padding: 0 30px; display: flex; justify-content: space-between; align-items: center; height: 70px; }
+        .logo { font-family: 'Darker Grotesque', sans-serif; font-size: 30px; font-weight: 900; color: var(--primary); text-decoration: none; }
+        .nav-right { display: flex; align-items: center; gap: 15px; }
+        .nav-link { text-decoration: none; color: var(--dark); font-weight: 600; font-size: 14px; padding: 8px 16px; border-radius: 50px; transition: all 0.2s; }
+        .nav-link:hover { background: var(--light); }
+        .cart-btn { background: var(--secondary); color: white; padding: 10px 20px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+        .cart-count { background: var(--primary); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+        .btn-logout { background: var(--danger); color: white; padding: 10px 20px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 14px; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 30px; display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+        .perfil-sidebar { display: flex; flex-direction: column; gap: 20px; }
+
+        .avatar-card { background: var(--white); border-radius: 16px; box-shadow: 0 4px 15px var(--shadow); padding: 30px; text-align: center; transition: background 0.3s; }
+        .avatar-circle { width: 90px; height: 90px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 800; color: white; margin: 0 auto 16px; }
+        .avatar-name { font-size: 20px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+        .avatar-email { font-size: 13px; color: var(--gray); margin-bottom: 12px; }
+        .avatar-rol { display: inline-block; background: #e3f2fd; color: #1565c0; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 50px; }
+
+        .stats-card { background: var(--white); border-radius: 16px; box-shadow: 0 4px 15px var(--shadow); padding: 20px; transition: background 0.3s; }
+        .stats-title { font-size: 13px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 16px; }
+        .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+        .stat-row:last-child { border-bottom: none; }
+        .stat-label { font-size: 14px; color: var(--gray); }
+        .stat-value { font-size: 16px; font-weight: 700; color: var(--dark); }
+        .stat-value.primary { color: var(--primary); }
+
+        .nav-card { background: var(--white); border-radius: 16px; box-shadow: 0 4px 15px var(--shadow); overflow: hidden; transition: background 0.3s; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 14px 20px; color: var(--dark); text-decoration: none; font-weight: 500; font-size: 14px; border-bottom: 1px solid #f0f0f0; transition: all 0.2s; cursor: pointer; border: none; background: none; width: 100%; font-family: inherit; }
+        .nav-item:last-child { border-bottom: none; }
+        .nav-item:hover { background: var(--light); padding-left: 25px; }
+        .nav-item.active { background: #fff5f0; color: var(--primary); border-left: 3px solid var(--primary); }
+        .nav-item.danger { color: var(--danger); }
+        .nav-item.danger:hover { background: #fef0f0; }
+
+        .perfil-content { display: flex; flex-direction: column; gap: 25px; }
+        .section-card { background: var(--white); border-radius: 16px; box-shadow: 0 4px 15px var(--shadow); overflow: hidden; transition: background 0.3s; }
+        .section-header { padding: 20px 25px; border-bottom: 2px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+        .section-title { font-size: 18px; font-weight: 700; color: var(--dark); }
+        .section-body { padding: 25px; }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group.full { grid-column: span 2; }
+        .form-label { font-size: 13px; font-weight: 600; color: var(--dark); }
+        .form-control { padding: 12px 16px; border: 2px solid #e0e6ed; border-radius: 10px; font-size: 14px; font-family: inherit; transition: all 0.2s; background: #f8f9fa; color: var(--dark); }
+        .form-control:focus { outline: none; border-color: var(--primary); background: white; }
+        .btn-save { padding: 12px 30px; background: var(--primary); color: white; border: none; border-radius: 50px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+        .btn-save:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+        .alert { padding: 14px 20px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+        .alert-success { background: #d4edda; color: #155724; border-left: 4px solid var(--success); }
+        .alert-error   { background: #f8d7da; color: #721c24; border-left: 4px solid var(--danger); }
+
+        .empty-history { text-align: center; padding: 50px 20px; color: var(--gray); }
+        .empty-icon { font-size: 56px; margin-bottom: 16px; opacity: 0.4; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .form-group.full { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-container">
+        <a href="{% url 'tienda' %}" class="logo"> MOA</a>
+        <div class="nav-right">
+            <a href="{% url 'tienda' %}" class="nav-link">🛍️ Tienda</a>
+            <a href="{% url 'carrito_ver' %}" class="cart-btn">
+                🛒 Carrito <span class="cart-count">{{ cantidad_carrito }}</span>
+            </a>
+            <a href="{% url 'logout' %}" class="btn-logout">➜] Cerrar Sesión</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <aside class="perfil-sidebar">
+
+        <div class="avatar-card">
+            <div class="avatar-circle">{{ usuario.nombres_usuario|first|upper }}</div>
+            <div class="avatar-name">{{ usuario.nombres_usuario }} {{ usuario.apellidos_usuario }}</div>
+            <div class="avatar-email">{{ usuario.correo_usuario }}</div>
+            <span class="avatar-rol">
+                {% if usuario.is_admin %}👑 Administrador{% else %}🪪 Cliente{% endif %}
+            </span>
+        </div>
+
+        <div class="stats-card">
+            <div class="stats-title">Resumen</div>
+            <div class="stat-row">
+                <span class="stat-label">Total compras</span>
+                <span class="stat-value primary">{{ total_compras }}</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Total gastado</span>
+                <span class="stat-value">$ {{ total_gastado|floatformat:0|intcomma }}</span>
+            </div>
+        </div>
+
+        <div class="nav-card">
+            <button class="nav-item active" onclick="mostrarTab('datos', this)">📋 Mis datos</button>
+            <button class="nav-item" onclick="mostrarTab('password', this)">⚙️ Contraseña</button>
+            <button class="nav-item" onclick="mostrarTab('historial', this)">🛒 Mis pedidos</button>
+            <!-- TOGGLE TEMA -->
+            <div class="theme-toggle-wrap" onclick="toggleTema()">
+                <span class="toggle-label">🌙 Modo oscuro</span>
+                <label class="toggle-switch" onclick="event.stopPropagation()">
+                    <input type="checkbox" id="temaToggle" onchange="toggleTema()">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <a href="{% url 'tienda' %}" class="nav-item">🛍️ Ir a la tienda</a>
+            {% if usuario.is_admin %}
+            <a href="{% url 'admin_dashboard' %}" class="nav-item">🏠 Panel Admin</a>
+            {% endif %}
+            <a href="{% url 'logout' %}" class="nav-item danger">➜] Cerrar sesión</a>
+        </div>
+
+    </aside>
+
+    <main class="perfil-content">
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                    {% if message.tags == 'error' %}⚠️{% else %}✅{% endif %} {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- TAB: MIS DATOS -->
+        <div class="section-card tab-content active" id="tab-datos">
+            <div class="section-header"><span class="section-title">📋 Mis datos</span></div>
+            <div class="section-body">
+                <form method="post" action="{% url 'perfil_usuario' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="accion" value="actualizar_datos">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Nombres *</label>
+                            <input type="text" name="nombres" class="form-control" value="{{ usuario.nombres_usuario }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Apellidos</label>
+                            <input type="text" name="apellidos" class="form-control" value="{{ usuario.apellidos_usuario|default:'' }}">
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Email *</label>
+                            <input type="email" name="email" class="form-control" value="{{ usuario.correo_usuario }}" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-save">💾 Guardar cambios</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- TAB: CONTRASEÑA -->
+        <div class="section-card tab-content" id="tab-password">
+            <div class="section-header"><span class="section-title">⚙️ Cambiar contraseña</span></div>
+            <div class="section-body">
+                <form method="post" action="{% url 'perfil_usuario' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="accion" value="cambiar_password">
+                    <div class="form-row">
+                        <div class="form-group full">
+                            <label class="form-label">Contraseña actual *</label>
+                            <input type="password" name="password_actual" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nueva contraseña *</label>
+                            <input type="password" name="password_nuevo" class="form-control" required minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirmar contraseña *</label>
+                            <input type="password" name="password_confirmacion" class="form-control" required minlength="6">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-save">🔒 Cambiar contraseña</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- TAB: HISTORIAL -->
+        <div class="section-card tab-content" id="tab-historial">
+            <div class="section-header">
+                <span class="section-title">📦 Mis pedidos</span>
+                <span style="font-size:14px; color:var(--gray);">{{ total_compras }} pedido{{ total_compras|pluralize }}</span>
+            </div>
+            <div class="section-body">
+                {% if ventas %}
+                    {% for venta in ventas %}
+                    {% with envio=venta.envio %}
+                    <div style="border:2px solid #f0f0f0; border-radius:14px; margin-bottom:20px; overflow:hidden; transition: border-color .2s;"
+                         onmouseover="this.style.borderColor='#ddd'" onmouseout="this.style.borderColor='#f0f0f0'">
+                        <div style="background:#f8f8f8; padding:14px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; border-bottom:1px solid #f0f0f0;">
+                            <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+                                <span style="font-size:15px; font-weight:700; color:var(--dark);">Pedido #{{ venta.id }}</span>
+                                <span style="font-size:12px; color:var(--gray);">📅 {{ venta.fecha|date:"d/m/Y" }} {{ venta.fecha|date:"H:i" }}</span>
+                            </div>
+                            <span style="font-size:17px; font-weight:800; color:var(--secondary);">${{ venta.monto_final|floatformat:0|intcomma }}</span>
+                        </div>
+                        <div style="padding:16px 20px; border-bottom:1px solid #f0f0f0;">
+                            {% for detalle in venta.detalles.all %}
+                            <div style="display:flex; align-items:center; gap:12px; padding:6px 0; {% if not forloop.last %}border-bottom:1px dashed #f5f5f5;{% endif %}">
+                                <div style="width:42px; height:42px; border-radius:8px; background:#f0f4ff; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; overflow:hidden;">
+                                    {% if detalle.variacion.producto.foto %}<img src="/imagenes/{{ detalle.variacion.producto.foto }}" alt="" style="width:100%; height:100%; object-fit:cover;">{% else %}👗{% endif %}
+                                </div>
+                                <div style="flex:1; min-width:0;">
+                                    <div style="font-size:13px; font-weight:600; color:var(--dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ detalle.variacion.producto.nombre_producto }}</div>
+                                    <div style="font-size:12px; color:var(--gray);">Talla: {{ detalle.variacion.talla }} · Color: {{ detalle.variacion.color }} · Cant: {{ detalle.cantidad }}</div>
+                                </div>
+                                <div style="font-size:13px; font-weight:700; color:var(--dark); flex-shrink:0;">${{ detalle.subtotal|floatformat:0|intcomma }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div style="padding:16px 20px;">
+                            {% if envio %}
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        {% if envio.estado_envio == 'ENTREGADO' %}<span style="background:#d4edda; color:#155724; padding:5px 14px; border-radius:50px; font-size:12px; font-weight:700;">✓ Entregado</span>
+                                        {% elif envio.estado_envio == 'EN_CAMINO' %}<span style="background:#fff3cd; color:#856404; padding:5px 14px; border-radius:50px; font-size:12px; font-weight:700;">🚚 En camino</span>
+                                        {% elif envio.estado_envio == 'CANCELADO' %}<span style="background:#fdecea; color:#c62828; padding:5px 14px; border-radius:50px; font-size:12px; font-weight:700;">✗ Cancelado</span>
+                                        {% else %}<span style="background:#e3f2fd; color:#1565c0; padding:5px 14px; border-radius:50px; font-size:12px; font-weight:700;">⏳ Preparando</span>{% endif %}
+                                        <span style="font-size:12px; color:var(--gray);">{{ envio.empresa_transportadora|default:"—" }} · #{{ envio.numero_guia|default:"—" }}</span>
+                                    </div>
+                                    <span style="font-size:12px; color:var(--gray);">📍 {{ envio.ciudad_envio }}, {{ envio.departamento_envio }}</span>
+                                </div>
+                                <div style="margin-top:12px; padding:10px 14px; background:#f8f8f8; border-radius:8px; font-size:12px; color:var(--gray); display:flex; align-items:center; gap:6px;">
+                                    📬 <span>{{ envio.direccion_envio }}{% if envio.barrio_envio %}, {{ envio.barrio_envio }}{% endif %} — {{ envio.ciudad_envio }}, {{ envio.departamento_envio }}</span>
+                                </div>
+
+                                {# Botón confirmar llegada #}
+                                {% if envio.estado_envio == 'EN_CAMINO' or envio.estado_envio == 'ENTREGADO' %}
+                                    {% if not envio.confirmado_llegada %}
+                                    <form method="post" action="{% url 'confirmar_llegada' envio.id %}" style="margin-top:12px;">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                            onclick="return confirm('¿Confirmas que recibiste tu pedido #{{ venta.id }}?')"
+                                            style="padding:10px 24px; background:#22c55e; color:white; border:none; border-radius:50px; font-size:13px; font-weight:700; cursor:pointer; width:100%;">
+                                            ✅ Confirmar recepción del pedido
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    <div style="margin-top:12px; padding:10px 14px; background:#d4edda; border-radius:8px; text-align:center; font-size:13px; font-weight:700; color:#155724;">
+                                        ✓ Recibido confirmado el {{ envio.fecha_confirmacion_llegada|date:"d/m/Y H:i" }}
+                                    </div>
+                                    {% endif %}
+                                {% endif %}
+
+                            {% else %}
+
+                                <div style="display:flex; align-items:center; gap:10px; padding:10px 14px; background:#f0f4ff; border-radius:8px;">
+                                    <span style="font-size:20px;">🕐</span>
+                                    <div>
+                                        <div style="font-size:13px; font-weight:600; color:#1565c0;">Pedido recibido</div>
+                                        <div style="font-size:12px; color:var(--gray);">Tu pedido está siendo preparado. El envío se asignará pronto.</div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endwith %}
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-history">
+                        <div class="empty-icon">📭</div>
+                        <h3 style="font-size:20px; color:var(--dark); margin-bottom:8px;">Aún no tienes pedidos</h3>
+                        <p style="font-size:14px;">Explora la tienda y realiza tu primera compra</p>
+                        <a href="{% url 'tienda' %}" style="display:inline-block; margin-top:20px; padding:12px 30px; background:var(--primary); color:white; border-radius:50px; text-decoration:none; font-weight:700;">🛍️ Ir a la tienda</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script>
+/* ── TEMA GLOBAL (localStorage) ── */
+function aplicarTema(oscuro) {
+    document.body.classList.toggle('dark-mode', oscuro);
+    const chk = document.getElementById('temaToggle');
+    if (chk) chk.checked = oscuro;
+    localStorage.setItem('moa_tema', oscuro ? 'dark' : 'light');
+}
+
+function toggleTema() {
+    const oscuro = !document.body.classList.contains('dark-mode');
+    aplicarTema(oscuro);
+}
+
+// Aplicar al cargar
+(function() {
+    const guardado = localStorage.getItem('moa_tema');
+    if (guardado === 'dark') aplicarTema(true);
+})();
+
+/* ── TABS ── */
+function mostrarTab(tab, btn) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    if (btn) btn.classList.add('active');
+}
+
+{% if messages %}
+    {% for message in messages %}
+        {% if 'contraseña' in message|lower %}
+        window.addEventListener('DOMContentLoaded', function() {
+            mostrarTab('password', document.querySelectorAll('.nav-item')[1]);
+        });
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+// ← ESTO va FUERA del bloque messages, suelto aquí:
+window.addEventListener('DOMContentLoaded', function() {
+    if (window.location.hash === '#pedidos') {
+        mostrarTab('historial', document.querySelectorAll('.nav-item')[2]);
+    }
+});
+</script>
+
+</body>
+</html>

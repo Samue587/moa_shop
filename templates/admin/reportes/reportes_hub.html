@@ -1,0 +1,479 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Reportes — MOA{% endblock %}
+{% block navbar_title %}📑 Reportes{% endblock %}
+{% block menu_reportes %}active{% endblock %}
+
+
+{% block content %}
+
+<div class="page-header">
+
+  <div>
+
+    <div class="page-title">
+      📑 Centro de Reportes
+    </div>
+
+
+    <div class="breadcrumb">
+
+      <a href="{% url 'admin_dashboard' %}">
+        Dashboard
+      </a>
+
+      › Reportes
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<style>
+
+  .reportes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+
+  .reporte-card {
+
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+
+    padding: 32px 28px;
+
+    text-decoration: none;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 14px;
+
+    border-top: 5px solid transparent;
+
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease;
+
+    position: relative;
+    overflow: hidden;
+
+  }
+
+
+  .reporte-card::after {
+
+    content: '→';
+
+    position: absolute;
+
+    bottom: 24px;
+    right: 28px;
+
+    font-size: 20px;
+
+    opacity: 0;
+
+    transition:
+      opacity 0.2s ease,
+      right 0.2s ease;
+
+    color: inherit;
+
+  }
+
+
+  .reporte-card:hover {
+
+    transform: translateY(-6px);
+
+    box-shadow: 0 12px 32px rgba(0,0,0,0.13);
+
+  }
+
+
+  .reporte-card:hover::after {
+
+    opacity: 0.5;
+
+    right: 22px;
+
+  }
+
+
+
+  /* colores por tipo */
+
+  .reporte-card.ventas {
+    border-top-color: #27ae60;
+  }
+
+  .reporte-card.inventario {
+    border-top-color: #144272;
+  }
+
+  .reporte-card.categorias {
+    border-top-color: #8e44ad;
+  }
+
+  .reporte-card.envios {
+    border-top-color: #e67e22;
+  }
+
+  .reporte-card.clientes {
+    border-top-color: #e74c3c;
+  }
+
+
+
+  .reporte-card.ventas .rc-icon {
+    background: rgba(39,174,96,0.12);
+    color: #27ae60;
+  }
+
+
+  .reporte-card.inventario .rc-icon {
+    background: rgba(20,66,114,0.12);
+    color: #144272;
+  }
+
+
+  .reporte-card.categorias .rc-icon {
+    background: rgba(142,68,173,0.12);
+    color: #8e44ad;
+  }
+
+
+  .reporte-card.envios .rc-icon {
+    background: rgba(230,126,34,0.12);
+    color: #e67e22;
+  }
+
+
+  .reporte-card.clientes .rc-icon {
+    background: rgba(231,76,60,0.12);
+    color: #e74c3c;
+  }
+
+
+
+  .rc-icon {
+
+    width: 60px;
+    height: 60px;
+
+    border-radius: 14px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 28px;
+
+    flex-shrink: 0;
+
+  }
+
+
+
+  .rc-title {
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+    color: #2c3e50;
+
+    margin: 0;
+
+  }
+
+
+
+  .rc-desc {
+
+    font-size: 13px;
+
+    color: #7f8c8d;
+
+    line-height: 1.6;
+
+    margin: 0;
+
+  }
+
+
+
+  .rc-tags {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 6px;
+
+    margin-top: 4px;
+
+  }
+
+
+
+  .rc-tag {
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    padding: 3px 10px;
+
+    border-radius: 20px;
+
+    background: #f0f4f8;
+
+    color: #555;
+
+  }
+
+
+</style>
+
+
+
+
+<div class="reportes-grid">
+
+
+
+  <!-- Ventas -->
+
+  <a href="{% url 'reporte_ventas' %}"
+     class="reporte-card ventas"
+     aria-label="Abrir reporte de ventas">
+
+    <div class="rc-icon">
+      📈
+    </div>
+
+
+    <h3 class="rc-title">
+      Reporte de Ventas
+    </h3>
+
+
+    <p class="rc-desc">
+      Analiza el rendimiento de ventas por fechas, usuarios y períodos. Compara vendedores e identifica temporadas pico.
+    </p>
+
+
+    <div class="rc-tags">
+
+      <span class="rc-tag">
+        Por fecha
+      </span>
+
+      <span class="rc-tag">
+        Por usuario
+      </span>
+
+      <span class="rc-tag">
+        Ingresos
+      </span>
+
+    </div>
+
+  </a>
+
+
+
+
+
+  <!-- Inventario -->
+
+  <a href="{% url 'reporte_inventario' %}"
+     class="reporte-card inventario"
+     aria-label="Abrir reporte de inventario">
+
+
+    <div class="rc-icon">
+      📦
+    </div>
+
+
+    <h3 class="rc-title">
+      Reporte de Inventario
+    </h3>
+
+
+    <p class="rc-desc">
+      Controla el stock disponible, productos agotados y rotación. Filtra por marca, talla, color, categoría y ciudad.
+    </p>
+
+
+    <div class="rc-tags">
+
+      <span class="rc-tag">
+        Stock
+      </span>
+
+      <span class="rc-tag">
+        Rotación
+      </span>
+
+      <span class="rc-tag">
+        Por ciudad
+      </span>
+
+    </div>
+
+
+  </a>
+
+
+
+
+
+  <!-- Categorías -->
+
+  <a href="{% url 'reporte_categorias' %}"
+     class="reporte-card categorias"
+     aria-label="Abrir reporte de categorías">
+
+
+    <div class="rc-icon">
+      📊
+    </div>
+
+
+    <h3 class="rc-title">
+      Reporte de Categorías
+    </h3>
+
+
+    <p class="rc-desc">
+      Descubre qué categorías generan más ventas e ingresos. Compara camisas, pantalones, gorras, oversized y accesorios.
+    </p>
+
+
+    <div class="rc-tags">
+
+      <span class="rc-tag">
+        Más vendida
+      </span>
+
+      <span class="rc-tag">
+        Tendencias
+      </span>
+
+      <span class="rc-tag">
+        Comparativa
+      </span>
+
+    </div>
+
+
+  </a>
+
+
+
+
+
+  <!-- Envíos -->
+
+  <a href="{% url 'reporte_envios' %}"
+     class="reporte-card envios"
+     aria-label="Abrir reporte de envíos">
+
+
+    <div class="rc-icon">
+      🚚
+    </div>
+
+
+    <h3 class="rc-title">
+      Reporte de Envíos
+    </h3>
+
+
+    <p class="rc-desc">
+      Supervisa el estado de todos los pedidos enviados. Rastrea por transportadora, ciudad, departamento y fecha.
+    </p>
+
+
+    <div class="rc-tags">
+
+      <span class="rc-tag">
+        Pendiente
+      </span>
+
+      <span class="rc-tag">
+        En camino
+      </span>
+
+      <span class="rc-tag">
+        Entregado
+      </span>
+
+    </div>
+
+
+  </a>
+
+
+
+
+
+  <!-- Clientes -->
+
+  <a href="{% url 'reporte_clientes' %}"
+     class="reporte-card clientes"
+     aria-label="Abrir reporte de clientes">
+
+
+    <div class="rc-icon">
+      👥
+    </div>
+
+
+    <h3 class="rc-title">
+      Reporte de Clientes
+    </h3>
+
+
+    <p class="rc-desc">
+      Analiza el comportamiento de compra, frecuencia, historial y fidelización. Identifica clientes activos e inactivos.
+    </p>
+
+
+    <div class="rc-tags">
+
+      <span class="rc-tag">
+        Frecuencia
+      </span>
+
+      <span class="rc-tag">
+        Historial
+      </span>
+
+      <span class="rc-tag">
+        Fidelización
+      </span>
+
+    </div>
+
+
+  </a>
+
+
+
+</div>
+
+
+{% endblock %}

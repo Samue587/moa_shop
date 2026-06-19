@@ -1,0 +1,194 @@
+{% extends "admin/base_admin.html" %}
+{% load humanize %}
+{% block title %}Reporte Envíos — MOA{% endblock %}
+{% block navbar_title %}🚚 Reporte de Envíos{% endblock %}
+
+{% block content %}
+
+<!-- STATS POR ESTADO -->
+<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:16px; margin-bottom:24px;">
+
+  <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #f39c12;">
+    <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">Pendientes</div>
+    <div style="font-size:28px; font-weight:800; color:#f39c12;">{{ stats.PENDIENTE }}</div>
+    <div style="font-size:12px; color:#aab; margin-top:2px;">envíos por despachar</div>
+  </div>
+
+  <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #3498db;">
+    <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">En Camino</div>
+    <div style="font-size:28px; font-weight:800; color:#3498db;">{{ stats.EN_CAMINO }}</div>
+    <div style="font-size:12px; color:#aab; margin-top:2px;">en tránsito</div>
+  </div>
+
+  <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #27ae60;">
+    <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">Entregados</div>
+    <div style="font-size:28px; font-weight:800; color:#27ae60;">{{ stats.ENTREGADO }}</div>
+    <div style="font-size:12px; color:#aab; margin-top:2px;">entregados con éxito</div>
+  </div>
+
+  <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #e74c3c;">
+    <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">Cancelados</div>
+    <div style="font-size:28px; font-weight:800; color:#e74c3c;">{{ stats.CANCELADO }}</div>
+    <div style="font-size:12px; color:#aab; margin-top:2px;">envíos cancelados</div>
+  </div>
+
+  <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:6px; border-top:4px solid #9b59b6;">
+    <div style="font-size:12px; font-weight:700; color:#7f8c8d; text-transform:uppercase; letter-spacing:0.5px;">Devueltos</div>
+    <div style="font-size:28px; font-weight:800; color:#9b59b6;">{{ stats.DEVUELTO }}</div>
+    <div style="font-size:12px; color:#aab; margin-top:2px;">envíos devueltos</div>
+  </div>
+
+</div>
+
+<!-- FILTROS -->
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-body" style="padding:20px 25px;">
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+      <a href="{% url 'reporte_envios' %}" class="btn btn-secondary btn-sm">🔄 Todos</a>
+      {% for val, label in estados %}
+        <a href="{% url 'reporte_envios' %}?estado={{ val }}" class="btn btn-secondary btn-sm">{{ label }}</a>
+      {% endfor %}
+    </div>
+
+    <form method="get" action="{% url 'reporte_envios' %}"
+          style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;margin-bottom:14px;">
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">DESDE</label>
+        <input type="date" name="fecha_inicio" class="form-control" value="{{ fecha_inicio }}">
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">HASTA</label>
+        <input type="date" name="fecha_fin" class="form-control" value="{{ fecha_fin }}">
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">EMPRESA</label>
+        <select name="empresa" class="form-control">
+          <option value="">Todas</option>
+          {% for emp in empresas_disponibles %}
+            <option value="{{ emp }}" {% if filtro_empresa == emp %}selected{% endif %}>{{ emp }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">🔍 Filtrar</button>
+    </form>
+
+    <form method="get" action="{% url 'reporte_envios' %}"
+          style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;">
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">BUSCAR (ciudad, departamento, cliente, guía)</label>
+        <input type="text" name="q" class="form-control" placeholder="Buscar..." value="{{ busqueda }}">
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">🔍 Buscar</button>
+    </form>
+
+  </div>
+</div>
+
+<!-- TOP EMPRESAS Y DESTINOS -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+
+  <div class="card">
+    <div class="card-header"><h3>🏢 Top Transportadoras</h3></div>
+    <div class="table-responsive">
+      <table>
+        <thead><tr><th>Empresa</th><th>Envíos</th></tr></thead>
+        <tbody>
+          {% for e in top_empresas %}
+          <tr>
+            <td>{{ e.empresa_transportadora|default:"Sin asignar" }}</td>
+            <td><span class="badge badge-info">{{ e.total }}</span></td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="2" style="text-align:center;color:#999;">Sin datos</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h3>📍 Top Destinos</h3></div>
+    <div class="table-responsive">
+      <table>
+        <thead><tr><th>Ciudad</th><th>Departamento</th><th>Envíos</th></tr></thead>
+        <tbody>
+          {% for d in top_destinos %}
+          <tr>
+            <td>{{ d.ciudad_envio }}</td>
+            <td style="color:#7f8c8d;font-size:12px;">{{ d.departamento_envio }}</td>
+            <td><span class="badge badge-info">{{ d.total }}</span></td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3" style="text-align:center;color:#999;">Sin datos</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- TABLA ENVÍOS -->
+<div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+    <h3>📋 Listado de Envíos</h3>
+    <div style="display:flex;gap:10px;align-items:center;">
+        <span style="font-size:13px;color:#7f8c8d;">{{ envios|length }} resultado(s)</span>
+        <a href="{% url 'exportar_envios_excel' %}" class="btn btn-success btn-sm">📊 Exportar Excel</a>
+        <a href="{% url 'exportar_envios_pdf' %}"   class="btn btn-danger  btn-sm">📄 Exportar PDF</a>
+    </div>
+</div>
+  {% if envios %}
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>Venta</th><th>Cliente</th><th>Destino</th>
+          <th>Empresa</th><th>Guía</th><th>Fecha Envío</th><th>Llegada Est.</th><th>Estado</th><th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for envio in envios %}
+        <tr>
+          <td><strong>#{{ envio.id }}</strong></td>
+          <td>#{{ envio.venta.id }}</td>
+          <td>{{ envio.venta.usuario.get_full_name }}</td>
+          <td style="font-size:12px;">{{ envio.ciudad_envio }}, {{ envio.departamento_envio }}</td>
+          <td>{{ envio.empresa_transportadora|default:"—" }}</td>
+          <td style="font-size:12px;color:#7f8c8d;">{{ envio.numero_guia|default:"—" }}</td>
+          <td>{{ envio.fecha_envio|date:"d/m/Y" }}</td>
+          <td>
+            {% if envio.fecha_estipulada_llegada %}
+              <span style="color:#27ae60;">{{ envio.fecha_estipulada_llegada|date:"d/m/Y" }}</span>
+            {% else %}—{% endif %}
+          </td>
+          <td>
+            {% if envio.estado_envio == 'PENDIENTE' %}
+              <span class="badge badge-warning">Pendiente</span>
+            {% elif envio.estado_envio == 'EN_CAMINO' %}
+              <span class="badge badge-info">En Camino</span>
+            {% elif envio.estado_envio == 'ENTREGADO' %}
+              <span class="badge badge-success">Entregado</span>
+            {% elif envio.estado_envio == 'CANCELADO' %}
+              <span class="badge badge-danger">Cancelado</span>
+            {% else %}
+              <span class="badge">{{ envio.estado_envio }}</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{% url 'detalle_envio' envio.id %}" class="btn btn-info btn-sm">👁️ Ver</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📭</div>
+    <p>No hay envíos con ese filtro.</p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

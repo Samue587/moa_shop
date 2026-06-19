@@ -1,0 +1,172 @@
+{% extends "admin/base_admin.html" %}
+{% load humanize %}
+{% block title %}Venta #{{ venta.id }} — TiendaMoa07{% endblock %}
+{% block menu_ventas %}active{% endblock %}
+{% block navbar_title %}Detalle de Venta #{{ venta.id }}{% endblock %}
+
+{% block content %}
+
+
+<!-- AVISO NO CONFIRMADO -->
+{% if not venta.confirmado %}
+<div style="background:#fff3cd; border:2px solid #ffc107; border-radius:12px; padding:20px 24px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+    <div style="display:flex; align-items:center; gap:12px;">
+        <span style="font-size:28px;">⏳</span>
+        <div>
+            <div style="font-size:15px; font-weight:700; color:#856404;">Pedido pendiente de confirmación</div>
+            <div style="font-size:13px; color:#856404; margin-top:2px;">El cliente aún no ha confirmado este pedido. No proceses el envío hasta que confirme.</div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div style="background:#d4edda; border:2px solid #28a745; border-radius:12px; padding:16px 24px; margin-bottom:20px; display:flex; align-items:center; gap:12px;">
+    <span style="font-size:24px;">✅</span>
+    <div style="font-size:15px; font-weight:700; color:#155724;">Pedido confirmado por el cliente — puedes procesar el envío.</div>
+</div>
+{% endif %}
+
+<!-- BREADCRUMB -->
+<div class="page-header">
+    <div>
+        <div class="page-title">🧾 Venta #{{ venta.id }}</div>
+        <div class="breadcrumb">
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
+            <a href="{% url 'admin_ventas' %}">Ventas</a> ›
+            Venta #{{ venta.id }}
+        </div>
+    </div>
+    <div style="display:flex; gap:10px;">
+        <a href="{% url 'admin_ventas' %}" class="btn btn-secondary">← Volver</a>
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-primary">📊 Dashboard</a>
+    </div>
+</div>
+
+<!-- CARD COMPROBANTE -->
+<div class="card" style="max-width:640px; margin:0 auto;">
+
+    <!-- HEADER NARANJA -->
+    <div style="background:linear-gradient(135deg,#FF6B35,#E85A2B); padding:28px 34px; display:flex; justify-content:space-between; align-items:center; position:relative;">
+        <div style="display:flex; align-items:center; gap:14px;">
+            <div style="width:48px; height:48px; background:rgba(255,255,255,0.2); border-radius:9px; display:flex; align-items:center; justify-content:center;">
+                <span style="font-family:'Segoe UI'; font-size:26px; font-weight:900; color:white;">M</span>
+            </div>
+            <div>
+                <div style="font-size:26px; font-weight:900; color:white; line-height:1;">OA</div>
+                <div style="font-size:10px; color:rgba(255,255,255,0.7); letter-spacing:6px; text-transform:uppercase;">A la Moda</div>
+            </div>
+        </div>
+        <div style="text-align:right;">
+            <div style="font-size:10px; color:rgba(255,255,255,0.65); letter-spacing:3px; text-transform:uppercase; margin-bottom:2px;">Venta</div>
+            <div style="font-size:44px; font-weight:900; color:white; line-height:1;">#{{ venta.id }}</div>
+            <div style="font-size:12px; color:rgba(255,255,255,0.7); margin-top:4px;">{{ venta.fecha_venta|date:"d \d\e F \d\e Y — H:i" }}</div>
+        </div>
+        <span style="position:absolute; top:14px; right:14px; background:rgba(255,255,255,0.18); color:white; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:4px 12px; border-radius:20px;">Vista Admin</span>
+    </div>
+
+    <!-- INFO CLIENTE -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; padding:22px 34px; border-bottom:1px solid #dce4ed;">
+        <div>
+            <div style="font-size:10px; color:#7a8fa6; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:5px;">Cliente</div>
+            <div style="font-size:15px; font-weight:600; color:#1A1A2E;">
+                {{ venta.usuario.nombres_usuario }} {{ venta.usuario.apellidos_usuario }}
+            </div>
+            <div style="font-size:12px; color:#7a8fa6; margin-top:2px;">{{ venta.usuario.correo_usuario }}</div>
+        </div>
+        <div>
+            <div style="font-size:10px; color:#7a8fa6; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:5px;">Estado</div>
+            <div style="font-size:15px; font-weight:600; color:#1A1A2E;">Completado</div>
+            <span style="font-size:12px; font-weight:600; color:#28A745; margin-top:3px; display:block;">✅ Pago confirmado</span>
+        </div>
+        <div>
+            <div style="font-size:10px; color:#7a8fa6; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:5px;">ID Registro</div>
+            <div style="font-size:15px; font-weight:600; color:#1A1A2E;">Venta #{{ venta.id }}</div>
+            <span style="display:inline-block; background:#EEF4FA; color:#144272; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; margin-top:4px;">{{ venta.fecha_venta|date:"d/m/Y" }}</span>
+        </div>
+        <div>
+            <div style="font-size:10px; color:#7a8fa6; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:5px;">Descuento Fidelidad</div>
+            <div style="font-size:15px; font-weight:600; color:#e67e22;">
+                - $ {{ venta.descuento_fidelidad|floatformat:0|intcomma }}
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLA PRODUCTOS -->
+    <div style="padding:22px 34px;">
+        <div style="font-size:11px; font-weight:700; color:#7a8fa6; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Detalle de productos</div>
+        <table style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr style="background:#FFF5F0;">
+                    <th style="padding:10px 14px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#FF6B35; text-align:left; border-radius:8px 0 0 8px;">Producto</th>
+                    <th style="padding:10px 14px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#FF6B35; text-align:center;">Talla/Color</th>
+                    <th style="padding:10px 14px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#FF6B35; text-align:right;">P. Unit.</th>
+                    <th style="padding:10px 14px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#FF6B35; text-align:right;">Cant.</th>
+                    <th style="padding:10px 14px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#FF6B35; text-align:right; border-radius:0 8px 8px 0;">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detalle in detalles %}
+                <tr>
+                    <td style="padding:15px 14px; border-bottom:1px solid #dce4ed; vertical-align:middle;">
+                        <div style="font-size:14px; font-weight:600; color:#1A1A2E; text-transform:uppercase; letter-spacing:0.3px;">
+                            {{ detalle.variacion.producto.nombre_producto }}
+                        </div>
+                        <div style="font-size:12px; color:#7a8fa6; margin-top:2px;">
+                            {{ detalle.variacion.producto.categoria.nombre_categoria|default:"Sin categoría" }}
+                        </div>
+                    </td>
+                    <td style="padding:15px 14px; border-bottom:1px solid #dce4ed; text-align:center; font-size:13px; color:#555;">
+                        {{ detalle.variacion.talla_variacion }} / {{ detalle.variacion.color_variacion }}
+                    </td>
+                    <td style="padding:15px 14px; border-bottom:1px solid #dce4ed; text-align:right; font-size:14px; color:#555;">
+                        $ {{ detalle.precio_unitario|floatformat:0|intcomma }}
+                    </td>
+                    <td style="padding:15px 14px; border-bottom:1px solid #dce4ed; text-align:right; font-size:16px; font-weight:800; color:#FF6B35;">
+                        x{{ detalle.cantidad_detalle }}
+                    </td>
+                    <td style="padding:15px 14px; border-bottom:1px solid #dce4ed; text-align:right; font-size:14px; font-weight:700; color:#1A1A2E;">
+                        $ {{ detalle.subtotal_detalle|floatformat:0|intcomma }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- TOTALES -->
+    <div style="margin:0 22px 22px; background:#1e2d4a; border-radius:12px; padding:20px 26px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="font-size:12px; color:rgba(255,255,255,0.5);">Subtotal</span>
+            <span style="font-size:15px; color:rgba(255,255,255,0.8);">$ {{ venta.subtotal|floatformat:0|intcomma }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="font-size:12px; color:rgba(255,255,255,0.5);">IVA</span>
+            <span style="font-size:15px; color:rgba(255,255,255,0.8);">$ {{ venta.monto_iva|floatformat:0|intcomma }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="font-size:12px; color:rgba(255,255,255,0.5);">Descuento fidelidad</span>
+            <span style="font-size:15px; color:#e67e22;">- $ {{ venta.descuento_fidelidad|floatformat:0|intcomma }}</span>
+        </div>
+        <div style="border-top:1px solid rgba(255,255,255,0.1); margin-top:12px; padding-top:14px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:rgba(255,255,255,0.55); margin-bottom:4px;">Total Venta</div>
+                <div style="font-size:12px; color:rgba(255,255,255,0.35);">{{ detalles|length }} producto{% if detalles|length != 1 %}s{% endif %}</div>
+            </div>
+            <div style="text-align:right;">
+                <div style="font-size:42px; font-weight:900; color:#FF6B35; line-height:1;">$ {{ venta.monto_final|floatformat:0|intcomma }}</div>
+                <div style="font-size:11px; color:rgba(255,255,255,0.35); margin-top:3px; letter-spacing:1px;">Pesos colombianos</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIE -->
+    <div style="border-top:1px solid #dce4ed; padding:18px 34px; display:flex; justify-content:space-between; align-items:center;">
+        <div style="font-style:italic; font-size:13px; color:#FF6B35;">"Tu estilo, nuestra pasión. Gracias por elegirnos."</div>
+        <div style="text-align:right;">
+            <div style="font-size:12px; font-weight:700; color:#1A1A2E; letter-spacing:2px; text-transform:uppercase;">COLOMBIA <span style="color:#FF6B35;">— Bogotá</span></div>
+            <div style="font-size:10px; color:#7a8fa6; margin-top:2px;">© 2026 MOA Moda — Todos los derechos reservados</div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
