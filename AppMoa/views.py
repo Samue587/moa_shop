@@ -2284,13 +2284,18 @@ def listar_entradas(request):
     )
 
 
+from decimal import Decimal
+from django.db import transaction
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib import messages
+
 @admin_required
 @permiso_requerido("crear_entradas")
 def crear_entrada(request):
     proveedores = Proveedor.objects.all()
-    variaciones = VariacionProducto.objects.select_related("producto").order_by(
-        "producto__nombre_producto", "talla"
-    )
+    variaciones = VariacionProducto.objects.select_related(
+        "producto"
+    ).order_by("producto__nombre_producto", "talla")
 
     if request.method == "POST":
         proveedor_id = request.POST.get("proveedor")
@@ -2305,6 +2310,7 @@ def crear_entrada(request):
             vid = request.POST.get(f"variacion_{i}")
             cant = request.POST.get(f"cantidad_{i}")
             precio = request.POST.get(f"precio_{i}")
+
             if vid and cant and precio:
                 variacion_ids.append(vid)
                 cantidades.append(cant)
@@ -2312,7 +2318,8 @@ def crear_entrada(request):
 
         if not proveedor_id or not fecha_entrada or not variacion_ids:
             messages.error(
-                request, "Proveedor, fecha y al menos una variación son obligatorios."
+                request,
+                "Proveedor, fecha y al menos una variación son obligatorios."
             )
             return render(
                 request,
@@ -2327,31 +2334,55 @@ def crear_entrada(request):
 
         try:
             with transaction.atomic():
+
                 entrada = Entrada.objects.create(
-                    proveedor=get_object_or_404(Proveedor, pk=proveedor_id),
+                    proveedor=get_object_or_404(
+                        Proveedor,
+                        pk=proveedor_id
+                    ),
                     fecha_entrada=fecha_entrada,
-                    total_entrada=0,
+                    total_entrada=Decimal("0.00"),
                 )
-                total = 0
-                for vid, cant, precio in zip(variacion_ids, cantidades, precios):
-                    if not cant or int(cant) <= 0:
+
+                total = Decimal("0.00")
+
+                for vid, cant, precio in zip(
+                    variacion_ids,
+                    cantidades,
+                    precios
+                ):
+                    cantidad = int(cant)
+
+                    if cantidad <= 0:
                         continue
+
+                    precio_decimal = Decimal(str(precio))
+
                     detalle = DetalleEntrada.objects.create(
                         entrada=entrada,
-                        variacion=get_object_or_404(VariacionProducto, pk=vid),
-                        cantidades=int(cant),
-                        precio_comprado=int(precio),
+                        variacion=get_object_or_404(
+                            VariacionProducto,
+                            pk=vid
+                        ),
+                        cantidades=cantidad,
+                        precio_comprado=precio_decimal,
                     )
+
                     detalle.aplicar_stock()
-                    total += int(cant)
+
+                    subtotal = precio_decimal * cantidad
+                    total += subtotal
 
                 entrada.total_entrada = total
                 entrada.save(update_fields=["total_entrada"])
 
             messages.success(
-                request, f"Entrada de inventario #{entrada.id} registrada."
+                request,
+                f"Entrada de inventario #{entrada.id} registrada correctamente."
             )
+
             return redirect("admin_inventario")
+
         except Exception as e:
             messages.error(request, f"Error: {e}")
 
@@ -2369,15 +2400,32 @@ def crear_entrada(request):
 
 @admin_required
 def detalle_entrada(request, id):
-    entrada = get_object_or_404(Entrada.objects.select_related("proveedor"), pk=id)
-    detalles = DetalleEntrada.objects.select_related("variacion__producto").filter(
+    entrada = get_object_or_404(
+        Entrada.objects.select_related("proveedor"),
+        pk=id
+    )
+
+    detalles = DetalleEntrada.objects.select_related(
+        "variacion__producto"
+    ).filter(
         entrada=entrada
     )
+
+    for d in detalles:
+        d.subtotal = d.cantidades * d.precio_comprado
+
     return render(
         request,
         "admin/inventario/detalle.html",
-        {"entrada": entrada, "detalles": detalles, "usuario": request.usuario},
+        {
+            "entrada": entrada,
+            "detalles": detalles,
+            "usuario": request.usuario,
+        },
     )
+    
+    for d in detalles:
+        d.subtotal = d.cantidades * d.precio_comprado
 
 
 @admin_required

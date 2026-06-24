@@ -105,16 +105,16 @@
 
 <script>
 const variaciones = [
-{% for v in variaciones %}
-{
-    id: {{ v.id }},
-    sku: "{{ v.sku_unico|escapejs }}",
-    nombre: "{{ v.producto.nombre_producto|escapejs }} — {{ v.talla }} / {{ v.color }}",
-    stock: {{ v.stock_actual }},
-    precio: {{ v.precio_compra }}
-}{% if not  forloop.last %},{% endif %}
-{% endfor %}
-];
+    {% for v in variaciones %}
+    {
+        id: {{ v.id }},
+        sku: "{{ v.sku_unico|escapejs }}",
+        nombre: "{{ v.producto.nombre_producto|escapejs }} — {{ v.talla }} / {{ v.color }}",
+        stock: {{ v.stock_actual }},
+        precio: "{{ v.precio_compra }}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+    ];
 
 let filaIndex = 0;
 
@@ -122,6 +122,9 @@ function agregarFila() {
 
     const tbody = document.getElementById('cuerpoDetalles');
     const idx = filaIndex++;
+
+    // IMPORTANTE
+    document.getElementById('totalFilas').value = filaIndex;
 
     const opciones = variaciones.map(v =>
         `<option value="${v.id}" data-precio="${v.precio}">
@@ -134,25 +137,40 @@ function agregarFila() {
 
     fila.innerHTML = `
         <td>
-            <select name="variacion_${idx}" onchange="actualizarPrecio(${idx})" required>
+            <select class="form-control"
+                    name="variacion_${idx}"
+                    onchange="actualizarPrecio(${idx})"
+                    required>
                 <option value="">— Seleccionar —</option>
                 ${opciones}
             </select>
         </td>
 
         <td style="text-align:center;">
-            <input type="number" name="cantidad_${idx}" value="1"
-                   min="1" oninput="calcularSubtotal(${idx})">
+            <input class="form-control"
+                   type="number"
+                   name="cantidad_${idx}"
+                   value="1"
+                   min="1"
+                   oninput="calcularSubtotal(${idx})">
         </td>
 
         <td style="text-align:center;">
-            <input type="number" name="precio_${idx}" value="0" readonly>
+            <input class="form-control"
+                   type="number"
+                   name="precio_${idx}"
+                   value="0"
+                   readonly>
         </td>
 
         <td id="sub_${idx}" style="text-align:center;">$0</td>
 
         <td style="text-align:center;">
-            <button type="button" onclick="eliminarFila(${idx})">🗑️</button>
+            <button type="button"
+                    class="btn btn-danger btn-sm"
+                    onclick="eliminarFila(${idx})">
+                🗑️
+            </button>
         </td>
     `;
 
@@ -163,7 +181,11 @@ function agregarFila() {
 function actualizarPrecio(idx){
     const sel = document.querySelector(`[name="variacion_${idx}"]`);
     const precio = sel.options[sel.selectedIndex].dataset.precio || 0;
-    document.querySelector(`[name="precio_${idx}"]`).value = precio;
+    const precioLimpio = String(precio)
+            .replace(/\./g, '')   // elimina separadores de miles
+            .replace(',', '.');   // cambia coma decimal por punto
+
+        document.querySelector(`[name="precio_${idx}"]`).value = precioLimpio;
     calcularSubtotal(idx);
 }
 

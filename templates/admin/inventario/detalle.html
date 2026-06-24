@@ -1,192 +1,87 @@
 {% extends "admin/base_admin.html" %}
-{% block title %}Nueva Entrada — TiendaMoa07{% endblock %}
+{% block title %}Detalle Entrada #{{ entrada.id }} — TiendaMoa07{% endblock %}
 {% block menu_inventario %}active{% endblock %}
-{% block navbar_title %}Nueva Entrada de Inventario{% endblock %}
+{% block navbar_title %}Detalle de Entrada{% endblock %}
 
 {% block content %}
+
 <div class="page-header">
     <div>
-        <div class="page-title">➕ Nueva Entrada</div>
+        <div class="page-title">📦 Entrada #{{ entrada.id }}</div>
         <div class="breadcrumb">
             <a href="{% url 'admin_dashboard' %}">Dashboard</a> ›
             <a href="{% url 'admin_inventario' %}">Inventario</a> ›
-            Nueva Entrada
+            Detalle
         </div>
     </div>
+
+```
+<a href="{% url 'admin_inventario' %}" class="btn btn-secondary">
+    ← Volver
+</a>
+```
+
 </div>
 
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">
-            {{ message }}
-        </div>
-    {% endfor %}
-{% endif %}
-
-<form method="post" id="formEntrada">
-    {% csrf_token %}
-
-    <!-- CABECERA -->
-    <div class="card" style="max-width:800px; margin-bottom:24px;">
-        <div class="card-header"><h3>📋 Datos de la Entrada</h3></div>
-        <div class="card-body">
-
-            <div class="form-group">
-                <label>🏭 Proveedor *</label>
-                <select name="proveedor" class="form-control" required>
-                    <option value="">— Seleccionar —</option>
-                    {% for p in proveedores %}
-                        <option value="{{ p.id }}">{{ p.nombre_proveedor }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>📅 Fecha de Entrada *</label>
-                <input type="datetime-local"
-                       name="fecha_entrada"
-                       class="form-control"
-                       value="{{ fecha_actual }}"
-                       required>
-            </div>
-
-        </div>
+<div class="card" style="margin-bottom:24px;">
+    <div class="card-header">
+        <h3>📋 Información General</h3>
     </div>
 
-    <!-- DETALLES -->
-    <div class="card" style="max-width:800px; margin-bottom:24px;">
-        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
-            <h3>🗂️ Productos Recibidos</h3>
-            <button type="button" class="btn btn-primary btn-sm" onclick="agregarFila()">
-                ➕ Agregar Producto
-            </button>
-        </div>
+```
+<div class="card-body">
+    <p><strong>ID Entrada:</strong> #{{ entrada.id }}</p>
+    <p><strong>Proveedor:</strong> {{ entrada.proveedor.nombre_proveedor }}</p>
+    <p><strong>Fecha Entrada:</strong> {{ entrada.fecha_entrada|date:"d/m/Y H:i" }}</p>
+    <p><strong>Total:</strong> ${{ entrada.total_entrada }}</p>
+</div>
+```
 
-        <div class="card-body" style="padding:0;">
-            <table style="width:100%;" id="tablaDetalles">
-                <thead>
-                    <tr>
-                        <th>Variación</th>
-                        <th>Cantidad</th>
-                        <th>Precio</th>
-                        <th>Subtotal</th>
-                        <th>Acción</th>
-                    </tr>
-                </thead>
+</div>
 
-                <tbody id="cuerpoDetalles"></tbody>
-
-                <tfoot>
-                    <tr>
-                        <td colspan="3" style="text-align:right;font-weight:700;">
-                            TOTAL:
-                        </td>
-                        <td id="totalGeneral">$0</td>
-                        <td></td>
-                    </tr>
-                </tfoot>
-            </table>
-
-            <div id="mensajeVacio" style="text-align:center;padding:30px;color:#7f8c8d;">
-                📭 Agrega productos
-            </div>
-        </div>
+<div class="card">
+    <div class="card-header">
+        <h3>🗂️ Productos Recibidos</h3>
     </div>
 
-    <input type="hidden" name="totalFilas" id="totalFilas">
-    <input type="hidden" name="total_entrada" id="totalEntrada">
+```
+<div class="table-responsive">
+    <table>
+        <thead>
+            <tr>
+                <th>SKU</th>
+                <th>Producto</th>
+                <th>Talla</th>
+                <th>Color</th>
+                <th>Cantidad</th>
+                <th>Precio Compra</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
 
-    <button type="submit" class="btn btn-success">💾 Registrar Entrada</button>
-    <a href="{% url 'admin_inventario' %}" class="btn btn-secondary">Cancelar</a>
+        <tbody>
+            {% for d in detalles %}
+            <tr>
+                <td>{{ d.variacion.sku_unico }}</td>
+                <td>{{ d.variacion.producto.nombre_producto }}</td>
+                <td>{{ d.variacion.talla }}</td>
+                <td>{{ d.variacion.color }}</td>
+                <td>{{ d.cantidades }}</td>
+                <td>${{ d.precio_comprado }}</td>
+                <td>${{ d.subtotal }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="empty-state">
+                    No existen detalles registrados.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+```
 
-</form>
-
-<script>
-const variaciones = [
-{% for v in variaciones %}
-{
-    id: {{ v.id }},
-    sku: "{{ v.sku_unico|escapejs }}",
-    nombre: "{{ v.producto.nombre_producto|escapejs }}",
-    stock: {{ v.stock_actual }},
-    precio: {{ v.precio_compra }}
-},
-{% endfor %}
-];
-
-let idx = 0;
-
-function agregarFila() {
-    const tbody = document.getElementById("cuerpoDetalles");
-    const i = idx++;
-
-    const opciones = variaciones.map(v =>
-        `<option value="${v.id}" data-precio="${v.precio}">
-            ${v.sku} - ${v.nombre}
-        </option>`
-    ).join("");
-
-    const tr = document.createElement("tr");
-    tr.id = "fila_" + i;
-
-    tr.innerHTML = `
-        <td>
-            <select name="variacion_${i}" onchange="setPrecio(${i})">
-                <option value="">Seleccione</option>
-                ${opciones}
-            </select>
-        </td>
-
-        <td>
-            <input type="number" name="cantidad_${i}" value="1" min="1"
-                   oninput="calc(${i})">
-        </td>
-
-        <td>
-            <input type="number" name="precio_${i}" value="0" readonly>
-        </td>
-
-        <td id="sub_${i}">$0</td>
-
-        <td>
-            <button type="button" onclick="eliminar(${i})">🗑️</button>
-        </td>
-    `;
-
-    tbody.appendChild(tr);
-    document.getElementById("mensajeVacio").style.display = "none";
-    document.getElementById("totalFilas").value = idx;
-}
-
-function setPrecio(i){
-    const sel = document.querySelector(`[name="variacion_${i}"]`);
-    const price = sel.options[sel.selectedIndex].dataset.precio || 0;
-    document.querySelector(`[name="precio_${i}"]`).value = price;
-    calc(i);
-}
-
-function calc(i){
-    const c = document.querySelector(`[name="cantidad_${i}"]`).value || 0;
-    const p = document.querySelector(`[name="precio_${i}"]`).value || 0;
-    const s = c * p;
-
-    document.getElementById("sub_" + i).innerText = "$" + s.toLocaleString();
-    total();
-}
-
-function total(){
-    let t = 0;
-    document.querySelectorAll("[id^='sub_']").forEach(x=>{
-        t += parseInt(x.innerText.replace(/\D/g,"")||0);
-    });
-    document.getElementById("totalGeneral").innerText = "$" + t.toLocaleString();
-    document.getElementById("totalEntrada").value = t;
-}
-
-function eliminar(i){
-    document.getElementById("fila_" + i)?.remove();
-    total();
-}
-</script>
+</div>
 
 {% endblock %}

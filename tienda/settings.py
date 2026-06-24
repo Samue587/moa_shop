@@ -105,6 +105,7 @@ else:
             "PASSWORD": "1028864373",
             "HOST": "127.0.0.1",
             "PORT": "3307",
+            'CONN_MAX_AGE': 60,   # 🔥 CLAVE
             "OPTIONS": {
                 "charset": "utf8mb4",
             },
