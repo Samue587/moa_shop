@@ -48,21 +48,35 @@
                 <div class="form-row-3">
                     <div class="form-group">
                         <label class="form-label">Precio de Compra <span class="required">*</span></label>
-                        <input type="number" name="precio_compra" class="form-control"
-                            step="0.01" min="0"
-                            value="{{ form.precio_compra|default:variacion.precio_compra }}" required>
+                        <input type="number"
+                            id="precio_compra"
+                            name="precio_compra"
+                            class="form-control"
+                            step="0.01"
+                            min="0"
+                            value="{{ form.precio_compra|default:variacion.precio_compra }}"
+                            required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Precio Base <span class="required">*</span></label>
-                        <input type="number" name="precio_base" class="form-control"
-                            step="0.01" min="0"
-                            value="{{ form.precio_base|default:variacion.precio_base }}" required>
+                        <input type="number"
+                            id="precio_base"
+                            name="precio_base"
+                            class="form-control"
+                            step="0.01"
+                            min="0"
+                            value="{{ form.precio_base|default:variacion.precio_base }}"
+                            required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">IVA (%)</label>
-                        <input type="number" name="iva_porcentaje" class="form-control"
-                            step="0.1" min="0"
-                            value="{{ form.iva_porcentaje|default:variacion.iva_porcentaje }}">
+                        <input type="number"
+                            name="iva_porcentaje"
+                            id="iva_porcentaje"
+                            class="form-control"
+                            step="0.1"
+                            min="0"
+                            value="{{ form.iva_porcentaje|default:19 }}">
                     </div>
                 </div>
     
@@ -105,5 +119,37 @@
         const tallaActual = document.getElementById('talla-input').value;
         if (tallaActual) elegirTalla(tallaActual);
     });
+
+
+
+
+    function calcularPrecioBase() {
+        const compra = parseFloat(
+            document.getElementById("precio_compra").value || 0
+        );
+
+        const iva = parseFloat(
+            document.getElementById("iva_porcentaje").value || 19
+        );
+
+        const factorIVA = 1 + (iva / 100);
+
+        const precioBase = compra * factorIVA * 1.50;
+
+        document.getElementById("precio_base").value =
+            precioBase.toFixed(0);
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const compra = document.getElementById("precio_compra");
+        const iva = document.getElementById("iva_porcentaje");
+
+        compra.addEventListener("input", calcularPrecioBase);
+        iva.addEventListener("input", calcularPrecioBase);
+
+        calcularPrecioBase();
+    });
+
     </script>
     {% endblock %}
