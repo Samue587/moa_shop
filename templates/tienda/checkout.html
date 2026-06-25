@@ -488,9 +488,27 @@ body.dark-mode .resume-line   { color: #f0f0f0; }
 
                     <div class="form-group">
 
-                        <label>
-                            Teléfono <span class="req">*</span>
-                        </label>
+                        <div class="form-group">
+                            <label>
+                                Teléfono <span class="req">*</span>
+                            </label>
+
+                            <input
+                                type="tel"
+                                id="telefono"
+                                name="telefono"
+                                class="form-control"
+                                maxlength="10"
+                                minlength="10"
+                                pattern="[0-9]{10}"
+                                inputmode="numeric"
+                                required>
+
+                            <small id="errorTelefono"
+                                style="color:red;display:none;">
+                                El teléfono debe contener exactamente 10 números.
+                            </small>
+                        </div>
 
                         <input
                             type="tel"
@@ -868,6 +886,27 @@ actualizarDireccion();
         document.body.classList.add('dark-mode');
     }
 })();
+
+const telefono = document.getElementById('telefono');
+const errorTelefono = document.getElementById('errorTelefono');
+
+telefono.addEventListener('input', function() {
+
+    // Elimina cualquier cosa que no sea número
+    this.value = this.value.replace(/\D/g, '');
+
+    // Máximo 10 dígitos
+    if (this.value.length > 10) {
+        this.value = this.value.slice(0, 10);
+    }
+
+    // Mostrar error si no tiene exactamente 10
+    if (this.value.length > 0 && this.value.length !== 10) {
+        errorTelefono.style.display = 'block';
+    } else {
+        errorTelefono.style.display = 'none';
+    }
+});
 
 
 </script>
