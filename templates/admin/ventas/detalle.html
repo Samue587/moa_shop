@@ -36,7 +36,7 @@
         </div>
     </div>
     <div style="display:flex; gap:10px;">
-        <a href="{% url 'admin_ventas' %}" class="btn btn-secondary">← Volver</a>
+        <a href="{% url 'admin_envios' %}" class="btn btn-secondary">← Volver</a>
         <a href="{% url 'admin_dashboard' %}" class="btn btn-primary">📊 Dashboard</a>
     </div>
 </div>
@@ -94,41 +94,46 @@
     <div style="padding:22px 34px;">
         <div style="font-size:11px; font-weight:700; color:#7a8fa6; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Detalle de productos</div>
         <table style="width:100%; border-collapse:collapse;">
-            <thead>
-                <tr style="background:#FFF5F0;">
-                    <th style="padding:10px 14px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#FF6B35; text-align:left; border-radius:8px 0 0 8px;">Producto</th>
-                    <th style="padding:10px 14px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#FF6B35; text-align:center;">Talla/Color</th>
-                    <th style="padding:10px 14px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#FF6B35; text-align:right;">P. Unit.</th>
-                    <th style="padding:10px 14px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#FF6B35; text-align:right;">Cant.</th>
-                    <th style="padding:10px 14px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#FF6B35; text-align:right; border-radius:0 8px 8px 0;">Subtotal</th>
-                </tr>
-            </thead>
             <tbody>
-                {% for detalle in detalles %}
-                <tr>
-                    <td style="padding:15px 14px; border-bottom:1px solid #dce4ed; vertical-align:middle;">
-                        <div style="font-size:14px; font-weight:600; color:#1A1A2E; text-transform:uppercase; letter-spacing:0.3px;">
-                            {{ detalle.variacion.producto.nombre_producto }}
-                        </div>
-                        <div style="font-size:12px; color:#7a8fa6; margin-top:2px;">
-                            {{ detalle.variacion.producto.categoria.nombre_categoria|default:"Sin categoría" }}
-                        </div>
-                    </td>
-                    <td style="padding:15px 14px; border-bottom:1px solid #dce4ed; text-align:center; font-size:13px; color:#555;">
-                        {{ detalle.variacion.talla_variacion }} / {{ detalle.variacion.color_variacion }}
-                    </td>
-                    <td style="padding:15px 14px; border-bottom:1px solid #dce4ed; text-align:right; font-size:14px; color:#555;">
-                        $ {{ detalle.precio_unitario|floatformat:0|intcomma }}
-                    </td>
-                    <td style="padding:15px 14px; border-bottom:1px solid #dce4ed; text-align:right; font-size:16px; font-weight:800; color:#FF6B35;">
-                        x{{ detalle.cantidad_detalle }}
-                    </td>
-                    <td style="padding:15px 14px; border-bottom:1px solid #dce4ed; text-align:right; font-size:14px; font-weight:700; color:#1A1A2E;">
-                        $ {{ detalle.subtotal_detalle|floatformat:0|intcomma }}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
+                    {% for detalle in detalles %}
+                    <tr>
+                        <td style="padding:15px 14px; border-bottom:1px solid #dce4ed;">
+                            <div style="font-size:14px; font-weight:600; color:#1A1A2E;">
+                                {{ detalle.variacion.producto.nombre_producto }}
+                            </div>
+
+                            <div style="font-size:12px; color:#7a8fa6;">
+                                {{ detalle.variacion.producto.categoria.nombre_categoria|default:"Sin categoría" }}
+                            </div>
+                        </td>
+
+                        <td style="padding:15px 14px; border-bottom:1px solid #dce4ed; text-align:center;">
+                            {{ detalle.variacion.talla }}
+                            /
+                            {{ detalle.variacion.color }}
+                        </td>
+
+                        <td style="padding:15px 14px; border-bottom:1px solid #dce4ed; text-align:right;">
+                            $ {{ detalle.precio_unitario|floatformat:0|intcomma }}
+                        </td>
+
+                        <td style="padding:15px 14px; border-bottom:1px solid #dce4ed; text-align:right; font-weight:700;">
+                            x{{ detalle.cantidad }}
+                        </td>
+
+                        <td style="padding:15px 14px; border-bottom:1px solid #dce4ed; text-align:right; font-weight:700;">
+                            $ {{ detalle.subtotal|floatformat:0|intcomma }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align:center; padding:20px;">
+                            No hay productos en esta venta
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+    
         </table>
     </div>
 
