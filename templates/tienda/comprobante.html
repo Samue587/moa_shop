@@ -558,9 +558,10 @@
   <!-- ACCIONES -->
   <div class="actions-row">
     <a href="{% url 'tienda' %}" class="btn-primary">🛍️ Seguir comprando</a>
-<a href="{% url 'perfil_usuario' %}#pedidos" class="btn-secondary">📦 Ver mis pedidos</a>  </div>
+    <a href="{% url 'perfil_usuario' %}#pedidos" class="btn-secondary">📦 Ver mis pedidos</a>
+    <a href="{% url 'comprobante_pdf' venta.id %}" class="btn-secondary">⬇️ Descargar PDF</a>
 
-</div><!-- factura-wrapper -->
+  </div><!-- factura-wrapper -->
 <script>
 (function() {
     if (localStorage.getItem('moa_tema') === 'dark') {

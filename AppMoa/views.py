@@ -531,118 +531,73 @@ def checkout_procesar(request):
     usuario = get_usuario_sesion(request)
     carrito = _get_carrito(request)
 
-    list(messages.get_messages(request))
-    storage = messages.get_messages(request)
-    storage.used = True
-
-    list(messages.get_messages(request))
-    storage = messages.get_messages(request)
-    storage.used = True
-
     if not carrito["items"]:
         messages.error(request, "El carrito está vacío.")
         return redirect("carrito_ver")
 
-    # TOTAL BASE DEL CARRITO
+    # Limpiar mensajes previos
+    storage = messages.get_messages(request)
+    storage.used = True
+
     total_carrito = float(_calcular_total(carrito))
 
-    ctx_base = {
-        "usuario": usuario,
-        "items": carrito["items"],
-        "total": total_carrito,
-    }
+    # Último envío del usuario para prellenar dirección
+    ultimo_envio = Envio.objects.filter(
+        usuario=usuario
+    ).order_by('-id').first()
 
     ctx_base = {
-        "usuario": usuario,
-        "items": carrito["items"],
-        "total": _calcular_total(carrito),
-        "cantidad_carrito": _cantidad_carrito(request),
-        "departamentos": sorted(CIUDADES_POR_DEPARTAMENTO.keys()),
+        "usuario":                   usuario,
+        "items":                     carrito["items"],
+        "total":                     total_carrito,
+        "cantidad_carrito":          _cantidad_carrito(request),
+        "departamentos":             sorted(CIUDADES_POR_DEPARTAMENTO.keys()),
         "ciudades_por_departamento": CIUDADES_POR_DEPARTAMENTO,
+        "ultimo_envio":              ultimo_envio,
     }
 
     if request.method == "GET":
-        return render(
-            request,
-            "tienda/checkout.html",
-            {
-                **ctx_base,
-                "form": {},
-                "errores": [],
-                "costo_envio": 0,
-                "total_final": total_carrito,
-            },
-        )
+        return render(request, "tienda/checkout.html", {
+            **ctx_base,
+            "form":        {},
+            "errores":     [],
+            "costo_envio": 0,
+            "total_final": total_carrito,
+        })
 
-    direccion = request.POST.get("direccion", "").strip()
-    barrio = request.POST.get("barrio", "").strip()
-    ciudad = request.POST.get("ciudad", "").strip()
-    departamento = request.POST.get("departamento", "").strip()
-    tipo_vivienda = request.POST.get("tipo_vivienda", "CASA").strip()
+    # ── POST ────────────────────────────────────────────
+    direccion        = request.POST.get("direccion", "").strip()
+    barrio           = request.POST.get("barrio", "").strip()
+    ciudad           = request.POST.get("ciudad", "").strip()
+    departamento     = request.POST.get("departamento", "").strip()
+    tipo_vivienda    = request.POST.get("tipo_vivienda", "CASA").strip()
     especificaciones = request.POST.get("especificaciones", "").strip()
-    telefono = request.POST.get("telefono", "").strip()
-    empresa = request.POST.get("empresa", "Interrapidísimo").strip()
+    telefono         = request.POST.get("telefono", "").strip()
+    empresa          = request.POST.get("empresa", "Interrapidísimo").strip()
 
-    # COSTO ENVÍO POR DEPARTAMENTO
     costo_envio = COSTOS_ENVIO.get(departamento, 20000)
-
-    # TOTAL FINAL
     total_final = total_carrito + costo_envio
 
     errores = []
-
-    if not direccion:
-        errores.append("La dirección es obligatoria.")
-
-    if not ciudad:
-        errores.append("La ciudad es obligatoria.")
-
-    if not departamento:
-        errores.append("El departamento es obligatorio.")
-
-    if not telefono:
-        errores.append("El teléfono es obligatorio.")
-        return render(
-            request, "tienda/checkout.html", {**ctx_base, "form": {}, "errores": []}
-        )
-
-    direccion = request.POST.get("direccion", "").strip()
-    barrio = request.POST.get("barrio", "").strip()
-    ciudad = request.POST.get("ciudad", "").strip()
-    departamento = request.POST.get("departamento", "").strip()
-    tipo_vivienda = request.POST.get("tipo_vivienda", "CASA").strip()
-    especificaciones = request.POST.get("especificaciones", "").strip()
-    telefono = request.POST.get("telefono", "").strip()
-    empresa = request.POST.get("empresa", "Interrapidísimo").strip()
-
-    errores = []
-    if not direccion:
-        errores.append("La dirección es obligatoria.")
-    if not ciudad:
-        errores.append("La ciudad es obligatoria.")
-    if not departamento:
-        errores.append("El departamento es obligatorio.")
-    if not telefono:
-        errores.append("El teléfono es obligatorio.")
+    if not direccion:    errores.append("La dirección es obligatoria.")
+    if not ciudad:       errores.append("La ciudad es obligatoria.")
+    if not departamento: errores.append("El departamento es obligatorio.")
+    if not telefono:     errores.append("El teléfono es obligatorio.")
 
     if errores:
-        return render(
-            request,
-            "tienda/checkout.html",
-            {
-                **ctx_base,
-                "form": request.POST,
-                "errores": errores,
-                "costo_envio": costo_envio,
-                "total_final": total_final,
-            },
-        )
+        return render(request, "tienda/checkout.html", {
+            **ctx_base,
+            "form":        request.POST,
+            "errores":     errores,
+            "costo_envio": costo_envio,
+            "total_final": total_final,
+        })
 
     try:
         with transaction.atomic():
 
-            iva = round(total_carrito * 0.19 / 1.19, 2)
-            subtotal = round(total_carrito - iva, 2)
+            iva         = round(total_carrito * 0.19 / 1.19, 2)
+            subtotal    = round(total_carrito - iva, 2)
             monto_final = total_carrito + costo_envio
 
             venta = Venta.objects.create(
@@ -658,19 +613,17 @@ def checkout_procesar(request):
                 )
                 if variacion.stock_actual < item["cantidad"]:
                     raise Exception(
-                        f"Stock insuficiente para '{variacion.producto.nombre_producto}' ({variacion.talla} - {variacion.color})."
+                        f"Stock insuficiente para '{variacion.producto.nombre_producto}' "
+                        f"({variacion.talla} - {variacion.color})."
                     )
-
                 DetalleVenta.objects.create(
                     venta=venta,
                     variacion=variacion,
                     cantidad=item["cantidad"],
                     precio_unitario=item["precio"],
                 )
-
                 variacion.stock_actual -= item["cantidad"]
                 variacion.save(update_fields=["stock_actual", "actualizado_en"])
-
                 producto = variacion.producto
                 producto.actualizar_estado()
                 producto.save(update_fields=["estado", "actualizado_en"])
@@ -699,18 +652,13 @@ def checkout_procesar(request):
 
     except Exception as e:
         messages.error(request, f"Error al procesar la compra: {e}")
-        return render(
-            request,
-            "tienda/checkout.html",
-            {
-                **ctx_base,
-                "form": request.POST,
-                "errores": [str(e)],
-                "costo_envio": costo_envio,
-                "total_final": total_final,
-            },
-        )
-
+        return render(request, "tienda/checkout.html", {
+            **ctx_base,
+            "form":        request.POST,
+            "errores":     [str(e)],
+            "costo_envio": costo_envio,
+            "total_final": total_final,
+        })
 
 def checkout_comprobante(request, venta_id):
     usuario = get_usuario_sesion(request)
@@ -4512,3 +4460,168 @@ def confirmar_reset(request, token):
 
 def reset_completo(request):
     return render(request, "registration/password_reset_complete.html")
+
+
+def comprobante_pdf(request, venta_id):
+    import io
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.lib.units import mm
+    from reportlab.lib.enums import TA_CENTER, TA_RIGHT
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, HRFlowable
+
+    venta    = get_object_or_404(Venta.objects.select_related('usuario'), pk=venta_id)
+    detalles = DetalleVenta.objects.select_related('variacion__producto').filter(venta=venta)
+    envio    = Envio.objects.filter(venta=venta).first()
+
+    NARANJA  = colors.HexColor('#FF6B35')
+    NAVY     = colors.HexColor('#1e2d4a')
+    BLANCO   = colors.white
+    GRIS     = colors.HexColor('#F5F4F0')
+    GRIS2    = colors.HexColor('#e8e4de')
+    MUTED    = colors.HexColor('#7a8fa6')
+    DARK     = colors.HexColor('#1A1A2E')
+    GREEN    = colors.HexColor('#22c55e')
+
+    buffer = io.BytesIO()
+    page_w = letter[0] - 56 * mm
+    doc = SimpleDocTemplate(
+        buffer, pagesize=letter,
+        leftMargin=28*mm, rightMargin=28*mm,
+        topMargin=20*mm,  bottomMargin=20*mm,
+    )
+
+    s_titulo = ParagraphStyle('t', fontName='Helvetica-Bold', fontSize=18, textColor=DARK, spaceAfter=2)
+    s_sub    = ParagraphStyle('s', fontName='Helvetica',      fontSize=9,  textColor=MUTED, spaceAfter=8)
+    s_label  = ParagraphStyle('l', fontName='Helvetica-Bold', fontSize=7,  textColor=MUTED, spaceAfter=2)
+    s_val    = ParagraphStyle('v', fontName='Helvetica',      fontSize=9,  textColor=DARK)
+    s_pie    = ParagraphStyle('p', fontName='Helvetica-Oblique', fontSize=7, textColor=MUTED, alignment=TA_CENTER)
+
+    elements = []
+
+    # ── BANNER ──────────────────────────────────────────
+    banner = Table([['MOA Moda  ·  Comprobante de Compra']], colWidths=[page_w])
+    banner.setStyle(TableStyle([
+        ('BACKGROUND',    (0,0), (-1,0), NARANJA),
+        ('TEXTCOLOR',     (0,0), (-1,0), BLANCO),
+        ('FONTNAME',      (0,0), (-1,0), 'Helvetica-Bold'),
+        ('FONTSIZE',      (0,0), (-1,0), 12),
+        ('LEFTPADDING',   (0,0), (-1,0), 14),
+        ('TOPPADDING',    (0,0), (-1,0), 10),
+        ('BOTTOMPADDING', (0,0), (-1,0), 10),
+    ]))
+    elements.append(banner)
+    elements.append(Spacer(1, 10))
+
+    # ── TÍTULO ──────────────────────────────────────────
+    elements.append(Paragraph(f'Orden #{venta.id}', s_titulo))
+    elements.append(Paragraph(
+        f'Fecha: {venta.fecha.strftime("%d/%m/%Y %H:%M")}  ·  Colombia, Bogotá D.C.', s_sub
+    ))
+    elements.append(HRFlowable(width='100%', thickness=3, color=NARANJA, spaceBefore=4, spaceAfter=12))
+
+    # ── CLIENTE + ENVÍO ─────────────────────────────────
+    cliente_data = [
+        [Paragraph('CLIENTE', s_label), Paragraph('ENVÍO', s_label)],
+        [
+            Paragraph(venta.usuario.get_full_name(), s_val),
+            Paragraph(envio.direccion_completa if envio else '—', s_val),
+        ],
+        [
+            Paragraph(venta.usuario.correo_usuario, s_val),
+            Paragraph(
+                f'Tel: {envio.telefono_llegada}  ·  {envio.empresa_transportadora or "—"}' if envio else '—',
+                s_val
+            ),
+        ],
+        [
+            Paragraph('', s_val),
+            Paragraph(
+                f'Llegada est.: {envio.fecha_estipulada_llegada.strftime("%d/%m/%Y") if envio else "—"}',
+                s_val
+            ),
+        ],
+    ]
+    cliente_tbl = Table(cliente_data, colWidths=[page_w/2, page_w/2])
+    cliente_tbl.setStyle(TableStyle([
+        ('BACKGROUND',    (0,0), (-1,0), GRIS),
+        ('FONTNAME',      (0,0), (-1,0), 'Helvetica-Bold'),
+        ('TOPPADDING',    (0,0), (-1,-1), 5),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 5),
+        ('LINEAFTER',     (0,0), (0,-1), 0.5, GRIS2),
+        ('BOX',           (0,0), (-1,-1), 0.5, GRIS2),
+    ]))
+    elements.append(cliente_tbl)
+    elements.append(Spacer(1, 14))
+
+    # ── TABLA PRODUCTOS ──────────────────────────────────
+    prod_data = [['Producto', 'Talla', 'Color', 'Cant.', 'P. Unit.', 'Subtotal']]
+    for d in detalles:
+        prod_data.append([
+            d.variacion.producto.nombre_producto,
+            d.variacion.talla,
+            d.variacion.color,
+            str(d.cantidad),
+            f'${d.precio_unitario:,.0f}',
+            f'${d.subtotal:,.0f}',
+        ])
+
+    col_w = [page_w*0.35, page_w*0.1, page_w*0.15, page_w*0.08, page_w*0.15, page_w*0.17]
+    prod_tbl = Table(prod_data, colWidths=col_w, repeatRows=1)
+    prod_tbl.setStyle(TableStyle([
+        ('BACKGROUND',    (0,0), (-1,0), NAVY),
+        ('TEXTCOLOR',     (0,0), (-1,0), BLANCO),
+        ('FONTNAME',      (0,0), (-1,0), 'Helvetica-Bold'),
+        ('FONTSIZE',      (0,0), (-1,0), 8),
+        ('ALIGN',         (0,0), (-1,0), 'CENTER'),
+        ('TOPPADDING',    (0,0), (-1,0), 7),
+        ('BOTTOMPADDING', (0,0), (-1,0), 7),
+        ('FONTNAME',      (0,1), (-1,-1), 'Helvetica'),
+        ('FONTSIZE',      (0,1), (-1,-1), 8),
+        ('TEXTCOLOR',     (0,1), (-1,-1), DARK),
+        ('TOPPADDING',    (0,1), (-1,-1), 6),
+        ('BOTTOMPADDING', (0,1), (-1,-1), 6),
+        ('ALIGN',         (3,1), (5,-1), 'RIGHT'),
+        ('LINEBELOW',     (0,0), (-1,-2), 0.3, GRIS2),
+        ('BOX',           (0,0), (-1,-1), 0.5, GRIS2),
+    ]))
+    elements.append(prod_tbl)
+    elements.append(Spacer(1, 10))
+
+    # ── TOTALES ─────────────────────────────────────────
+    costo_envio = envio.costo_envio if envio else 0
+    totales_data = [
+        ['Subtotal',   f'${venta.subtotal:,.0f}'],
+        ['IVA (19%)',  f'${venta.monto_iva:,.0f}'],
+        ['Envío',      f'${float(costo_envio):,.0f}'],
+        ['TOTAL',      f'${venta.monto_final:,.0f}'],
+    ]
+    totales_tbl = Table(totales_data, colWidths=[page_w - 80*mm, 80*mm])
+    totales_tbl.setStyle(TableStyle([
+        ('FONTNAME',      (0,0), (-1,2), 'Helvetica'),
+        ('FONTNAME',      (0,3), (-1,3), 'Helvetica-Bold'),
+        ('FONTSIZE',      (0,0), (-1,-1), 9),
+        ('TEXTCOLOR',     (0,0), (-1,2), MUTED),
+        ('TEXTCOLOR',     (0,3), (-1,3), DARK),
+        ('ALIGN',         (1,0), (1,-1), 'RIGHT'),
+        ('BACKGROUND',    (0,3), (-1,3), GRIS),
+        ('TOPPADDING',    (0,0), (-1,-1), 4),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+        ('LINEABOVE',     (0,3), (-1,3), 1, NARANJA),
+        ('BOX',           (0,0), (-1,-1), 0.5, GRIS2),
+    ]))
+    elements.append(totales_tbl)
+    elements.append(Spacer(1, 20))
+
+    # ── PIE ─────────────────────────────────────────────
+    elements.append(HRFlowable(width='100%', thickness=0.5, color=GRIS2, spaceAfter=8))
+    elements.append(Paragraph('"Tu estilo, nuestra pasión."  ·  MOA Moda', s_pie))
+    elements.append(Paragraph('© 2026 MOA Moda  ·  Colombia, Bogotá D.C.  ·  Todos los derechos reservados', s_pie))
+
+    doc.build(elements)
+    buffer.seek(0)
+
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="comprobante_orden_{venta.id}.pdf"'
+    return response

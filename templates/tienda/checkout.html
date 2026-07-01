@@ -19,350 +19,223 @@
             --muted:        #888;
             --success:      #28A745;
         }
-/* ══════════════════════════════════════
-   DARK MODE — Variables globales
-══════════════════════════════════════ */
-body.dark-mode {
-    --bg:     #0f0f0f;
-    --white:  #1a1a1a;
-    --ink:    #f0f0f0;
-    --muted:  #aaa;
-    --border: #333;
-}
 
-/* Navbar */
-body.dark-mode .navbar     { background: #ffffff !important; }
-body.dark-mode .logo-oa    { color: #1A1A2E !important; }
-body.dark-mode .nav-back   { color: #888 !important; }
+        /* DARK MODE */
+        body.dark-mode { --bg:#0f0f0f; --white:#1a1a1a; --ink:#f0f0f0; --muted:#aaa; --border:#333; }
+        body.dark-mode .navbar             { background: #ffffff !important; }
+        body.dark-mode .logo-oa            { color: #1A1A2E !important; }
+        body.dark-mode .nav-back           { color: #888 !important; }
+        body.dark-mode .card               { background: #1a1a1a; }
+        body.dark-mode .card-title         { color: #f0f0f0; border-color: #333; }
+        body.dark-mode label               { color: #f0f0f0; }
+        body.dark-mode input[type="text"],
+        body.dark-mode input[type="number"],
+        body.dark-mode input[type="tel"],
+        body.dark-mode select              { background: #2a2a2a; border-color: #444; color: #f0f0f0; }
+        body.dark-mode input:focus,
+        body.dark-mode select:focus        { background: #333; border-color: var(--primary); }
+        body.dark-mode select:disabled,
+        body.dark-mode input[readonly]     { background: #222; color: #666; border-color: #333; }
+        body.dark-mode #direccion_preview  { background: #222 !important; color: #f0f0f0 !important; border-color: #444 !important; }
+        body.dark-mode .resumen-item       { border-color: #333; }
+        body.dark-mode .item-nombre        { color: #f0f0f0; }
+        body.dark-mode .item-precio        { color: #f0f0f0; }
+        body.dark-mode .item-foto          { background: #2a2a2a; }
+        body.dark-mode .resume-line        { color: #f0f0f0; }
+        body.dark-mode .saved-card         { background: #1a1a1a; border-color: #333; }
+        body.dark-mode .saved-dir          { color: #f0f0f0; }
+        body.dark-mode .saved-sub          { color: #aaa; }
+        body.dark-mode .ojo-valor          { color: #f0f0f0; }
+        body.dark-mode .ojo-blk            { background: #111; border-color: #333; }
 
-/* Cards */
-body.dark-mode .card       { background: #1a1a1a; }
-body.dark-mode .card-title { color: #f0f0f0; border-color: #333; }
-
-/* Labels y textos */
-body.dark-mode label       { color: #f0f0f0; }
-
-/* Inputs y selects */
-body.dark-mode input[type="text"],
-body.dark-mode input[type="number"],
-body.dark-mode input[type="tel"],
-body.dark-mode select {
-    background: #2a2a2a;
-    border-color: #444;
-    color: #f0f0f0;
-}
-body.dark-mode input:focus,
-body.dark-mode select:focus {
-    background: #333;
-    border-color: var(--primary);
-}
-body.dark-mode select:disabled,
-body.dark-mode input[readonly] {
-    background: #222;
-    color: #666;
-    border-color: #333;
-}
-
-/* Preview dirección */
-body.dark-mode #direccion_preview {
-    background: #222 !important;
-    color: #f0f0f0 !important;
-    border-color: #444 !important;
-}
-
-/* Resumen */
-body.dark-mode .resumen-item  { border-color: #333; }
-body.dark-mode .item-nombre   { color: #f0f0f0; }
-body.dark-mode .item-precio   { color: #f0f0f0; }
-body.dark-mode .item-foto     { background: #2a2a2a; }
-body.dark-mode .resume-line   { color: #f0f0f0; }
- 
         body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; transition: background 0.3s, color 0.3s; }
 
-        /* ── NAVBAR ── */
-        .navbar {
-            background: var(--white);
-            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
-            position: sticky; top: 0; z-index: 100;
-        }
-        .navbar-inner {
-            max-width: 1100px; margin: 0 auto;
-            padding: 0 30px; height: 72px;
-            display: flex; align-items: center; justify-content: space-between;
-        }
+        /* NAVBAR */
+        .navbar { background: var(--white); box-shadow: 0 2px 20px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 100; }
+        .navbar-inner { max-width: 1100px; margin: 0 auto; padding: 0 30px; height: 72px; display: flex; align-items: center; justify-content: space-between; }
         .logo { text-decoration: none; display: flex; align-items: center; gap: 10px; }
-        .logo-sq {
-            width: 44px; height: 38px;
-            background: var(--primary); border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .logo-sq span {
-            font-family: 'Darker Grotesque', sans-serif;
-            font-size: 32px; font-weight: 900; color: white; line-height: 1;
-        }
-        .logo-text { display: flex; flex-direction: column; line-height: 1; }
-        .logo-oa   { font-family: 'Darker Grotesque', sans-serif; font-size: 20px; font-weight: 900; color: var(--dark); }
-        .logo-shop { font-size: 11px; font-weight: 600; color: var(--primary); letter-spacing: 4px; text-transform: uppercase; }
-        .nav-back {
-            display: flex; align-items: center; gap: 6px;
-            color: var(--muted); text-decoration: none;
-            font-size: 14px; font-weight: 600; transition: color 0.2s;
-        }
+        .logo-sq { width: 44px; height: 38px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        .logo-sq span { font-family: 'Darker Grotesque', sans-serif; font-size: 32px; font-weight: 900; color: white; line-height: 1; }
+        .logo-text  { display: flex; flex-direction: column; line-height: 1; }
+        .logo-oa    { font-family: 'Darker Grotesque', sans-serif; font-size: 20px; font-weight: 900; color: var(--dark); }
+        .logo-shop  { font-size: 11px; font-weight: 600; color: var(--primary); letter-spacing: 4px; text-transform: uppercase; }
+        .nav-back   { display: flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 600; transition: color 0.2s; }
         .nav-back:hover { color: var(--dark); }
 
-        /* ── LAYOUT ── */
-        .page {
-            max-width: 1050px; margin: 40px auto;
-            padding: 0 24px 60px;
-            display: grid; grid-template-columns: 1fr 360px; gap: 28px;
-        }
-        @media (max-width: 800px) {
-            .page { grid-template-columns: 1fr; }
-            .resumen-sticky { position: static !important; }
-        }
+        /* LAYOUT */
+        .page { max-width: 1050px; margin: 40px auto; padding: 0 24px 60px; display: grid; grid-template-columns: 1fr 360px; gap: 28px; }
+        @media (max-width: 800px) { .page { grid-template-columns: 1fr; } .resumen-sticky { position: static !important; } }
 
-        /* ── CARDS ── */
-        .card {
-            background: var(--white); border-radius: 16px;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.07);
-            margin-bottom: 20px; overflow: hidden;
-        }
+        /* CARDS */
+        .card { background: var(--white); border-radius: 16px; box-shadow: 0 2px 20px rgba(0,0,0,0.07); margin-bottom: 20px; overflow: hidden; }
         .card:last-child { margin-bottom: 0; }
-        .card-title {
-            padding: 20px 26px 16px;
-            border-bottom: 1px solid var(--border);
-            font-family: 'Darker Grotesque', sans-serif;
-            font-size: 19px; font-weight: 800; color: var(--dark);
-            display: flex; align-items: center; gap: 8px;
-        }
-        .card-body { padding: 22px 26px; }
+        .card-title { padding: 20px 26px 16px; border-bottom: 1px solid var(--border); font-family: 'Darker Grotesque', sans-serif; font-size: 19px; font-weight: 800; color: var(--dark); display: flex; align-items: center; gap: 8px; }
+        .card-body  { padding: 22px 26px; }
 
-        /* ── FORMULARIO ── */
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        /* DIRECCIÓN GUARDADA */
+        .saved-card {
+            background: var(--white); border: 2px solid #22c55e;
+            border-radius: 14px; padding: 18px 22px; margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+        }
+        .saved-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: #ecfdf5; color: #15803d; border: 1px solid #bbf7d0;
+            border-radius: 20px; padding: 3px 10px; font-size: 11px;
+            font-weight: 700; letter-spacing: .5px; margin-bottom: 8px;
+        }
+        .saved-dir  { font-size: 15px; font-weight: 700; color: var(--dark); margin-bottom: 5px; }
+        .saved-sub  { font-size: 13px; color: var(--muted); line-height: 1.5; }
+        .saved-btns { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+        .btn-usar   { padding: 9px 18px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; transition: background .2s; }
+        .btn-usar:hover   { background: var(--primary-dark); }
+        .btn-editar { padding: 9px 18px; background: transparent; color: var(--dark); border: 2px solid var(--border); border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; transition: border-color .2s; }
+        .btn-editar:hover { border-color: var(--dark); }
+
+        /* FORMULARIO */
+        .form-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
         .form-group { margin-bottom: 16px; }
         .form-group:last-child { margin-bottom: 0; }
-        /* ─────────────────────────────
-   DIRECCIÓN COLOMBIA
-───────────────────────────── */
 
-.direccion-box {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.direccion-grid {
-    display: grid;
-    grid-template-columns:
-        1.5fr
-        1fr
-        .8fr
-        1fr
-        1fr
-        auto
-        1fr
-        .8fr
-        auto
-        1fr;
-    gap: 10px;
-    align-items: center;
-}
-
-.direccion-grid span {
-    font-weight: 700;
-    color: var(--muted);
-    text-align: center;
-    font-size: 18px;
-}
-
-/* Preview dirección */
-#direccion_preview {
-    font-weight: 600;
-    color: var(--navy);
-    background: #f3f4f6;
-    border: 2px dashed var(--border);
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-    .direccion-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .direccion-grid span {
-        display: none;
-    }
-}
-
-@media (max-width: 500px) {
-    .direccion-grid {
-        grid-template-columns: 1fr;
-    }
-}
-        label {
-            display: block; font-size: 13px; font-weight: 600;
-            color: var(--dark); margin-bottom: 6px;
+        .direccion-box  { display: flex; flex-direction: column; gap: 14px; }
+        .direccion-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr .8fr 1fr 1fr auto 1fr .8fr auto 1fr;
+            gap: 10px; align-items: center;
         }
-        label .req { color: var(--primary); margin-left: 2px; }
-        label .opc { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 4px; }
-        input[type="text"],
-        input[type="number"],
-        input[type="tel"],
-        select {
-            width: 100%; padding: 11px 14px;
-            border: 1.5px solid var(--border); border-radius: 10px;
-            font-family: inherit; font-size: 14px; color: var(--dark);
-            background: #fafafa;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            appearance: auto;
-        }
-        input:focus, select:focus {
-            outline: none; border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
-            background: var(--white);
-        }
-        select:disabled {
-            background: #f0f0f0; color: var(--muted);
-            cursor: not-allowed; border-color: #e0e0e0;
-            opacity: 1;
-        }
-        input[readonly] {
-            background: #f0f0f0; color: var(--muted);
-            cursor: not-allowed; border-color: #e0e0e0;
-        }
+        .direccion-grid span { font-weight: 700; color: var(--muted); text-align: center; font-size: 18px; }
+        #direccion_preview { font-weight: 600; color: var(--navy); background: #f3f4f6; border: 2px dashed var(--border); }
 
-        /* ── ALERTAS ── */
-        .alert {
-            padding: 13px 16px; border-radius: 10px; margin-bottom: 18px;
-            font-size: 13px; font-weight: 500;
-            display: flex; align-items: flex-start; gap: 8px;
-        }
-        .alert-error { background: #fdecea; color: #b91c1c; border-left: 4px solid #ef4444; }
+        @media (max-width: 900px) { .direccion-grid { grid-template-columns: 1fr 1fr; } .direccion-grid span { display: none; } }
+        @media (max-width: 500px) { .direccion-grid { grid-template-columns: 1fr; } }
 
-        /* ── RESUMEN ── */
+        label       { display: block; font-size: 13px; font-weight: 600; color: var(--dark); margin-bottom: 6px; }
+        label .req  { color: var(--primary); margin-left: 2px; }
+        label .opc  { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 4px; }
+
+        input[type="text"], input[type="number"], input[type="tel"], select {
+            width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+            font-family: inherit; font-size: 14px; color: var(--dark); background: #fafafa;
+            transition: border-color .2s, box-shadow .2s; appearance: auto;
+        }
+        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255,107,53,0.12); background: var(--white); }
+        select:disabled  { background: #f0f0f0; color: var(--muted); cursor: not-allowed; border-color: #e0e0e0; opacity: 1; }
+        input[readonly]  { background: #f0f0f0; color: var(--muted); cursor: not-allowed; border-color: #e0e0e0; }
+
+        /* ALERTAS */
+        .alert         { padding: 13px 16px; border-radius: 10px; margin-bottom: 18px; font-size: 13px; font-weight: 500; display: flex; align-items: flex-start; gap: 8px; }
+        .alert-error   { background: #fdecea; color: #b91c1c; border-left: 4px solid #ef4444; }
+        .alert-success { background: #ecfdf5; color: #065f46; border-left: 4px solid #22c55e; }
+
+        /* RESUMEN */
         .resumen-sticky { position: sticky; top: 90px; }
-        .resumen-item {
-            display: flex; align-items: center; gap: 14px;
-            padding: 13px 0; border-bottom: 1px solid var(--border);
-        }
+        .resumen-item   { display: flex; align-items: center; gap: 14px; padding: 13px 0; border-bottom: 1px solid var(--border); }
         .resumen-item:last-of-type { border-bottom: none; }
-        .item-foto {
-            width: 52px; height: 52px; border-radius: 10px;
-            background: var(--light); flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 22px; overflow: hidden;
-        }
+        .item-foto   { width: 52px; height: 52px; border-radius: 10px; background: var(--light); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; overflow: hidden; }
         .item-foto img { width: 100%; height: 100%; object-fit: cover; }
-        .item-info { flex: 1; min-width: 0; }
-        .item-nombre {
-            font-size: 14px; font-weight: 600; color: var(--dark);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .item-qty { font-size: 12px; color: var(--muted); margin-top: 3px; }
-        .item-precio {
-            font-family: 'Darker Grotesque', sans-serif;
-            font-size: 17px; font-weight: 800; color: var(--navy); flex-shrink: 0;
-        }
-        .total-blk {
-            background: var(--navy); border-radius: 12px;
-            padding: 18px 22px; margin-top: 20px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .total-label {
-            font-size: 11px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 1.5px;
-            color: rgba(255,255,255,0.55); margin-bottom: 4px;
-        }
-        .total-refs { font-size: 12px; color: rgba(255,255,255,0.35); }
-        .total-monto {
-            font-family: 'Darker Grotesque', sans-serif;
-            font-size: 36px; font-weight: 900; color: var(--primary); line-height: 1;
-        }
-        .total-cop { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 2px; text-align: right; }
+        .item-info   { flex: 1; min-width: 0; }
+        .item-nombre { font-size: 14px; font-weight: 600; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .item-qty    { font-size: 12px; color: var(--muted); margin-top: 3px; }
+        .item-precio { font-family: 'Darker Grotesque', sans-serif; font-size: 17px; font-weight: 800; color: var(--navy); flex-shrink: 0; }
+        .total-blk   { background: var(--navy); border-radius: 12px; padding: 18px 22px; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .total-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.55); margin-bottom: 4px; }
+        .total-refs  { font-size: 12px; color: rgba(255,255,255,0.35); }
+        .total-monto { font-family: 'Darker Grotesque', sans-serif; font-size: 36px; font-weight: 900; color: var(--primary); line-height: 1; }
+        .total-cop   { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 2px; text-align: right; }
 
-        /* ── BOTÓN COMPRAR ── */
-        .btn-comprar {
-            width: 100%; padding: 15px;
-            background: var(--primary); color: white;
-            border: none; border-radius: 12px;
-            font-family: inherit; font-size: 16px; font-weight: 700;
-            cursor: pointer; margin-top: 22px;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            transition: background 0.2s, transform 0.15s;
+        /* OJO RESUMEN */
+        .ojo-blk {
+            margin-top: 18px;
+            border-top: 1px solid var(--border);
+            padding-top: 16px;
+            display: none;
         }
+        .ojo-titulo {
+            font-family: 'Darker Grotesque', sans-serif;
+            font-size: 13px; font-weight: 800;
+            color: var(--muted); text-transform: uppercase;
+            letter-spacing: 1px; margin-bottom: 10px;
+        }
+        .ojo-fila {
+            display: flex; justify-content: space-between;
+            align-items: baseline; gap: 8px;
+            font-size: 13px; padding: 5px 0;
+            border-bottom: 1px dashed var(--border);
+        }
+        .ojo-fila:last-child { border-bottom: none; }
+        .ojo-label { color: var(--muted); font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+        .ojo-valor { color: var(--dark); font-weight: 700; text-align: right; word-break: break-word; }
+
+        /* BOTÓN COMPRAR */
+        .btn-comprar { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 22px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background .2s, transform .15s; }
         .btn-comprar:hover  { background: var(--primary-dark); transform: translateY(-1px); }
         .btn-comprar:active { transform: translateY(0); }
-        .seguridad {
-            display: flex; align-items: center; justify-content: center;
-            gap: 6px; margin-top: 10px;
-            font-size: 12px; color: var(--muted);
-        }
     </style>
 </head>
 <body>
 
 <nav class="navbar">
-
     <div class="navbar-inner">
-
         <a href="{% url 'tienda' %}" class="logo">
-
-            <div class="logo-sq">
-                <span>M</span>
-            </div>
-
+            <div class="logo-sq"><span>M</span></div>
             <div class="logo-text">
                 <span class="logo-oa">OA</span>
                 <span class="logo-shop">Shop</span>
             </div>
-
         </a>
-
-        <a href="{% url 'carrito_ver' %}" class="nav-back">
-            ← Volver al carrito
-        </a>
-
+        <a href="{% url 'carrito_ver' %}" class="nav-back">← Volver al carrito</a>
     </div>
-
 </nav>
 
 <div class="page">
 
     <!-- FORMULARIO -->
-
     <div>
 
         {% if errores %}
             {% for e in errores %}
-                <div class="alert alert-error">
-                    ⚠️ {{ e }}
-                </div>
+                <div class="alert alert-error">⚠️ {{ e }}</div>
             {% endfor %}
         {% endif %}
 
-        <form method="POST" action="{% url 'checkout_procesar' %}">
+        <!-- BLOQUE DIRECCIÓN GUARDADA (solo si ya compró antes) -->
+        {% if ultimo_envio %}
+        <div id="bloque-direccion-guardada" class="saved-card">
+            <div>
+                <div class="saved-badge">📍 Dirección guardada</div>
+                <div class="saved-dir">{{ ultimo_envio.direccion_envio }}</div>
+                <div class="saved-sub">
+                    {% if ultimo_envio.barrio_envio %}Barrio {{ ultimo_envio.barrio_envio }}, {% endif %}
+                    {{ ultimo_envio.ciudad_envio }}, {{ ultimo_envio.departamento_envio }}<br>
+                    📞 {{ ultimo_envio.telefono_llegada }}
+                </div>
+                <!-- Datos guardados como hidden -->
+                <input type="hidden" id="saved_direccion"      value="{{ ultimo_envio.direccion_envio }}">
+                <input type="hidden" id="saved_barrio"         value="{{ ultimo_envio.barrio_envio|default:'' }}">
+                <input type="hidden" id="saved_ciudad"         value="{{ ultimo_envio.ciudad_envio }}">
+                <input type="hidden" id="saved_departamento"   value="{{ ultimo_envio.departamento_envio }}">
+                <input type="hidden" id="saved_telefono"       value="{{ ultimo_envio.telefono_llegada }}">
+                <input type="hidden" id="saved_num_documento"  value="{{ ultimo_envio.num_documento|default:'' }}">
+            </div>
+            <div class="saved-btns">
+                <button type="button" class="btn-usar"   onclick="usarDireccionGuardada()">✅ Usar esta</button>
+                <button type="button" class="btn-editar" onclick="editarDireccion()">✏️ Editar</button>
+            </div>
+        </div>
+        {% endif %}
 
+        <form method="POST" action="{% url 'checkout_procesar' %}">
             {% csrf_token %}
 
-            <!-- ENVÍO -->
-
-            <div class="card">
-
-                <div class="card-title">
-                    📦 Datos de envío
-                </div>
-
+            <!-- CARD ENVÍO -->
+            <div class="card" id="form-direccion" {% if ultimo_envio %}style="display:none;"{% endif %}>
+                <div class="card-title">📦 Datos de envío</div>
                 <div class="card-body">
 
                     <div class="direccion-box">
-
-                        <label>
-                            Dirección <span class="req">*</span>
-                        </label>
-
+                        <label>Dirección <span class="req">*</span></label>
                         <div class="direccion-grid">
-
                             <select id="tipo_via">
                                 <option value="Calle">Sin Seleccionar</option>
                                 <option value="Calle">Calle</option>
@@ -371,16 +244,12 @@ body.dark-mode .resume-line   { color: #f0f0f0; }
                                 <option value="Transversal">Transversal</option>
                                 <option value="Avenida">Avenida</option>
                             </select>
-
-                            <input type="text" id="numero1" placeholder="123">
-
-                            <input type="text" id="letra1" placeholder="A">
-
+                            <input type="text" id="numero1"   placeholder="123">
+                            <input type="text" id="letra1"    placeholder="A">
                             <select id="bis">
                                 <option value=""></option>
                                 <option value="Bis">Bis</option>
                             </select>
-
                             <select id="cardinal1">
                                 <option value=""></option>
                                 <option value="Norte">Norte</option>
@@ -388,521 +257,377 @@ body.dark-mode .resume-line   { color: #f0f0f0; }
                                 <option value="Este">Este</option>
                                 <option value="Oeste">Oeste</option>
                             </select>
-
                             <span>#</span>
-
-                            <input type="text" id="numero2" placeholder="45">
-
-                            <input type="text" id="letra2" placeholder="B">
-
+                            <input type="text" id="numero2"  placeholder="45">
+                            <input type="text" id="letra2"   placeholder="B">
                             <span>-</span>
-
-                            <input type="text" id="numero3" placeholder="67">
-
+                            <input type="text" id="numero3"  placeholder="67">
                         </div>
-
-                        <input
-                            type="text"
-                            id="complemento"
-                            placeholder="Apartamento, torre, interior..."
-                        >
-
-                        <input
-                            type="text"
-                            id="direccion_preview"
-                            name="direccion"
-                            placeholder="Tu dirección aparecerá aquí..."
-                            readonly
-                            required
-                        >
-
+                        <input type="text" id="complemento" placeholder="Apartamento, torre, interior...">
+                        <input type="text" id="direccion_preview" name="direccion"
+                               placeholder="Tu dirección aparecerá aquí..." readonly>
                     </div>
 
-                    <div class="form-group">
-
-                        <label>
-                            Barrio 
-                        </label>
-
-                        <input
-                            type="text"
-                            name="barrio"
-                            value="{{ form.barrio|default:'' }}"
-                        required>
-
+                    <div class="form-group" style="margin-top:16px;">
+                        <label>Barrio</label>
+                        <input type="text" name="barrio" id="campo_barrio" value="{{ form.barrio|default:'' }}">
                     </div>
 
                     <div class="form-row">
-
                         <div class="form-group">
-
-                            <label>
-                                Departamento <span class="req">*</span>
-                            </label>
-
-                            <select name="departamento"
-                                    id="sel-departamento"
-                                    required>
-
-                                <option value="">
-                                    Selecciona departamento
-                                </option>
-
+                            <label>Departamento <span class="req">*</span></label>
+                            <select name="departamento" id="sel-departamento">
+                                <option value="">Selecciona departamento</option>
                                 {% for depto in departamentos %}
-
-                                    <option value="{{ depto }}"
-                                    {% if form.departamento == depto %}
-                                        selected
-                                    {% endif %}>
-
-                                        {{ depto }}
-
-                                    </option>
-
+                                    <option value="{{ depto }}" {% if form.departamento == depto %}selected{% endif %}>{{ depto }}</option>
                                 {% endfor %}
-
                             </select>
-
                         </div>
-
                         <div class="form-group">
-
-                            <label>
-                                Ciudad <span class="req">*</span>
-                            </label>
-
-                            <select name="ciudad"
-                                    id="sel-ciudad"
-                                    required
-                                    disabled>
-
-                                <option value="">
-                                    Primero elige departamento
-                                </option>
-
+                            <label>Ciudad <span class="req">*</span></label>
+                            <select name="ciudad" id="sel-ciudad" disabled>
+                                <option value="">Primero elige departamento</option>
                             </select>
-
                         </div>
-
                     </div>
 
                     <div class="form-group">
-
-                        <div class="form-group">
-                            <label>
-                                Teléfono <span class="req">*</span>
-                            </label>
-
-                            <input
-                                type="tel"
-                                id="telefono"
-                                name="telefono"
-                                class="form-control"
-                                maxlength="10"
-                                minlength="10"
-                                pattern="[0-9]{10}"
-                                inputmode="numeric"
-                                required>
-
-                            <small id="errorTelefono"
-                                style="color:red;display:none;">
-                                El teléfono debe contener exactamente 10 números.
-                            </small>
-                        </div>
-
-                    
+                        <label>Teléfono <span class="req">*</span></label>
+                        <input type="tel" id="telefono" name="telefono"
+                               maxlength="10" minlength="10" pattern="[0-9]{10}" inputmode="numeric">
+                        <small id="errorTelefono" style="color:red;display:none;">
+                            El teléfono debe contener exactamente 10 números.
+                        </small>
                     </div>
 
                 </div>
-
             </div>
 
             <!-- RECEPTOR -->
-
             <div class="card">
-
-                <div class="card-title">
-                    🪪 Datos del receptor
-                </div>
-
+                <div class="card-title">🪪 Datos del receptor</div>
                 <div class="card-body">
-
                     <div class="form-group">
-
-                        <label>
-                            Número de documento
-                            <span class="req">*</span>
-                        </label>
-
-                        <input
-                            type="number"
-                            name="num_documento"
-                            required
-                            value="{{ form.num_documento|default:'' }}"
-                        >
-
+                        <label>Número de documento <span class="req">*</span></label>
+                        <input type="number" name="num_documento" id="num_documento" required value="{{ form.num_documento|default:'' }}">
                     </div>
-
                 </div>
-
             </div>
 
-            <button type="submit" class="btn-comprar">
-                💳 Confirmar compra
-            </button>
+            <button type="submit" class="btn-comprar">💳 Confirmar compra</button>
 
         </form>
-
     </div>
 
     <!-- RESUMEN -->
-
     <div>
-
         <div class="card resumen-sticky">
-
-            <div class="card-title">
-                🛒 Resumen del pedido
-            </div>
-
+            <div class="card-title">🛒 Resumen del pedido</div>
             <div class="card-body">
 
                 {% for item in items %}
-
                 <div class="resumen-item">
-
                     <div class="item-foto">
-
-                        {% if item.foto %}
-                            <img src="/imagenes/{{ item.foto }}">
-                        {% else %}
-                            📦
-                        {% endif %}
-
+                        {% if item.foto %}<img src="/imagenes/{{ item.foto }}">{% else %}📦{% endif %}
                     </div>
-
                     <div class="item-info">
-
-                        <div class="item-nombre">
-                            {{ item.nombre }}
-                        </div>
-
-                        <div class="item-qty">
-                            Cantidad: {{ item.cantidad }}
-                        </div>
-
+                        <div class="item-nombre">{{ item.nombre }}</div>
+                        <div class="item-qty">Cantidad: {{ item.cantidad }}</div>
                     </div>
-
-                    <div class="item-precio">
-                        ${{ item.subtotal|floatformat:0|intcomma }}
-                    </div>
-
+                    <div class="item-precio">${{ item.subtotal|floatformat:0|intcomma }}</div>
                 </div>
-
                 {% endfor %}
 
-                <!-- SUBTOTAL -->
-
-                <div class="resume-line">
-
+                <div class="resume-line" style="display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid var(--border);margin-top:8px;">
                     <span>Subtotal</span>
-
-                    <strong>
-                        ${{ total|floatformat:0|intcomma }}
-                    </strong>
-
+                    <strong>${{ total|floatformat:0|intcomma }}</strong>
                 </div>
-
-                <!-- ENVÍO -->
-
-                <div class="resume-line">
-
+                <div class="resume-line" style="display:flex;justify-content:space-between;padding:6px 0;">
                     <span>Envío</span>
-
-                    <strong id="valor-envio" class="shipping-price">
-                        $0
-                    </strong>
-
+                    <strong id="valor-envio">$0</strong>
                 </div>
-
-                <!-- TOTAL -->
 
                 <div class="total-blk">
-
                     <div>
-
-                        <div class="total-label">
-                            Total final
-                        </div>
-
-                        <div class="total-refs">
-                            {{ items|length }} producto{% if items|length != 1 %}s{% endif %}
-                        </div>
-
+                        <div class="total-label">Total final</div>
+                        <div class="total-refs">{{ items|length }} producto{% if items|length != 1 %}s{% endif %}</div>
                     </div>
-
                     <div style="text-align:right;">
-
-                        <div class="total-monto" id="total-final">
-
-                            ${{ total|floatformat:0|intcomma }}
-
-                        </div>
-
-                        <div class="total-cop">
-                            Pesos colombianos
-                        </div>
-
+                        <div class="total-monto" id="total-final">${{ total|floatformat:0|intcomma }}</div>
+                        <div class="total-cop">Pesos colombianos</div>
                     </div>
+                </div>
 
+                <!-- OJO RESUMEN -->
+                <div class="ojo-blk" id="ojo-resumen">
+                    <div class="ojo-titulo">👁️ Datos del envío</div>
+                    <div id="ojo-contenido"></div>
                 </div>
 
             </div>
-
         </div>
-
     </div>
 
 </div>
 
 <script>
-
 const ciudadesPorDepto = {{ ciudades_por_departamento|safe }};
 
 const costosEnvio = {
-
-    'Antioquia':18000,
-    'Atlántico':22000,
-    'Bogotá D.C.':8000,
-    'Bolívar':23000,
-    'Boyacá':16000,
-    'Caldas':17000,
-    'Cauca':22000,
-    'Cesar':24000,
-    'Córdoba':23000,
-    'Cundinamarca':12000,
-    'Huila':18000,
-    'La Guajira':26000,
-    'Magdalena':23000,
-    'Meta':17000,
-    'Nariño':25000,
-    'Norte de Santander':24000,
-    'Quindío':17000,
-    'Risaralda':17000,
-    'Santander':20000,
-    'Sucre':23000,
-    'Tolima':17000,
-    'Valle del Cauca':20000,
-    'Putumayo':28000,
-    'Caquetá': 25000
-
+    'Antioquia':18000,'Atlántico':22000,'Bogotá D.C.':8000,
+    'Bolívar':23000,'Boyacá':16000,'Caldas':17000,'Cauca':22000,
+    'Cesar':24000,'Córdoba':23000,'Cundinamarca':12000,'Huila':18000,
+    'La Guajira':26000,'Magdalena':23000,'Meta':17000,'Nariño':25000,
+    'Norte de Santander':24000,'Quindío':17000,'Risaralda':17000,
+    'Santander':20000,'Sucre':23000,'Tolima':17000,'Valle del Cauca':20000,
+    'Putumayo':28000,'Caquetá':25000
 };
 
-const subtotal = parseInt("{{ total|floatformat:'0'|cut:'.'|cut:',' }}");
-
-const selDepto = document.getElementById('sel-departamento');
-const selCiudad = document.getElementById('sel-ciudad');
-
+const subtotal     = Number("{{ total|floatformat:0|cut:','|cut:'.' }}");
+const selDepto     = document.getElementById('sel-departamento');
+const selCiudad    = document.getElementById('sel-ciudad');
 const ciudadPrevia = "{{ form.ciudad|default:'' }}";
 
-/* CIUDADES */
-
-function cargarCiudades(depto){
-
+/* ── CIUDADES ── */
+function cargarCiudades(depto) {
     selCiudad.innerHTML = '';
-
-    if(!depto){
-
+    if (!depto) {
         selCiudad.disabled = true;
-
-        selCiudad.innerHTML =
-            '<option value="">Primero elige departamento</option>';
-
+        selCiudad.innerHTML = '<option value="">Primero elige departamento</option>';
         return;
     }
-
     const ciudades = ciudadesPorDepto[depto] || [];
-
     selCiudad.disabled = false;
-
-    const placeholder = document.createElement('option');
-
-    placeholder.value = '';
-    placeholder.textContent = 'Selecciona ciudad';
-
-    selCiudad.appendChild(placeholder);
-
-    ciudades.forEach(function(c){
-
+    const ph = document.createElement('option');
+    ph.value = ''; ph.textContent = 'Selecciona ciudad';
+    selCiudad.appendChild(ph);
+    ciudades.forEach(c => {
         const opt = document.createElement('option');
-
-        opt.value = c;
-        opt.textContent = c;
-
-        if(c === ciudadPrevia){
-            opt.selected = true;
-        }
-
+        opt.value = c; opt.textContent = c;
+        if (c === ciudadPrevia) opt.selected = true;
         selCiudad.appendChild(opt);
-
     });
 }
 
-/* ENVÍO */
-
-function actualizarEnvio(departamento){
-
+/* ── COSTO ENVÍO ── */
+function actualizarEnvio(departamento) {
     const envio = costosEnvio[departamento] || 20000;
-
-    document.getElementById('valor-envio').textContent =
-        '$' + envio.toLocaleString('es-CO');
-
-    const totalFinal = subtotal + envio;
-
-    document.getElementById('total-final').textContent =
-        '$' + totalFinal.toLocaleString('es-CO');
+    document.getElementById('valor-envio').textContent = '$' + envio.toLocaleString('es-CO');
+    document.getElementById('total-final').textContent = '$' + (subtotal + envio).toLocaleString('es-CO');
 }
 
-/* DIRECCIÓN */
-
-const campos = [
-    'tipo_via',
-    'numero1',
-    'letra1',
-    'bis',
-    'cardinal1',
-    'numero2',
-    'letra2',
-    'numero3',
-    'complemento'
-];
-
-campos.forEach(id => {
-
-    document.getElementById(id)
-        .addEventListener('input', actualizarDireccion);
-
-    document.getElementById(id)
-        .addEventListener('change', actualizarDireccion);
-
+/* ── DIRECCIÓN ── */
+const camposDireccion = ['tipo_via','numero1','letra1','bis','cardinal1','numero2','letra2','numero3','complemento'];
+camposDireccion.forEach(id => {
+    document.getElementById(id).addEventListener('input',  () => { actualizarDireccion(); actualizarOjo(); });
+    document.getElementById(id).addEventListener('change', () => { actualizarDireccion(); actualizarOjo(); });
 });
 
-function actualizarDireccion(){
-
-    const tipoVia   = document.getElementById('tipo_via').value;
-    const numero1   = document.getElementById('numero1').value.trim();
-    const letra1    = document.getElementById('letra1').value.trim();
-    const bis       = document.getElementById('bis').value.trim();
-    const cardinal1 = document.getElementById('cardinal1').value.trim();
-    const numero2   = document.getElementById('numero2').value.trim();
-    const letra2    = document.getElementById('letra2').value.trim();
-    const numero3   = document.getElementById('numero3').value.trim();
+function actualizarDireccion() {
+    const tipoVia     = document.getElementById('tipo_via').value;
+    const numero1     = document.getElementById('numero1').value.trim();
+    const letra1      = document.getElementById('letra1').value.trim();
+    const bis         = document.getElementById('bis').value.trim();
+    const cardinal1   = document.getElementById('cardinal1').value.trim();
+    const numero2     = document.getElementById('numero2').value.trim();
+    const letra2      = document.getElementById('letra2').value.trim();
+    const numero3     = document.getElementById('numero3').value.trim();
     const complemento = document.getElementById('complemento').value.trim();
+    const preview     = document.getElementById('direccion_preview');
 
-    const preview = document.getElementById('direccion_preview');
-
-    /* SI TODO ESTÁ VACÍO */
-
-    if(
-        !numero1 &&
-        !letra1 &&
-        !bis &&
-        !cardinal1 &&
-        !numero2 &&
-        !letra2 &&
-        !numero3 &&
-        !complemento
-    ){
-        preview.value = '';
-        return;
+    if (!numero1 && !letra1 && !bis && !cardinal1 && !numero2 && !letra2 && !numero3 && !complemento) {
+        preview.value = ''; return;
     }
-
-    let direccion = `${tipoVia}`;
-
-    if(numero1){
-        direccion += ` ${numero1}`;
-    }
-
-    if(letra1){
-        direccion += `${letra1.toUpperCase()}`;
-    }
-
-    if(bis){
-    
-        direccion += ` ${bis}`;
-    }
-
-    if(cardinal1){
-        direccion += ` ${cardinal1}`;
-    }
-
-    if(numero2){
-        direccion += ` # ${numero2}`;
-    }
-
-    if(letra2){
-        direccion += `${letra2.toUpperCase()}`;
-    }
-
-    if(numero3){
-        direccion += ` - ${numero3}`;
-    }
-
-    if(complemento){
-        direccion += ` ${complemento}`;
-    }
-
-    preview.value = direccion;
+    let dir = tipoVia;
+    if (numero1)     dir += ` ${numero1}`;
+    if (letra1)      dir += letra1.toUpperCase();
+    if (bis)         dir += ` ${bis}`;
+    if (cardinal1)   dir += ` ${cardinal1}`;
+    if (numero2)     dir += ` # ${numero2}`;
+    if (letra2)      dir += letra2.toUpperCase();
+    if (numero3)     dir += ` - ${numero3}`;
+    if (complemento) dir += ` ${complemento}`;
+    preview.value = dir;
 }
-/* EVENTOS */
 
-selDepto.addEventListener('change', function(){
+/* ── OJO RESUMEN ── */
+function actualizarOjo() {
+    const dir    = document.getElementById('direccion_preview').value.trim();
+    const barrio = document.getElementById('campo_barrio').value.trim();
+    const depto  = selDepto.value;
+    const ciudad = selCiudad.value;
+    const tel    = document.getElementById('telefono').value.trim();
+    const doc    = document.getElementById('num_documento').value.trim();
 
+    const hayDatos = dir || depto || ciudad || tel || doc;
+    const ojoBlk   = document.getElementById('ojo-resumen');
+    ojoBlk.style.display = hayDatos ? 'block' : 'none';
+
+    const filas = [
+        { label: '📦 Dirección', valor: dir || '—' },
+        { label: '🏘️ Barrio',    valor: barrio || '—' },
+        { label: '🏙️ Ciudad',    valor: ciudad && depto ? `${ciudad}, ${depto}` : (ciudad || depto || '—') },
+        { label: '📞 Teléfono',  valor: tel || '—' },
+        { label: '🪪 Documento', valor: doc || '—' },
+    ];
+
+    document.getElementById('ojo-contenido').innerHTML = filas.map(f => `
+        <div class="ojo-fila">
+            <span class="ojo-label">${f.label}</span>
+            <span class="ojo-valor">${f.valor}</span>
+        </div>
+    `).join('');
+}
+
+/* ── EVENTOS ── */
+selDepto.addEventListener('change', function () {
     cargarCiudades(this.value);
-
     actualizarEnvio(this.value);
-
+    actualizarOjo();
 });
+selCiudad.addEventListener('change', actualizarOjo);
 
-/* INIT */
+document.getElementById('campo_barrio').addEventListener('input',   actualizarOjo);
+document.getElementById('telefono').addEventListener('input',        actualizarOjo);
+document.getElementById('num_documento').addEventListener('input',   actualizarOjo);
 
-if(selDepto.value){
-
+/* ── INIT ── */
+if (selDepto.value) {
     cargarCiudades(selDepto.value);
-
     actualizarEnvio(selDepto.value);
 }
-
 actualizarDireccion();
+actualizarOjo();
 
-(function() {
-    if (localStorage.getItem('moa_tema') === 'dark') {
-        document.body.classList.add('dark-mode');
-    }
+/* ── DARK MODE ── */
+(function () {
+    if (localStorage.getItem('moa_tema') === 'dark') document.body.classList.add('dark-mode');
 })();
 
-const telefono = document.getElementById('telefono');
+/* ── TELÉFONO ── */
+const telefonoInput = document.getElementById('telefono');
 const errorTelefono = document.getElementById('errorTelefono');
+if (telefonoInput) {
+    telefonoInput.addEventListener('input', function () {
+        this.value = this.value.replace(/\D/g, '');
+        if (this.value.length > 10) this.value = this.value.slice(0, 10);
+        errorTelefono.style.display = (this.value.length > 0 && this.value.length !== 10) ? 'block' : 'none';
+    });
+}
 
-telefono.addEventListener('input', function() {
+/* ── HELPERS ── */
+function rellenarCamposGuardados(dir, barrio, depto, ciudad, tel, doc) {
+    // Dirección preview
+    document.getElementById('direccion_preview').value = dir;
+    document.getElementById('campo_barrio').value      = barrio;
+    document.getElementById('telefono').value          = tel;
+    document.getElementById('num_documento').value     = doc;
 
-    // Elimina cualquier cosa que no sea número
-    this.value = this.value.replace(/\D/g, '');
+    // Departamento → ciudades → ciudad
+    selDepto.value = depto;
+    cargarCiudades(depto);
+    actualizarEnvio(depto);
+    setTimeout(() => {
+        selCiudad.value = ciudad;
+        actualizarOjo();
+    }, 80);
 
-    // Máximo 10 dígitos
-    if (this.value.length > 10) {
-        this.value = this.value.slice(0, 10);
+    // Parsear dirección en los campos individuales
+    parsearDireccion(dir);
+}
+
+function parsearDireccion(dir) {
+    const tiposVia = ['Calle','Carrera','Diagonal','Transversal','Avenida'];
+    let resto = dir.trim();
+
+    // 1. Tipo de vía
+    let tipoEncontrado = 'Calle';
+    for (const t of tiposVia) {
+        if (resto.startsWith(t)) { tipoEncontrado = t; resto = resto.slice(t.length).trim(); break; }
+    }
+    document.getElementById('tipo_via').value = tipoEncontrado;
+
+    // 2. Dividir por #
+    const partes      = resto.split('#');
+    const antesHash   = (partes[0] || '').trim();
+    const despuesHash = (partes[1] || '').trim();
+
+    // 3. Antes del #: numero1, letra1, bis, cardinal1
+    const mAntes = antesHash.match(/^(\d+)([A-Za-z]?)(?:\s*(Bis))?\s*(Norte|Sur|Este|Oeste)?/i);
+    if (mAntes) {
+        document.getElementById('numero1').value   = mAntes[1] || '';
+        document.getElementById('letra1').value    = mAntes[2] || '';
+        document.getElementById('bis').value       = mAntes[3] ? 'Bis' : '';
+        document.getElementById('cardinal1').value = mAntes[4]
+            ? mAntes[4].charAt(0).toUpperCase() + mAntes[4].slice(1).toLowerCase() : '';
     }
 
-    // Mostrar error si no tiene exactamente 10
-    if (this.value.length > 0 && this.value.length !== 10) {
-        errorTelefono.style.display = 'block';
+    // 4. Después del #: numero2, letra2, numero3, complemento
+    const subpartes    = despuesHash.split(/\s*-\s*/);
+    const antesGuion   = (subpartes[0] || '').trim();
+    const despuesGuion = (subpartes.slice(1).join('-') || '').trim();
+
+    const mNum2 = antesGuion.match(/^(\d+)([A-Za-z]?)/);
+    if (mNum2) {
+        document.getElementById('numero2').value = mNum2[1] || '';
+        document.getElementById('letra2').value  = mNum2[2] || '';
+    }
+
+    const mNum3 = despuesGuion.match(/^(\d+)\s*(.*)/);
+    if (mNum3) {
+        document.getElementById('numero3').value     = mNum3[1] || '';
+        document.getElementById('complemento').value = mNum3[2] || '';
     } else {
-        errorTelefono.style.display = 'none';
+        document.getElementById('complemento').value = despuesGuion;
     }
-});
+}
 
+/* ── USAR DIRECCIÓN GUARDADA ── */
+function usarDireccionGuardada() {
+    const dir   = document.getElementById('saved_direccion').value;
+    const barrio= document.getElementById('saved_barrio').value;
+    const depto = document.getElementById('saved_departamento').value;
+    const ciudad= document.getElementById('saved_ciudad').value;
+    const tel   = document.getElementById('saved_telefono').value;
+    const doc   = document.getElementById('saved_num_documento').value;
 
+    rellenarCamposGuardados(dir, barrio, depto, ciudad, tel, doc);
+
+    // Ocultar bloque guardado y form dirección
+    document.getElementById('bloque-direccion-guardada').style.display = 'none';
+    document.getElementById('form-direccion').style.display            = 'none';
+
+    // Aviso verde con opción de cambiar
+    const aviso = document.createElement('div');
+    aviso.className = 'alert alert-success';
+    aviso.innerHTML = '✅ Dirección guardada aplicada. <a href="#" onclick="location.reload();return false;" style="color:var(--primary);margin-left:8px;font-weight:700;">Cambiar</a>';
+    document.querySelector('form').insertBefore(aviso, document.querySelector('form').firstChild);
+}
+
+/* ── EDITAR DIRECCIÓN ── */
+function editarDireccion() {
+    const dir   = document.getElementById('saved_direccion').value;
+    const barrio= document.getElementById('saved_barrio').value;
+    const depto = document.getElementById('saved_departamento').value;
+    const ciudad= document.getElementById('saved_ciudad').value;
+    const tel   = document.getElementById('saved_telefono').value;
+    const doc   = document.getElementById('saved_num_documento').value;
+
+    // Mostrar formulario
+    document.getElementById('bloque-direccion-guardada').style.display = 'none';
+    document.getElementById('form-direccion').style.display            = 'block';
+
+    // Habilitar edición del preview
+    const preview = document.getElementById('direccion_preview');
+    preview.removeAttribute('readonly');
+    preview.style.background  = '';
+    preview.style.borderStyle = 'solid';
+    preview.style.cursor      = 'text';
+    preview.style.color       = 'var(--dark)';
+    preview.placeholder       = 'Edita tu dirección aquí...';
+
+    rellenarCamposGuardados(dir, barrio, depto, ciudad, tel, doc);
+}
 </script>
 
 </body>

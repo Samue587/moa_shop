@@ -282,4 +282,6 @@ urlpatterns = [
         views.exportar_categorias_pdf,
         name="exportar_categorias_pdf",
     ),
+    
+    path('comprobante/<int:venta_id>/pdf/', views.comprobante_pdf, name='comprobante_pdf'),
 ]
